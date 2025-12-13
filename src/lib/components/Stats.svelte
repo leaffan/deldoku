@@ -61,4 +61,21 @@
 			Noch keine Spiele gespielt. Starten Sie ein Spiel um Statistiken zu sammeln!
 		</div>
 	{/if}
+
+	<!-- Debug Info -->
+	<div class="border-t pt-4 mt-4 text-xs text-gray-500">
+		<details>
+			<summary class="cursor-pointer">Debug Info</summary>
+			<div class="mt-2 p-2 bg-gray-50 rounded font-mono text-xs">
+				<div>localStorage: {typeof window !== 'undefined' ? localStorage.getItem('del_doku_stats') : 'nicht verfügbar'}</div>
+				<div>gameHistory length: {$statsStore.gameHistory?.length || 0}</div>
+				<button 
+					onclick={() => statsStore.resetStats()}
+					class="mt-2 bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded"
+				>
+					Stats zurücksetzen
+				</button>
+			</div>
+		</details>
+	</div>
 </div>
