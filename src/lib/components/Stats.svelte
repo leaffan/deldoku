@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gameStore, statsStore, winRate, bestTimeFormatted, averageTimeFormatted } from '$lib/stores';
+	import { statsStore, winRate } from '$lib/stores';
 
 	interface Props {
 		showStats?: boolean;
@@ -11,7 +11,7 @@
 <div class="bg-white rounded-lg shadow-lg p-6">
 	<h2 class="text-2xl font-bold mb-4">Statistiken</h2>
 
-	<div class="grid grid-cols-2 gap-4 md:grid-cols-3">
+	<div class="grid grid-cols-2 gap-4 md:grid-cols-3 mb-6">
 		<div class="bg-blue-50 p-4 rounded-lg">
 			<div class="text-3xl font-bold text-blue-600">{$statsStore.totalGames}</div>
 			<div class="text-sm text-gray-600">Spiele gesamt</div>
@@ -27,19 +27,38 @@
 			<div class="text-sm text-gray-600">Spiele gewonnen</div>
 		</div>
 
-		<div class="bg-orange-50 p-4 rounded-lg">
-			<div class="text-2xl font-bold text-orange-600">{$bestTimeFormatted}</div>
-			<div class="text-sm text-gray-600">Beste Zeit</div>
-		</div>
-
-		<div class="bg-pink-50 p-4 rounded-lg">
-			<div class="text-2xl font-bold text-pink-600">{$averageTimeFormatted}</div>
-			<div class="text-sm text-gray-600">Ø Zeit</div>
-		</div>
-
 		<div class="bg-red-50 p-4 rounded-lg">
 			<div class="text-3xl font-bold text-red-600">{$statsStore.currentStreak}</div>
 			<div class="text-sm text-gray-600">Aktuelle Serie</div>
 		</div>
 	</div>
+
+	{#if $statsStore.gameHistory && $statsStore.gameHistory.length > 0}
+		<div class="border-t pt-6">
+			<h3 class="text-lg font-bold mb-4">Spielhistorie</h3>
+			<div class="space-y-4 max-h-96 overflow-y-auto">
+				{#each $statsStore.gameHistory as game}
+					<div class="border rounded-lg p-4 {game.won ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}">
+						<div class="flex justify-between items-start mb-2">
+							<div class="font-semibold text-sm">{game.date}</div>
+							<div class="text-sm font-bold {game.won ? 'text-green-600' : 'text-red-600'}">
+								{game.won ? '✓ Gewonnen' : '✗ Verloren'}
+							</div>
+						</div>
+						<div class="text-xs text-gray-600 space-y-1">
+							{#each Object.entries(game.playerSelections) as [cellKey, playerId]}
+								<div class="ml-2">
+									<span class="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-xs">{cellKey}</span>: {playerId}
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/each}
+			</div>
+		</div>
+	{:else}
+		<div class="border-t pt-6 text-center text-gray-500 text-sm">
+			Noch keine Spiele gespielt. Starten Sie ein Spiel um Statistiken zu sammeln!
+		</div>
+	{/if}
 </div>

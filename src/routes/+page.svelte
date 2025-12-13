@@ -26,38 +26,15 @@
 				<p class="text-gray-600">Laden...</p>
 			</div>
 		{:else if challenge}
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-				<div class="md:col-span-2">
-					<GameBoard
-						rowCategories={challenge.rowCategories}
-						colCategories={challenge.colCategories}
-						grid={challenge.grid}
-						{challenge}
-					/>
-				</div>
+			<div class="space-y-6">
+				<GameBoard
+					rowCategories={challenge.rowCategories}
+					colCategories={challenge.colCategories}
+					grid={challenge.grid}
+					{challenge}
+				/>
 
-			<div class="md:col-span-1">
-				<button
-					onclick={() => (showStats = !showStats)}
-					class="w-full mb-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-				>
-					{showStats ? 'Spiel anzeigen' : 'Statistiken'}
-				</button>
-
-				{#if showStats}
-					<Stats {showStats} />
-				{:else}
-					<div class="bg-white rounded-lg shadow-lg p-6">
-						<h3 class="text-xl font-bold mb-4">Über DEL-Doku</h3>
-						<p class="text-gray-700 mb-3">
-							Kombiniere Team und Position, um die richtigen Spieler zu finden!
-						</p>
-						<p class="text-gray-600 text-sm">
-							Tägliches Rätsel • Lokal speichern • Statistiken verfolgen
-						</p>
-					</div>
-				{/if}
-			</div>
+				<Stats {showStats} />
 			</div>
 		{/if}
 	</div>

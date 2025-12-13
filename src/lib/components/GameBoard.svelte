@@ -85,13 +85,16 @@
 
 	function submitSolution() {
 		let correctCount = 0;
-		const startTime = Date.now();
+		const playerSelections: Record<string, string> = {};
 
 		// Überprüfe alle 9 Zellen
 		for (let row = 0; row < 3; row++) {
 			for (let col = 0; col < 3; col++) {
 				const cellKey = getCellKey(row, col);
 				const player = gameGrid[row][col];
+
+				// Speichere Spielerauswahl (oder 'empty' wenn leer)
+				playerSelections[cellKey] = player ? player.id : 'empty';
 
 				if (player) {
 					// Zelle ist gefüllt - prüfe ob korrekt
@@ -116,13 +119,12 @@
 		}
 
 		// Gebe Feedback
-		const totalTime = Date.now() - startTime;
 		if (correctCount === 9) {
 			feedback = '🎉 Glückwunsch! Rätsel gelöst!';
-			statsStore.addGame(true, totalTime);
+			statsStore.addGame(true, playerSelections);
 		} else {
 			feedback = `⏁ ${correctCount}/9 Zellen korrekt. Versuchen Sie es erneut!`;
-			statsStore.addGame(false, totalTime);
+			statsStore.addGame(false, playerSelections);
 		}
 
 		setTimeout(() => {
@@ -131,27 +133,27 @@
 	}
 </script>
 
-<div class="w-full max-w-2xl">
-	<div class="mb-6">
+<div class="w-full flex flex-col items-center">
+	<div class="mb-6 text-center">
 		<h1 class="text-3xl font-bold mb-4">DEL-Doku</h1>
 		<p class="text-gray-600">Finde die Spieler basierend auf Team- und Positionskombinationen!</p>
 	</div>
 
 	{#if feedback}
 		<div
-			class={`mb-6 p-4 rounded-lg font-semibold ${correctCells.length === 9 ? 'bg-green-100 text-green-800' : feedback.startsWith('✓') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+			class={`mb-6 p-4 rounded-lg font-semibold w-full max-w-2xl ${correctCells.length === 9 ? 'bg-green-100 text-green-800' : feedback.startsWith('✓') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
 		>
 			{feedback}
 		</div>
 	{/if}
 
-	<div class="mb-6 p-4 bg-blue-50 rounded-lg">
+	<div class="mb-6 p-4 bg-blue-50 rounded-lg w-full max-w-2xl">
 		<PlayerSearch bind:this={playerSearchComponent} onPlayerSelect={handlePlayerSelect} usedPlayerIds={usedPlayerIds} />
 		<div class="text-sm text-gray-600 mt-2">{correctCells.length}/9 Zellen korrekt gefüllt</div>
 	</div>
 
 	<!-- Game Grid -->
-	<div class="inline-block bg-white shadow-lg rounded-lg overflow-hidden">
+	<div class="inline-block bg-white shadow-lg rounded-lg overflow-hidden mb-6">
 		<!-- Header with column categories -->
 		<div class="flex">
 			<div class="w-28 h-28 bg-gray-200 flex items-center justify-center font-bold text-center text-xs p-2">
@@ -191,7 +193,7 @@
 	</div>
 
 	<!-- Submit Button -->
-	<div class="mt-6">
+	<div class="w-full max-w-2xl">
 		<button
 			onclick={submitSolution}
 			class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
