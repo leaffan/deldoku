@@ -26,10 +26,24 @@
 	let correctCells = $state<string[]>([]);
 	let incorrectCells = $state<string[]>([]);
 	let playerSearchComponent: any = $state(null);
+	let isAutoSubmitting = $state(false);
 
 	// Derived state: Liste der verwendeten Spieler-IDs
 	let usedPlayerIds = $derived.by(() => {
 		return gameGrid.flat().filter(p => p !== null).map(p => p!.id);
+	});
+
+	// Überprüfe ob alle Felder gefüllt sind und reiche automatisch ein
+	$effect(() => {
+		const filledCells = gameGrid.flat().filter(p => p !== null).length;
+		if (filledCells === 9 && !isAutoSubmitting) {
+			isAutoSubmitting = true;
+			// Kleine Verzögerung, damit die letzte Zelle visuell aktualisiert wird
+			setTimeout(() => {
+				submitSolution();
+				isAutoSubmitting = false;
+			}, 300);
+		}
 	});
 
 	function getCellKey(row: number, col: number): string {
@@ -141,7 +155,7 @@
 
 	{#if feedback}
 		<div
-			class={`mb-6 p-4 rounded-lg font-semibold w-full max-w-2xl ${correctCells.length === 9 ? 'bg-green-100 text-green-800' : feedback.startsWith('✓') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+			class={`mb-6 p-4 rounded-lg font-semibold w-full max-w-2xl text-center ${correctCells.length === 9 ? 'bg-green-100 text-green-800' : feedback.startsWith('✓') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
 		>
 			{feedback}
 		</div>
@@ -192,8 +206,17 @@
 		{/each}
 	</div>
 
+	<!-- Feedback Message -->
+	{#if feedback}
+		<div
+			class={`mt-6 p-4 rounded-lg font-semibold w-full max-w-2xl text-center ${correctCells.length === 9 ? 'bg-green-100 text-green-800' : feedback.startsWith('✓') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+		>
+			{feedback}
+		</div>
+	{/if}
+
 	<!-- Action Buttons -->
-	<div class="w-full max-w-2xl space-y-3">
+	<div class="w-full max-w-2xl space-y-3 mt-6">
 		<button
 			onclick={submitSolution}
 			class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
