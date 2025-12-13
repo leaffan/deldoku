@@ -1,6 +1,27 @@
 <script lang="ts">
 	import type { DELPlayer } from '$lib/data';
 
+	function getCountryFlag(nationality: string): string {
+		const flags: Record<string, string> = {
+			'de': '🇩🇪',
+			'us': '🇺🇸',
+			'ca': '🇨🇦',
+			'se': '🇸🇪',
+			'fi': '🇫🇮',
+			'cz': '🇨🇿',
+			'sk': '🇸🇰',
+			'ch': '🇨🇭',
+			'at': '🇦🇹',
+			'dk': '🇩🇰',
+			'no': '🇳🇴',
+			'fr': '🇫🇷',
+			'lv': '🇱🇻',
+			'ru': '🇷🇺',
+			'si': '🇸🇮'
+		};
+		return flags[nationality] || '🏳️';
+	}
+
 	interface Props {
 		rowCategory: string;
 		colCategory: string;
@@ -22,7 +43,8 @@
 >
 	{#if player}
 		<div class="flex flex-col items-center justify-center gap-1">
-			<div class="font-bold text-sm leading-tight">{player.name}</div>
+			<div class="text-lg">{getCountryFlag(player.nationality)}</div>
+			<div class="font-bold text-xs leading-tight">{player.name}</div>
 			<div class="text-xs opacity-80">{player.first_season} – {player.last_season}</div>
 		</div>
 	{:else}
