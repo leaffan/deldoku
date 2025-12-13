@@ -1,0 +1,92 @@
+[
+	{
+		"id": "p1",
+		"name": "John Doe",
+		"number": 10,
+		"position": "C",
+		"team": "München",
+		"season": 2025,
+		"nationality": "DEU"
+	},
+	{
+		"id": "p2",
+		"name": "Max Mustermann",
+		"number": 7,
+		"position": "LW",
+		"team": "Berlin",
+		"season": 2025,
+		"nationality": "DEU"
+	},
+	{
+		"id": "p3",
+		"name": "Anna Schmidt",
+		"number": 15,
+		"position": "D",
+		"team": "München",
+		"season": 2025,
+		"nationality": "DEU"
+	},
+	{
+		"id": "p4",
+		"name": "Klaus Weber",
+		"number": 5,
+		"position": "D",
+		"team": "Berlin",
+		"season": 2025,
+		"nationality": "DEU"
+	},
+	{
+		"id": "p5",
+		"name": "Thomas Bauer",
+		"number": 22,
+		"position": "RW",
+		"team": "Cologne",
+		"season": 2025,
+		"nationality": "DEU"
+	},
+	{
+		"id": "p6",
+		"name": "Stefan König",
+		"number": 19,
+		"position": "C",
+		"team": "Berlin",
+		"season": 2025,
+		"nationality": "DEU"
+	},
+	{
+		"id": "p7",
+		"name": "Martin Hoffmann",
+		"number": 11,
+		"position": "LW",
+		"team": "München",
+		"season": 2025,
+		"nationality": "DEU"
+	},
+	{
+		"id": "p8",
+		"name": "Christian Uhle",
+		"number": 25,
+		"position": "C",
+		"team": "Cologne",
+		"season": 2025,
+		"nationality": "DEU"
+	},
+	{
+		"id": "p9",
+		"name": "Robert Müller",
+		"number": 8,
+		"position": "D",
+		"team": "Cologne",
+		"season": 2025,
+		"nationality": "DEU"
+	},
+	{
+		"id": "p10",
+		"name": "Alexander Fischer",
+		"number": 10,
+		"position": "D",
+		"team": "Cologne",
+		"season": 2025,
+		"nationality": "DEU"
+	}
+]
