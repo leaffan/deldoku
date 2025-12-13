@@ -5,9 +5,9 @@ export interface DELPlayer {
 	name: string;
 	number: number;
 	position: 'C' | 'LW' | 'RW' | 'D' | 'G';
-	team: string;
-	season: number;
 	nationality: string;
+    first_season: number;
+    last_season: number;
 }
 
 export interface DELDokuChallenge {
