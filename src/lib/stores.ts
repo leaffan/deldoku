@@ -72,7 +72,16 @@ function createGameStore() {
 
 function createStatsStore() {
 	const stored = typeof window !== 'undefined' ? localStorage.getItem('del_doku_stats') : null;
-	const initial = stored ? JSON.parse(stored) : defaultStats;
+	let initial = stored ? JSON.parse(stored) : defaultStats;
+	
+	// Migration: Add gameHistory if missing
+	if (stored && !initial.gameHistory) {
+		initial = {
+			...defaultStats,
+			...initial,
+			gameHistory: []
+		};
+	}
 
 	const { subscribe, set, update } = writable<PlayerStats>(initial);
 
