@@ -77,9 +77,8 @@
 					>
 						<div>
 							<div class="font-semibold">{player.name}</div>
-							<div class="text-sm text-gray-600">{player.team} • {player.position}</div>
+							<div class="text-sm text-gray-600">{player.first_season} – {player.last_season}</div>
 						</div>
-						<span class="text-gray-500">#{player.number}</span>
 					</button>
 				</li>
 			{/each}
