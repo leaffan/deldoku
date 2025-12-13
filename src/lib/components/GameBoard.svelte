@@ -192,13 +192,30 @@
 		{/each}
 	</div>
 
-	<!-- Submit Button -->
-	<div class="w-full max-w-2xl">
+	<!-- Action Buttons -->
+	<div class="w-full max-w-2xl space-y-3">
 		<button
 			onclick={submitSolution}
 			class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
 		>
 			Lösung einreichen
+		</button>
+		
+		<button
+			onclick={() => {
+				gameGrid = [
+					[null, null, null],
+					[null, null, null],
+					[null, null, null]
+				];
+				correctCells = [];
+				incorrectCells = [];
+				selectedCell = null;
+				feedback = '';
+			}}
+			class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+		>
+			Spiel neu starten
 		</button>
 	</div>
 </div>
