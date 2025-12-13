@@ -67,7 +67,7 @@ function createGameStore() {
 }
 
 function createStatsStore() {
-	const stored = typeof window !== 'undefined' ? localStorage.getItem('puckdoku_stats') : null;
+	const stored = typeof window !== 'undefined' ? localStorage.getItem('del_doku_stats') : null;
 	const initial = stored ? JSON.parse(stored) : defaultStats;
 
 	const { subscribe, set, update } = writable<PlayerStats>(initial);
@@ -87,7 +87,7 @@ function createStatsStore() {
 				};
 
 				if (typeof window !== 'undefined') {
-					localStorage.setItem('puckdoku_stats', JSON.stringify(newStats));
+					localStorage.setItem('del_doku_stats', JSON.stringify(newStats));
 				}
 
 				return newStats;
@@ -96,7 +96,7 @@ function createStatsStore() {
 		resetStats: () => {
 			set(defaultStats);
 			if (typeof window !== 'undefined') {
-				localStorage.removeItem('puckdoku_stats');
+				localStorage.removeItem('del_doku_stats');
 			}
 		}
 	};

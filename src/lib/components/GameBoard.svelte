@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { DELPlayer, PuckdokuChallenge } from '$lib/data';
+	import type { DELPlayer, DELDokuChallenge } from '$lib/data';
 	import { validatePlayerMatch, samplePlayers } from '$lib/data';
 	import GameCell from './GameCell.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
@@ -9,7 +9,7 @@
 		rowCategories: string[];
 		colCategories: string[];
 		grid: (DELPlayer | null)[][];
-		challenge: PuckdokuChallenge;
+		challenge: DELDokuChallenge;
 	}
 
 	let { rowCategories, colCategories, grid: initialGrid, challenge }: Props = $props();
@@ -92,7 +92,7 @@
 
 <div class="w-full max-w-2xl">
 	<div class="mb-6">
-		<h1 class="text-3xl font-bold mb-4">DEL Puckdoku</h1>
+		<h1 class="text-3xl font-bold mb-4">DEL-Doku</h1>
 		<p class="text-gray-600">Finde die Spieler basierend auf Team- und Positionskombinationen!</p>
 	</div>
 

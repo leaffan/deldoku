@@ -9,8 +9,8 @@
 </script>
 
 <svelte:head>
-	<title>DEL Puckdoku - Tägliches Rätsel</title>
-	<meta name="description" content="Tägliches DEL Puckdoku Rätsel" />
+	<title>DEL-Doku - Tägliches Rätsel</title>
+	<meta name="description" content="Tägliches DEL-Doku Rätsel" />
 </svelte:head>
 
 <main class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
@@ -37,7 +37,7 @@
 					<Stats {showStats} />
 				{:else}
 					<div class="bg-white rounded-lg shadow-lg p-6">
-						<h3 class="text-xl font-bold mb-4">Über DEL Puckdoku</h3>
+						<h3 class="text-xl font-bold mb-4">Über DEL-Doku</h3>
 						<p class="text-gray-700 mb-3">
 							Kombiniere Team und Position, um die richtigen Spieler zu finden!
 						</p>

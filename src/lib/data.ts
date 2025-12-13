@@ -10,7 +10,7 @@ export interface DELPlayer {
 	nationality: string;
 }
 
-export interface PuckdokuChallenge {
+export interface DELDokuChallenge {
 	date: string;
 	rowCategories: string[];
 	colCategories: string[];
@@ -18,13 +18,13 @@ export interface PuckdokuChallenge {
 	answers: string[][][];
 }
 
-export const samplePlayers: DELPlayer[] = playersData;
+export const samplePlayers: DELPlayer[] = playersData as DELPlayer[];
 
 export function getDailyChallengeDate(): string {
 	return new Date().toISOString().split('T')[0];
 }
 
-export function generateDailyChallenge(players: DELPlayer[]): PuckdokuChallenge {
+export function generateDailyChallenge(players: DELPlayer[]): DELDokuChallenge {
 	const date = getDailyChallengeDate();
 	
 	// Verwende alle Sample-Spieler wenn keine übergeben
