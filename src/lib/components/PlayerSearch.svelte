@@ -4,9 +4,10 @@
 
 	interface Props {
 		onPlayerSelect: (player: DELPlayer) => void;
+		usedPlayerIds?: string[];
 	}
 
-	let { onPlayerSelect }: Props = $props();
+	let { onPlayerSelect, usedPlayerIds = [] }: Props = $props();
 	let searchQuery = $state('');
 	let suggestions = $state<DELPlayer[]>([]);
 	let isOpen = $state(false);
@@ -70,10 +71,13 @@
 	{#if isOpen && suggestions.length > 0}
 		<ul class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-10">
 			{#each suggestions as player (player.id)}
+				{@const isUsed = usedPlayerIds.includes(player.id)}
 				<li>
 					<button
-						onclick={() => selectPlayer(player)}
-						class="w-full text-left px-3 py-2 hover:bg-gray-100 flex justify-between items-center"
+						onclick={() => !isUsed && selectPlayer(player)}
+						disabled={isUsed}
+						class={`w-full text-left px-3 py-2 flex justify-between items-center transition-colors
+							${isUsed ? 'opacity-50 cursor-not-allowed line-through text-gray-400' : 'hover:bg-gray-100 cursor-pointer'}`}
 					>
 						<div>
 							<div class="font-semibold">{player.name}</div>

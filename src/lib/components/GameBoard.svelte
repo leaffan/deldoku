@@ -27,6 +27,11 @@
 	let incorrectCells = $state<string[]>([]);
 	let playerSearchComponent: any = $state(null);
 
+	// Derived state: Liste der verwendeten Spieler-IDs
+	let usedPlayerIds = $derived.by(() => {
+		return gameGrid.flat().filter(p => p !== null).map(p => p!.id);
+	});
+
 	function getCellKey(row: number, col: number): string {
 		return `${row}-${col}`;
 	}
@@ -141,7 +146,7 @@
 	{/if}
 
 	<div class="mb-6 p-4 bg-blue-50 rounded-lg">
-		<PlayerSearch bind:this={playerSearchComponent} onPlayerSelect={handlePlayerSelect} />
+		<PlayerSearch bind:this={playerSearchComponent} onPlayerSelect={handlePlayerSelect} usedPlayerIds={usedPlayerIds} />
 		<div class="text-sm text-gray-600 mt-2">{correctCells.length}/9 Zellen korrekt gefüllt</div>
 	</div>
 
