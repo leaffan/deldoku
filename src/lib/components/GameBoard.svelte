@@ -25,6 +25,7 @@
 	let feedback = $state<string>('');
 	let correctCells = $state<string[]>([]);
 	let incorrectCells = $state<string[]>([]);
+	let playerSearchComponent: any = $state(null);
 
 	function getCellKey(row: number, col: number): string {
 		return `${row}-${col}`;
@@ -140,7 +141,7 @@
 	{/if}
 
 	<div class="mb-6 p-4 bg-blue-50 rounded-lg">
-		<PlayerSearch onPlayerSelect={handlePlayerSelect} />
+		<PlayerSearch bind:this={playerSearchComponent} onPlayerSelect={handlePlayerSelect} />
 		<div class="text-sm text-gray-600 mt-2">{correctCells.length}/9 Zellen korrekt gefüllt</div>
 	</div>
 
@@ -171,6 +172,7 @@
 							player={gameGrid[rowIdx][colIdx]}
 							onCellClick={() => {
 								selectedCell = [rowIdx, colIdx];
+								playerSearchComponent?.focusInput();
 								console.log('Cell clicked:', rowIdx, colIdx, 'selectedCell now:', selectedCell);
 							}}
 							isSelected={selectedCell?.[0] === rowIdx && selectedCell?.[1] === colIdx}

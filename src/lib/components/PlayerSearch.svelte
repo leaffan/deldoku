@@ -10,6 +10,12 @@
 	let searchQuery = $state('');
 	let suggestions = $state<DELPlayer[]>([]);
 	let isOpen = $state(false);
+	let inputElement: HTMLInputElement | null = $state(null);
+
+	// Exportiere eine Funktion zum Fokussieren des Input-Felds
+	export function focusInput() {
+		inputElement?.focus();
+	}
 
 	function handleInput(e: Event) {
 		const input = (e.target as HTMLInputElement).value;
@@ -29,12 +35,14 @@
 	}
 
 	function selectPlayer(player: DELPlayer) {
-		searchQuery = player.name;
+		searchQuery = '';
 		isOpen = false;
 		onPlayerSelect(player);
 	}
 
 	function handleFocus() {
+		searchQuery = '';
+		suggestions = [];
 		if (searchQuery.length > 0) {
 			isOpen = true;
 		}
@@ -49,6 +57,7 @@
 
 <div class="relative w-full">
 	<input
+		bind:this={inputElement}
 		type="text"
 		placeholder="Spieler suchen..."
 		value={searchQuery}
