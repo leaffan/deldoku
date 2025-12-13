@@ -24,36 +24,53 @@ export function getDailyChallengeDate(): string {
 	return new Date().toISOString().split('T')[0];
 }
 
-export function generateDailyChallenge(players: DELPlayer[]): DELDokuChallenge {
+export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELDokuChallenge> {
 	const date = getDailyChallengeDate();
 	
 	// Verwende alle Sample-Spieler wenn keine übergeben
 	const allPlayers = players.length > 0 ? players : samplePlayers;
 	
-	// Definiere die Kategorien für dieses Rätsel
-	const rowCategories = ['München', 'Berlin', 'Cologne'];
-	const colCategories = ['Center (C)', 'Stürmer (LW/RW)', 'Verteidigung (D)'];
+	// Lade die Challenge-Datei für den heutigen Tag
+	try {
+		const challengeModule = await import(`./challenges/${date}.json`);
+		const challengeData = challengeModule.default;
+		
+		// Erstelle ein leeres Grid für den Spieler (am Anfang leer)
+		const grid: (DELPlayer | null)[][] = Array(3)
+			.fill(null)
+			.map(() => Array(3).fill(null));
 
-	// Erstelle ein 3x3 Grid mit Spieler-IDs als Lösungen
-	// Jede Zelle kann mehrere gültige Spieler haben
-	const answers: string[][][] = [
-		[['p1'], ['p7'], ['p3']],     // München: John Doe (C), Martin Hoffmann (LW), Anna Schmidt (D)
-		[['p6'], ['p2'], ['p4']],     // Berlin: Stefan König (C), Max Mustermann (LW), Klaus Weber (D)
-		[['p8'], ['p5'], ['p9', 'p10']]    // Cologne: Christian Uhle (C), Thomas Bauer (RW), Robert Müller/Fischer (D)
-	];
+		return {
+			date,
+			rowCategories: challengeData.rowCategories,
+			colCategories: challengeData.colCategories,
+			grid,
+			answers: challengeData.answers
+		};
+	} catch (error) {
+		console.warn(`Challenge-Datei für ${date} nicht gefunden, verwende Standard-Kategorien`);
+		
+		// Fallback auf Standard-Kategorien
+		const rowCategories = ['München', 'Berlin', 'Cologne'];
+		const colCategories = ['Center (C)', 'Stürmer (LW/RW)', 'Verteidigung (D)'];
+		const answers: string[][][] = [
+			[['p1'], ['p7'], ['p3']],
+			[['p6'], ['p2'], ['p4']],
+			[['p8'], ['p5'], ['p9', 'p10']]
+		];
 
-	// Erstelle ein leeres Grid für den Spieler (am Anfang leer)
-	const grid: (DELPlayer | null)[][] = Array(3)
-		.fill(null)
-		.map(() => Array(3).fill(null));
+		const grid: (DELPlayer | null)[][] = Array(3)
+			.fill(null)
+			.map(() => Array(3).fill(null));
 
-	return {
-		date,
-		rowCategories,
-		colCategories,
-		grid,
-		answers
-	};
+		return {
+			date,
+			rowCategories,
+			colCategories,
+			grid,
+			answers
+		};
+	}
 }
 
 export function validatePlayerMatch(
