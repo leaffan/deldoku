@@ -153,14 +153,6 @@
 		<p class="text-gray-600">Finde die Spieler basierend auf Team- und Positionskombinationen!</p>
 	</div>
 
-	{#if feedback}
-		<div
-			class={`mb-6 p-4 rounded-lg font-semibold w-full max-w-2xl text-center ${correctCells.length === 9 ? 'bg-green-100 text-green-800' : feedback.startsWith('✓') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
-		>
-			{feedback}
-		</div>
-	{/if}
-
 	<div class="mb-6 p-4 bg-blue-50 rounded-lg w-full max-w-2xl">
 		<PlayerSearch bind:this={playerSearchComponent} onPlayerSelect={handlePlayerSelect} usedPlayerIds={usedPlayerIds} />
 		<div class="text-sm text-gray-600 mt-2">{correctCells.length}/9 Zellen korrekt gefüllt</div>
