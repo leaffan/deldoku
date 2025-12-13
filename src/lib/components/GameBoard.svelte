@@ -49,12 +49,9 @@
 			const [row, col] = selectedCell;
 			const isCorrect = validatePlayerMatch(
 				player,
-				rowCategories[row],
-				colCategories[col],
 				challenge.answers,
 				row,
-				col,
-				samplePlayers
+				col
 			);
 
 			console.log('Validating:', player.name, 'at', row, col, '- Correct:', isCorrect);
@@ -67,15 +64,6 @@
 				const cellKey = getCellKey(row, col);
 				addCorrectCell(cellKey);
 				feedback = `✓ Richtig! ${player.name}`;
-
-				// Überprüfe ob alle Zellen richtig gefüllt sind
-				if (correctCells.length === 9) {
-					feedback = '🎉 Glückwunsch! Rätsel gelöst!';
-					const endTime = Date.now();
-					const startTime = Date.now() - 60000;
-					const timeMs = endTime - startTime;
-					statsStore.addGame(true, timeMs);
-				}
 			} else {
 				feedback = `✗ Falsch! ${player.name} passt nicht hier.`;
 				const cellKey = getCellKey(row, col);
@@ -87,6 +75,53 @@
 				feedback = '';
 			}, 3000);
 		}
+	}
+
+	function submitSolution() {
+		let correctCount = 0;
+		const startTime = Date.now();
+
+		// Überprüfe alle 9 Zellen
+		for (let row = 0; row < 3; row++) {
+			for (let col = 0; col < 3; col++) {
+				const cellKey = getCellKey(row, col);
+				const player = gameGrid[row][col];
+
+				if (player) {
+					// Zelle ist gefüllt - prüfe ob korrekt
+					const isCorrect = validatePlayerMatch(
+						player,
+						challenge.answers,
+						row,
+						col
+					);
+
+					if (isCorrect) {
+						correctCount++;
+						addCorrectCell(cellKey);
+					} else {
+						addIncorrectCell(cellKey);
+					}
+				} else {
+					// Zelle ist leer - zählt als falsch
+					addIncorrectCell(cellKey);
+				}
+			}
+		}
+
+		// Gebe Feedback
+		const totalTime = Date.now() - startTime;
+		if (correctCount === 9) {
+			feedback = '🎉 Glückwunsch! Rätsel gelöst!';
+			statsStore.addGame(true, totalTime);
+		} else {
+			feedback = `⏁ ${correctCount}/9 Zellen korrekt. Versuchen Sie es erneut!`;
+			statsStore.addGame(false, totalTime);
+		}
+
+		setTimeout(() => {
+			feedback = '';
+		}, 4000);
 	}
 </script>
 
@@ -151,16 +186,7 @@
 	<!-- Submit Button -->
 	<div class="mt-6">
 		<button
-			onclick={() => {
-				if (correctCells.length === 9) {
-					gameStore.markSolved?.();
-				} else {
-					feedback = `Noch ${9 - correctCells.length} Zellen zu füllen!`;
-					setTimeout(() => {
-						feedback = '';
-					}, 2000);
-				}
-			}}
+			onclick={submitSolution}
 			class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
 		>
 			Lösung einreichen
