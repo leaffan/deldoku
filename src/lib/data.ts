@@ -75,12 +75,9 @@ export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELD
 
 export function validatePlayerMatch(
 	player: DELPlayer,
-	rowCategory: string,
-	colCategory: string,
 	answers: string[][][],
 	rowIdx: number,
-	colIdx: number,
-	allPlayers: DELPlayer[] = samplePlayers
+	colIdx: number
 ): boolean {
 	// Hole die gültigen Player-IDs für diese Zelle
 	const expectedPlayerIds = answers[rowIdx][colIdx];
@@ -90,16 +87,5 @@ export function validatePlayerMatch(
 		return false;
 	}
 
-	// Zusätzliche Validierung: Überprüfe ob der Spieler die Kategorien erfüllt
-	const matchesRowCategory = rowCategory === 'München' ? player.team === 'München' :
-	                           rowCategory === 'Berlin' ? player.team === 'Berlin' :
-	                           rowCategory === 'Cologne' ? player.team === 'Cologne' :
-	                           false;
-
-	const matchesColCategory = colCategory === 'Center (C)' ? player.position === 'C' :
-	                          colCategory === 'Stürmer (LW/RW)' ? (player.position === 'LW' || player.position === 'RW') :
-	                          colCategory === 'Verteidigung (D)' ? player.position === 'D' :
-	                          false;
-
-	return matchesRowCategory && matchesColCategory;
+    return true;
 }
