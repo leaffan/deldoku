@@ -9,13 +9,18 @@ export interface GameState {
 	solved: boolean;
 }
 
+export interface GameEntry {
+	date: string;
+	won: boolean;
+	playerSelections: Record<string, string>; // "0-0": "p1", "0-1": "p2", etc.
+}
+
 export interface PlayerStats {
 	totalGames: number;
 	gamesWon: number;
-	bestTime: number;
-	averageTime: number;
 	currentStreak: number;
 	lastPlayedDate: string;
+	gameHistory: GameEntry[];
 }
 
 const defaultGameState: GameState = {
@@ -32,10 +37,9 @@ const defaultGameState: GameState = {
 const defaultStats: PlayerStats = {
 	totalGames: 0,
 	gamesWon: 0,
-	bestTime: Infinity,
-	averageTime: 0,
 	currentStreak: 0,
-	lastPlayedDate: ''
+	lastPlayedDate: '',
+	gameHistory: []
 };
 
 function createGameStore() {
@@ -74,16 +78,22 @@ function createStatsStore() {
 
 	return {
 		subscribe,
-		addGame: (won: boolean, timeMs: number) => {
+		addGame: (won: boolean, playerSelections: Record<string, string>) => {
 			update((state) => {
+				const today = new Date().toISOString().split('T')[0];
+				const newEntry: GameEntry = {
+					date: today,
+					won,
+					playerSelections
+				};
+
 				const newStats = {
 					...state,
 					totalGames: state.totalGames + 1,
 					gamesWon: won ? state.gamesWon + 1 : state.gamesWon,
-					bestTime: Math.min(state.bestTime, timeMs),
-					averageTime: (state.averageTime * state.totalGames + timeMs) / (state.totalGames + 1),
 					currentStreak: won ? state.currentStreak + 1 : 0,
-					lastPlayedDate: new Date().toISOString().split('T')[0]
+					lastPlayedDate: today,
+					gameHistory: [...state.gameHistory, newEntry]
 				};
 
 				if (typeof window !== 'undefined') {
@@ -108,17 +118,3 @@ export const statsStore = createStatsStore();
 export const winRate = derived(statsStore, ($stats) =>
 	$stats.totalGames === 0 ? 0 : (($stats.gamesWon / $stats.totalGames) * 100).toFixed(1)
 );
-
-export const bestTimeFormatted = derived(statsStore, ($stats) =>
-	$stats.bestTime === Infinity ? '--:--' : formatTime($stats.bestTime)
-);
-
-export const averageTimeFormatted = derived(statsStore, ($stats) =>
-	$stats.totalGames === 0 ? '--:--' : formatTime($stats.averageTime)
-);
-
-function formatTime(ms: number): string {
-	const seconds = Math.floor((ms / 1000) % 60);
-	const minutes = Math.floor((ms / (1000 * 60)) % 60);
-	return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-}
