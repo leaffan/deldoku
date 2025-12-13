@@ -23,7 +23,7 @@
 	{#if player}
 		<div class="flex flex-col items-center justify-center gap-1">
 			<div class="font-bold text-sm leading-tight">{player.name}</div>
-			<div class="text-xs opacity-80">#{player.number}</div>
+			<div class="text-xs opacity-80">{player.first_season} – {player.last_season}</div>
 		</div>
 	{:else}
 		<div>?</div>
