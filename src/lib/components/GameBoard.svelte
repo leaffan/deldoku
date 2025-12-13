@@ -155,7 +155,6 @@
 
 	<div class="mb-6 p-4 bg-blue-50 rounded-lg w-full max-w-2xl">
 		<PlayerSearch bind:this={playerSearchComponent} onPlayerSelect={handlePlayerSelect} usedPlayerIds={usedPlayerIds} />
-		<div class="text-sm text-gray-600 mt-2">{correctCells.length}/9 Zellen korrekt gefüllt</div>
 	</div>
 
 	<!-- Game Grid -->
@@ -196,6 +195,11 @@
 				{/each}
 			</div>
 		{/each}
+	</div>
+
+	<!-- Correct cells counter -->
+	<div class="mt-6 text-center text-sm text-gray-600">
+		{correctCells.length}/9 Zellen korrekt gefüllt
 	</div>
 
 	<!-- Feedback Message -->
