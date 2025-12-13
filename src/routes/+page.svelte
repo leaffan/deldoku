@@ -34,7 +34,18 @@
 					{challenge}
 				/>
 
-				<Stats {showStats} />
+				<div class="text-center">
+					<button
+						onclick={() => showStats = !showStats}
+						class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+					>
+						{showStats ? 'Statistiken ausblenden' : 'Statistiken anzeigen'}
+					</button>
+				</div>
+
+				{#if showStats}
+					<Stats />
+				{/if}
 			</div>
 		{/if}
 	</div>
