@@ -4,7 +4,7 @@
 		"name": "John Doe",
 		"number": 10,
 		"position": "C",
-		"nationality": "DEU",
+		"nationality": "de",
 		"first_season": 2010,
 		"last_season": 2025
 	},
@@ -13,7 +13,7 @@
 		"name": "Max Mustermann",
 		"number": 7,
 		"position": "LW",
-		"nationality": "DEU",
+		"nationality": "de",
 		"first_season": 2015,
 		"last_season": 2025
 	},
@@ -22,7 +22,7 @@
 		"name": "Anna Schmidt",
 		"number": 15,
 		"position": "D",
-		"nationality": "DEU",
+		"nationality": "de",
 		"first_season": 2008,
 		"last_season": 2023
 	},
@@ -31,7 +31,7 @@
 		"name": "Klaus Weber",
 		"number": 5,
 		"position": "D",
-		"nationality": "DEU",
+		"nationality": "de",
 		"first_season": 2005,
 		"last_season": 2020
 	},
@@ -40,7 +40,7 @@
 		"name": "Thomas Bauer",
 		"number": 22,
 		"position": "RW",
-		"nationality": "DEU",
+		"nationality": "de",
 		"first_season": 2012,
 		"last_season": 2025
 	},
@@ -49,7 +49,7 @@
 		"name": "Stefan König",
 		"number": 19,
 		"position": "C",
-		"nationality": "DEU",
+		"nationality": "de",
 		"first_season": 2000,
 		"last_season": 2022
 	},
@@ -58,7 +58,7 @@
 		"name": "Martin Hoffmann",
 		"number": 11,
 		"position": "LW",
-		"nationality": "DEU",
+		"nationality": "us",
 		"first_season": 2014,
 		"last_season": 2025
 	},
@@ -67,25 +67,25 @@
 		"name": "Christian Uhle",
 		"number": 25,
 		"position": "C",
-		"nationality": "DEU",
+		"nationality": "se",
 		"first_season": 2007,
 		"last_season": 2021
 	},
 	{
 		"id": "p9",
-		"name": "Robert Müller",
+		"name": "Kirk Muller",
 		"number": 8,
 		"position": "D",
-		"nationality": "DEU",
+		"nationality": "ca",
 		"first_season": 1998,
 		"last_season": 2018
 	},
 	{
 		"id": "p10",
-		"name": "Alexander Fischer",
+		"name": "Alexander Kovar",
 		"number": 10,
 		"position": "D",
-		"nationality": "DEU",
+		"nationality": "cz",
 		"first_season": 2016,
 		"last_season": 2025
 	}
