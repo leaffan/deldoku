@@ -1,11 +1,17 @@
 <script lang="ts">
 	import GameBoard from '$lib/components/GameBoard.svelte';
 	import Stats from '$lib/components/Stats.svelte';
-	import { generateDailyChallenge } from '$lib/data';
+	import { generateDailyChallenge, type DELDokuChallenge } from '$lib/data';
 
 	let showStats = $state(false);
+	let challenge = $state<DELDokuChallenge | null>(null);
+	let loading = $state(true);
 
-	const challenge = generateDailyChallenge([]);
+	// Lade Challenge beim Komponenten-Mount
+	generateDailyChallenge([]).then((data) => {
+		challenge = data;
+		loading = false;
+	});
 </script>
 
 <svelte:head>
@@ -15,15 +21,20 @@
 
 <main class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
 	<div class="max-w-4xl mx-auto">
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-			<div class="md:col-span-2">
-				<GameBoard
-					rowCategories={challenge.rowCategories}
-					colCategories={challenge.colCategories}
-					grid={challenge.grid}
-					{challenge}
-				/>
+		{#if loading}
+			<div class="text-center py-12">
+				<p class="text-gray-600">Laden...</p>
 			</div>
+		{:else if challenge}
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				<div class="md:col-span-2">
+					<GameBoard
+						rowCategories={challenge.rowCategories}
+						colCategories={challenge.colCategories}
+						grid={challenge.grid}
+						{challenge}
+					/>
+				</div>
 
 			<div class="md:col-span-1">
 				<button
@@ -47,7 +58,8 @@
 					</div>
 				{/if}
 			</div>
-		</div>
+			</div>
+		{/if}
 	</div>
 </main>
 
