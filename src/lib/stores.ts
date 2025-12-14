@@ -1,4 +1,6 @@
 import { writable, derived } from 'svelte/store';
+import type { DELPlayer } from './data';
+import { loadPlayers } from './data';
 
 export interface GameState {
 	grid: (string | null)[][];
@@ -134,3 +136,17 @@ export const statsStore = createStatsStore();
 export const winRate = derived(statsStore, ($stats) =>
 	$stats.totalGames === 0 ? 0 : (($stats.gamesWon / $stats.totalGames) * 100).toFixed(1)
 );
+
+function createPlayersStore() {
+	const { subscribe, set } = writable<DELPlayer[]>([]);
+
+	return {
+		subscribe,
+		init: async () => {
+			const players = await loadPlayers();
+			set(players);
+		}
+	};
+}
+
+export const playersStore = createPlayersStore();

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { DELPlayer } from '$lib/data';
-	import { samplePlayers } from '$lib/data';
+	import { playersStore } from '$lib/stores';
 
 	interface Props {
 		onPlayerSelect: (player: DELPlayer) => void;
@@ -24,7 +24,7 @@
 		isOpen = true;
 
 		if (input.length > 0) {
-			suggestions = samplePlayers.filter(
+			suggestions = $playersStore.filter(
 				(p) => p.name.toLowerCase().includes(input.toLowerCase())
 			);
 			console.log('Suggestions for "', input, '":', suggestions);

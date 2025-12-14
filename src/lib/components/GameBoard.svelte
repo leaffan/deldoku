@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { DELPlayer, DELDokuChallenge } from '$lib/data';
-	import { validatePlayerMatch, samplePlayers } from '$lib/data';
+	import { validatePlayerMatch } from '$lib/data';
+	import { playersStore } from '$lib/stores';
 	import GameCell from './GameCell.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
 	import { gameStore, statsStore } from '$lib/stores';

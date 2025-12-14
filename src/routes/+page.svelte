@@ -2,16 +2,29 @@
 	import GameBoard from '$lib/components/GameBoard.svelte';
 	import Stats from '$lib/components/Stats.svelte';
 	import { generateDailyChallenge, type DELDokuChallenge } from '$lib/data';
+	import { playersStore } from '$lib/stores';
 
 	let showStats = $state(false);
 	let challenge = $state<DELDokuChallenge | null>(null);
 	let loading = $state(true);
+	let error = $state<string | null>(null);
 
-	// Lade Challenge beim Komponenten-Mount
-	generateDailyChallenge([]).then((data) => {
-		challenge = data;
-		loading = false;
-	});
+	// Lade Players und Challenge beim Komponenten-Mount
+	playersStore.init()
+		.then(() => {
+			console.log('Players loaded successfully');
+			return generateDailyChallenge([]);
+		})
+		.then((data) => {
+			console.log('Challenge generated:', data);
+			challenge = data;
+			loading = false;
+		})
+		.catch((err) => {
+			console.error('Error loading game:', err);
+			error = `Fehler beim Laden: ${err.message}`;
+			loading = false;
+		});
 </script>
 
 <svelte:head>
@@ -21,7 +34,12 @@
 
 <main class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
 	<div class="max-w-4xl mx-auto">
-		{#if loading}
+		{#if error}
+			<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+				<p>{error}</p>
+				<p class="text-sm mt-2">Bitte öffne die Browser-Konsole (F12) für mehr Details.</p>
+			</div>
+		{:else if loading}
 			<div class="text-center py-12">
 				<p class="text-gray-600">Laden...</p>
 			</div>

@@ -1,5 +1,3 @@
-import playersData from './all_players.json';
-
 export interface DELPlayer {
 	id: string;
 	name: string;
@@ -18,7 +16,23 @@ export interface DELDokuChallenge {
 	answers: string[][][];
 }
 
-export const samplePlayers: DELPlayer[] = playersData as DELPlayer[];
+export let samplePlayers: DELPlayer[] = [];
+
+function getBasePath(): string {
+	if (typeof window !== 'undefined') {
+		return new URL('.', window.location.href).pathname;
+	}
+	return '/deldoku/';
+}
+
+export async function loadPlayers(): Promise<DELPlayer[]> {
+	if (samplePlayers.length === 0 && typeof window !== 'undefined') {
+		const basePath = getBasePath();
+		const response = await fetch(`${basePath}all_players.json`);
+		samplePlayers = await response.json();
+	}
+	return samplePlayers;
+}
 
 export function getDailyChallengeDate(): string {
 	return new Date().toISOString().split('T')[0];
@@ -27,13 +41,14 @@ export function getDailyChallengeDate(): string {
 export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELDokuChallenge> {
 	const date = getDailyChallengeDate();
 	
-	// Verwende alle Sample-Spieler wenn keine übergeben
-	const allPlayers = players.length > 0 ? players : samplePlayers;
+	// Lade Spieler wenn nicht vorhanden
+	const allPlayers = players.length > 0 ? players : await loadPlayers();
 	
 	// Lade die Challenge-Datei für den heutigen Tag
 	try {
-		const challengeModule = await import(`./challenges/${date}.json`);
-		const challengeData = challengeModule.default;
+		const basePath = getBasePath();
+		const response = await fetch(`${basePath}challenges/${date}.json`);
+		const challengeData = await response.json();
 		
 		// Erstelle ein leeres Grid für den Spieler (am Anfang leer)
 		const grid: (DELPlayer | null)[][] = Array(3)
