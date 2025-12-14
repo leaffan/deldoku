@@ -3,11 +3,11 @@ import playersData from './all_players.json';
 export interface DELPlayer {
 	id: string;
 	name: string;
-	number: number;
-	position: 'C' | 'LW' | 'RW' | 'D' | 'G';
+	number?: number;
+	position?: 'C' | 'LW' | 'RW' | 'D' | 'G';
 	nationality: string;
-    first_season: number;
-    last_season: number;
+	first_season: number;
+	last_season: number;
 }
 
 export interface DELDokuChallenge {
