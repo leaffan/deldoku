@@ -11,12 +11,8 @@
 
 	// Lade Players und Challenge beim Komponenten-Mount
 	playersStore.init()
-		.then(() => {
-			console.log('Players loaded successfully');
-			return generateDailyChallenge([]);
-		})
+		.then(() => generateDailyChallenge([]))
 		.then((data) => {
-			console.log('Challenge generated:', data);
 			challenge = data;
 			loading = false;
 		})

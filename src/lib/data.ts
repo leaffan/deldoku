@@ -44,8 +44,13 @@ export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELD
 	// Lade Spieler wenn nicht vorhanden
 	const allPlayers = players.length > 0 ? players : await loadPlayers();
 	
-	// Lade die Challenge-Datei für den heutigen Tag
+	// Lade die Challenge-Datei für den heutigen Tag (nur auf dem Client)
 	try {
+		// Nur im Browser laden - nicht während Server-Side Rendering
+		if (typeof window === 'undefined') {
+			throw new Error('Challenge kann nur im Browser geladen werden');
+		}
+		
 		const basePath = getBasePath();
 		const response = await fetch(`${basePath}challenges/${date}.json`);
 		const challengeData = await response.json();
@@ -63,7 +68,7 @@ export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELD
 			answers: challengeData.answers
 		};
 	} catch (error) {
-		console.warn(`Challenge-Datei für ${date} nicht gefunden, verwende Standard-Kategorien`);
+		console.warn(`Challenge-Datei für ${date} konnte nicht geladen werden (wird später im Browser nachgeladen):`, error instanceof Error ? error.message : String(error));
 		
 		// Fallback auf Standard-Kategorien
 		const rowCategories = ['München', 'Berlin', 'Cologne'];
