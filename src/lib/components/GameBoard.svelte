@@ -106,7 +106,7 @@
 
 	function submitSolution() {
 		let correctCount = 0;
-		const playerSelections: Record<string, string> = {};
+		const playerSelections: Record<string, string | null> = {};
 
 		// Überprüfe alle 9 Zellen
 		for (let row = 0; row < 3; row++) {
@@ -114,8 +114,8 @@
 				const cellKey = getCellKey(row, col);
 				const player = gameGrid[row][col];
 
-				// Speichere Spielerauswahl (oder 'empty' wenn leer)
-				playerSelections[cellKey] = player ? player.id : 'empty';
+				// Speichere Spielerauswahl (oder null wenn leer)
+				playerSelections[cellKey] = player ? player.id : null;
 
 				if (player) {
 					// Zelle ist gefüllt - prüfe ob korrekt
