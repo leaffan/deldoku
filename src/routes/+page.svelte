@@ -2,7 +2,7 @@
 	import GameBoard from '$lib/components/GameBoard.svelte';
 	import Stats from '$lib/components/Stats.svelte';
 	import { generateDailyChallenge, type DELDokuChallenge } from '$lib/data';
-	import { playersStore, languageStore } from '$lib/stores';
+	import { playersStore, languageStore, statsStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
 
 	let showStats = $state(false);
@@ -10,8 +10,11 @@
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 
-	// Lade Players und Challenge beim Komponenten-Mount
-	playersStore.init()
+	// Lade Players, Stats und Challenge beim Komponenten-Mount
+	Promise.all([
+		playersStore.init(),
+		statsStore.init()
+	])
 		.then(() => generateDailyChallenge([]))
 		.then((data) => {
 			challenge = data;

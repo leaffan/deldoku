@@ -25,6 +25,14 @@ function getBasePath(): string {
 	return '/deldoku/';
 }
 
+export function getApiBasePath(): string {
+	if (typeof window !== 'undefined') {
+		const pathname = new URL('.', window.location.href).pathname;
+		return pathname.endsWith('/') ? pathname : pathname + '/';
+	}
+	return '/deldoku/';
+}
+
 export async function loadPlayers(): Promise<DELPlayer[]> {
 	if (samplePlayers.length === 0 && typeof window !== 'undefined') {
 		const basePath = getBasePath();

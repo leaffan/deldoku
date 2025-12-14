@@ -1,7 +1,7 @@
 import { writable, derived } from 'svelte/store';
 import type { DELPlayer } from './data';
 import type { Language } from './i18n';
-import { loadPlayers } from './data';
+import { loadPlayers, getApiBasePath } from './data';
 
 export interface GameState {
 	grid: (string | null)[][];
@@ -75,21 +75,14 @@ function createGameStore() {
 
 function createStatsStore() {
 	let initial = defaultStats;
+	let userId: string | null = null;
 	
-	// Versuche localStorage zu laden, nur auf Client-Seite
+	// Generiere oder lade eine eindeutige User-ID
 	if (typeof window !== 'undefined') {
-		const stored = localStorage.getItem('del_doku_stats');
-		if (stored) {
-			try {
-				initial = JSON.parse(stored);
-				// Sicherstelle, dass gameHistory existiert
-				if (!initial.gameHistory) {
-					initial.gameHistory = [];
-				}
-			} catch (e) {
-				console.error('Error parsing stats from localStorage:', e);
-				initial = defaultStats;
-			}
+		userId = localStorage.getItem('del_doku_user_id');
+		if (!userId) {
+			userId = 'user_' + Math.random().toString(36).substr(2, 9);
+			localStorage.setItem('del_doku_user_id', userId);
 		}
 	}
 
@@ -97,6 +90,37 @@ function createStatsStore() {
 
 	return {
 		subscribe,
+		
+		// Lade Stats vom Server
+		init: async () => {
+			if (typeof window === 'undefined' || !userId) return;
+			
+			try {
+				const apiPath = getApiBasePath();
+				const response = await fetch(`${apiPath}api/stats?userId=${userId}`);
+				if (!response.ok) {
+					throw new Error(`HTTP ${response.status}`);
+				}
+				const data = await response.json();
+				
+				if (data.stats) {
+					set(data.stats);
+				}
+			} catch (error) {
+				console.error('Error loading stats from server:', error);
+				// Fallback auf localStorage
+				const stored = localStorage.getItem('del_doku_stats');
+				if (stored) {
+					try {
+						const parsed = JSON.parse(stored);
+						set(parsed);
+					} catch (e) {
+						console.error('Error parsing stats from localStorage:', e);
+					}
+				}
+			}
+		},
+		
 		addGame: (won: boolean, playerSelections: Record<string, string>) => {
 			update((state) => {
 				const timestamp = new Date().toISOString();
@@ -115,17 +139,34 @@ function createStatsStore() {
 					gameHistory: [...(state.gameHistory || []), newEntry]
 				};
 
-				if (typeof window !== 'undefined') {
+				// Speichere auf Server und localStorage
+				if (typeof window !== 'undefined' && userId) {
+					const apiPath = getApiBasePath();
+					fetch(`${apiPath}api/stats`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ userId, stats: newStats })
+					}).catch(err => console.error('Error saving stats:', err));
+					
 					localStorage.setItem('del_doku_stats', JSON.stringify(newStats));
 				}
 
 				return newStats;
 			});
 		},
+		
 		resetStats: () => {
 			set(defaultStats);
 			if (typeof window !== 'undefined') {
 				localStorage.removeItem('del_doku_stats');
+				if (userId) {
+					const apiPath = getApiBasePath();
+					fetch(`${apiPath}api/stats`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ userId, stats: defaultStats })
+					}).catch(err => console.error('Error resetting stats:', err));
+				}
 			}
 		}
 	};
