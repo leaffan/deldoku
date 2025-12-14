@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { statsStore, winRate } from '$lib/stores';
+	import { statsStore, languageStore, winRate } from '$lib/stores';
+	import { t } from '$lib/i18n';
 
 	interface Props {
 		showStats?: boolean;
@@ -9,35 +10,35 @@
 </script>
 
 <div class="bg-white rounded-lg shadow-lg p-6">
-	<h2 class="text-2xl font-bold mb-4">Statistiken</h2>
+	<h2 class="text-2xl font-bold mb-4">{t('statistics', $languageStore)}</h2>
 
 	<div class="grid grid-cols-3 gap-4 mb-6">
 		<div class="bg-blue-50 p-4 rounded-lg">
 			<div class="text-3xl font-bold text-blue-600">{$statsStore.totalGames}</div>
-			<div class="text-sm text-gray-600">Spiele gesamt</div>
+			<div class="text-sm text-gray-600">{t('totalGames', $languageStore)}</div>
 		</div>
 
 		<div class="bg-green-50 p-4 rounded-lg">
 			<div class="text-3xl font-bold text-green-600">{$winRate}%</div>
-			<div class="text-sm text-gray-600">Gewinnquote</div>
+			<div class="text-sm text-gray-600">{t('winRate', $languageStore)}</div>
 		</div>
 
 		<div class="bg-purple-50 p-4 rounded-lg">
 			<div class="text-3xl font-bold text-purple-600">{$statsStore.gamesWon}</div>
-			<div class="text-sm text-gray-600">Spiele gewonnen</div>
+			<div class="text-sm text-gray-600">{t('gamesWon', $languageStore)}</div>
 		</div>
 	</div>
 
 	{#if $statsStore.gameHistory && $statsStore.gameHistory.length > 0}
 		<div class="border-t pt-6">
-			<h3 class="text-lg font-bold mb-4">Spielhistorie</h3>
+			<h3 class="text-lg font-bold mb-4">{t('gameHistory', $languageStore)}</h3>
 			<div class="space-y-4 max-h-96 overflow-y-auto">
 				{#each $statsStore.gameHistory as game}
 					<div class="border rounded-lg p-4 {game.won ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}">
 						<div class="flex justify-between items-start mb-2">
-							<div class="font-semibold text-sm">{new Date(game.timestamp).toLocaleString('de-DE')}</div>
+							<div class="font-semibold text-sm">{new Date(game.timestamp).toLocaleString($languageStore === 'en' ? 'en-US' : 'de-DE')}</div>
 							<div class="text-sm font-bold {game.won ? 'text-green-600' : 'text-red-600'}">
-								{game.won ? '✓ Gewonnen' : '✗ Verloren'}
+								{game.won ? t('won', $languageStore) : t('lost', $languageStore)}
 							</div>
 						</div>
 						<div class="text-xs text-gray-600 space-y-1">

@@ -1,5 +1,6 @@
 import { writable, derived } from 'svelte/store';
 import type { DELPlayer } from './data';
+import type { Language } from './i18n';
 import { loadPlayers } from './data';
 
 export interface GameState {
@@ -150,3 +151,26 @@ function createPlayersStore() {
 }
 
 export const playersStore = createPlayersStore();
+
+function createLanguageStore() {
+	// Versuche Sprache aus localStorage zu laden, Standard ist Deutsch
+	const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
+	const initialLanguage: Language = savedLanguage === 'en' ? 'en' : 'de';
+	
+	const { subscribe, set, update } = writable<Language>(initialLanguage);
+
+	return {
+		subscribe,
+		toggle: () => {
+			update((current) => {
+				const newLang: Language = current === 'de' ? 'en' : 'de';
+				if (typeof window !== 'undefined') {
+					localStorage.setItem('language', newLang);
+				}
+				return newLang;
+			});
+		}
+	};
+}
+
+export const languageStore = createLanguageStore();

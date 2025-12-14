@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { DELPlayer, DELDokuChallenge } from '$lib/data';
 	import { validatePlayerMatch } from '$lib/data';
-	import { playersStore } from '$lib/stores';
+	import { playersStore, languageStore } from '$lib/stores';
+	import { t } from '$lib/i18n';
 	import GameCell from './GameCell.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
 	import { gameStore, statsStore } from '$lib/stores';
@@ -142,10 +143,10 @@
 
 		// Gebe Feedback
 		if (correctCount === 9) {
-			feedback = '🎉 Glückwunsch! Rätsel gelöst!';
+			feedback = t('correctAnswer', $languageStore);
 			statsStore.addGame(true, playerSelections);
 		} else {
-			feedback = `⏁ ${correctCount}/9 Zellen korrekt. Versuchen Sie es erneut!`;
+			feedback = `⏁ ${correctCount}/9 ${t('partialAnswer', $languageStore)}`;
 			statsStore.addGame(false, playerSelections);
 		}
 
@@ -157,8 +158,8 @@
 
 <div class="w-full flex flex-col items-center">
 	<div class="mb-6 text-center">
-		<h1 class="text-2xl sm:text-3xl font-bold mb-4">DEL-Doku</h1>
-		<p class="text-sm sm:text-base text-gray-600">Finde die Spieler basierend auf Team- und Positionskombinationen!</p>
+		<h1 class="text-2xl sm:text-3xl font-bold mb-4">{t('title', $languageStore)}</h1>
+		<p class="text-sm sm:text-base text-gray-600">{t('subtitle', $languageStore)}</p>
 	</div>
 
 	<div class="mb-6 p-4 bg-blue-50 rounded-lg w-full max-w-2xl px-3 sm:px-4">
@@ -207,7 +208,7 @@
 
 	<!-- Correct cells counter -->
 	<div class="mt-6 text-center text-sm text-gray-600">
-		{answersGiven}/9 Antworten gegeben
+		{answersGiven}/9 {t('answersGiven', $languageStore)}
 	</div>
 
 	<!-- Feedback Message -->
@@ -225,7 +226,7 @@
 			onclick={submitSolution}
 			class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
 		>
-			Lösung einreichen
+			{t('submitSolution', $languageStore)}
 		</button>
 		
 		<button
@@ -243,7 +244,7 @@
 			}}
 			class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
 		>
-			Spiel neu starten
+			{t('restartGame', $languageStore)}
 		</button>
 	</div>
 </div>
