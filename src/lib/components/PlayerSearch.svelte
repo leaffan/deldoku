@@ -25,9 +25,7 @@
 
 		if (input.length > 0) {
 			suggestions = samplePlayers.filter(
-				(p) =>
-					p.name.toLowerCase().includes(input.toLowerCase()) ||
-					(p.number && p.number.toString().includes(input))
+				(p) => p.name.toLowerCase().includes(input.toLowerCase())
 			);
 			console.log('Suggestions for "', input, '":', suggestions);
 		} else {
