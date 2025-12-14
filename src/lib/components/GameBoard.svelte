@@ -157,22 +157,22 @@
 
 <div class="w-full flex flex-col items-center">
 	<div class="mb-6 text-center">
-		<h1 class="text-3xl font-bold mb-4">DEL-Doku</h1>
-		<p class="text-gray-600">Finde die Spieler basierend auf Team- und Positionskombinationen!</p>
+		<h1 class="text-2xl sm:text-3xl font-bold mb-4">DEL-Doku</h1>
+		<p class="text-sm sm:text-base text-gray-600">Finde die Spieler basierend auf Team- und Positionskombinationen!</p>
 	</div>
 
-	<div class="mb-6 p-4 bg-blue-50 rounded-lg w-full max-w-2xl">
+	<div class="mb-6 p-4 bg-blue-50 rounded-lg w-full max-w-2xl px-3 sm:px-4">
 		<PlayerSearch bind:this={playerSearchComponent} onPlayerSelect={handlePlayerSelect} usedPlayerIds={usedPlayerIds} />
 	</div>
 
 	<!-- Game Grid -->
-	<div class="inline-block bg-white shadow-lg rounded-lg overflow-hidden mb-6">
+	<div class="inline-block bg-white shadow-lg rounded-lg overflow-hidden mb-6 max-w-full">
 		<!-- Header with column categories -->
 		<div class="flex">
-			<div class="w-28 h-28 bg-gray-200 flex items-center justify-center font-bold text-center text-xs p-2">
+			<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gray-200 flex items-center justify-center font-bold text-center text-xs p-2">
 			</div>
 			{#each colCategories as colCat}
-				<div class="w-28 h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-sm p-2">
+				<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-2">
 					{colCat}
 				</div>
 			{/each}
@@ -181,7 +181,7 @@
 		<!-- Grid rows -->
 		{#each rowCategories as rowCat, rowIdx}
 			<div class="flex">
-				<div class="w-28 h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-sm p-2">
+				<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-2">
 					{rowCat}
 				</div>
 				{#each colCategories as colCat, colIdx}

@@ -16,7 +16,7 @@
 
 <button
 	onclick={onCellClick}
-	class={`w-28 h-28 flex flex-col items-center justify-center font-semibold text-center text-xs transition-all cursor-pointer
+	class={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex flex-col items-center justify-center font-semibold text-center text-xs transition-all cursor-pointer
 		${isCorrect ? 'bg-green-400 text-white shadow-lg' : isIncorrect ? 'bg-red-400 text-white shadow-lg' : isSelected ? 'bg-blue-300 text-gray-900 shadow-md' : 'bg-white text-gray-900 hover:bg-gray-50'}
 		${player ? 'font-bold' : 'text-2xl text-gray-300'}`}
 >

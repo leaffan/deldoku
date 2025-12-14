@@ -28,19 +28,19 @@
 	<meta name="description" content="Tägliches DEL-Doku Rätsel" />
 </svelte:head>
 
-<main class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
-	<div class="max-w-4xl mx-auto">
+<main class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-4 sm:py-8 px-2 sm:px-4">
+	<div class="max-w-4xl mx-auto w-full">
 		{#if error}
-			<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+			<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-sm">
 				<p>{error}</p>
-				<p class="text-sm mt-2">Bitte öffne die Browser-Konsole (F12) für mehr Details.</p>
+				<p class="text-xs mt-2">Bitte öffne die Browser-Konsole (F12) für mehr Details.</p>
 			</div>
 		{:else if loading}
 			<div class="text-center py-12">
-				<p class="text-gray-600">Laden...</p>
+				<p class="text-sm sm:text-base text-gray-600">Laden...</p>
 			</div>
 		{:else if challenge}
-			<div class="space-y-6">
+			<div class="space-y-4 sm:space-y-6">
 				<GameBoard
 					rowCategories={challenge.rowCategories}
 					colCategories={challenge.colCategories}
@@ -51,7 +51,7 @@
 				<div class="text-center">
 					<button
 						onclick={() => showStats = !showStats}
-						class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+						class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 text-sm sm:text-base rounded-lg transition-colors"
 					>
 						{showStats ? 'Statistiken ausblenden' : 'Statistiken anzeigen'}
 					</button>
