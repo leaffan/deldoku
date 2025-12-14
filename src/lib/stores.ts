@@ -10,7 +10,7 @@ export interface GameState {
 }
 
 export interface GameEntry {
-	date: string;
+	timestamp: string; // ISO 8601 full timestamp
 	won: boolean;
 	playerSelections: Record<string, string>; // "0-0": "p1", "0-1": "p2", etc.
 }
@@ -19,7 +19,7 @@ export interface PlayerStats {
 	totalGames: number;
 	gamesWon: number;
 	currentStreak: number;
-	lastPlayedDate: string;
+	lastPlayedDate: string; // ISO 8601 full timestamp
 	gameHistory: GameEntry[];
 }
 
@@ -96,9 +96,9 @@ function createStatsStore() {
 		subscribe,
 		addGame: (won: boolean, playerSelections: Record<string, string>) => {
 			update((state) => {
-				const today = new Date().toISOString().split('T')[0];
+				const timestamp = new Date().toISOString();
 				const newEntry: GameEntry = {
-					date: today,
+					timestamp,
 					won,
 					playerSelections
 				};
@@ -108,7 +108,7 @@ function createStatsStore() {
 					totalGames: state.totalGames + 1,
 					gamesWon: won ? state.gamesWon + 1 : state.gamesWon,
 					currentStreak: won ? state.currentStreak + 1 : 0,
-					lastPlayedDate: today,
+					lastPlayedDate: timestamp,
 					gameHistory: [...(state.gameHistory || []), newEntry]
 				};
 
