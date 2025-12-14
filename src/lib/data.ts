@@ -35,7 +35,12 @@ export async function loadPlayers(): Promise<DELPlayer[]> {
 }
 
 export function getDailyChallengeDate(): string {
-	return new Date().toISOString().split('T')[0];
+	// Verwende lokale Zeit statt UTC
+	const now = new Date();
+	const year = now.getFullYear();
+	const month = String(now.getMonth() + 1).padStart(2, '0');
+	const day = String(now.getDate()).padStart(2, '0');
+	return `${year}-${month}-${day}`;
 }
 
 export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELDokuChallenge> {
@@ -53,6 +58,11 @@ export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELD
 		
 		const basePath = getBasePath();
 		const response = await fetch(`${basePath}challenges/${date}.json`);
+		
+		if (!response.ok) {
+			throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+		}
+		
 		const challengeData = await response.json();
 		
 		// Erstelle ein leeres Grid für den Spieler (am Anfang leer)
@@ -68,7 +78,7 @@ export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELD
 			answers: challengeData.answers
 		};
 	} catch (error) {
-		console.warn(`Challenge-Datei für ${date} konnte nicht geladen werden (wird später im Browser nachgeladen):`, error instanceof Error ? error.message : String(error));
+		console.warn(`Challenge-Datei für ${date} konnte nicht geladen werden:`, error instanceof Error ? error.message : String(error));
 		
 		// Fallback auf Standard-Kategorien
 		const rowCategories = ['München', 'Berlin', 'Cologne'];
