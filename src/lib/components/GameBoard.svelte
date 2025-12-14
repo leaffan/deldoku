@@ -27,23 +27,16 @@
 	let incorrectCells = $state<string[]>([]);
 	let playerSearchComponent: any = $state(null);
 	let isAutoSubmitting = $state(false);
+	let answersGiven = $state(0); // Zählt alle Antworten (richtig oder falsch)
 
 	// Derived state: Liste der verwendeten Spieler-IDs
 	let usedPlayerIds = $derived.by(() => {
 		return gameGrid.flat().filter(p => p !== null).map(p => p!.id);
 	});
 
-	// Überprüfe ob alle Felder gefüllt sind und reiche automatisch ein
-	$effect(() => {
-		const filledCells = gameGrid.flat().filter(p => p !== null).length;
-		if (filledCells === 9 && !isAutoSubmitting) {
-			isAutoSubmitting = true;
-			// Kleine Verzögerung, damit die letzte Zelle visuell aktualisiert wird
-			setTimeout(() => {
-				submitSolution();
-				isAutoSubmitting = false;
-			}, 300);
-		}
+	// Derived state: Anzahl gefüllter Zellen (egal ob richtig oder falsch)
+	let filledCells = $derived.by(() => {
+		return gameGrid.flat().filter(p => p !== null).length;
 	});
 
 	function getCellKey(row: number, col: number): string {
@@ -76,17 +69,21 @@
 
 			console.log('Validating:', player.name, 'at', row, col, '- Correct:', isCorrect);
 
+			// Inkrementiere Antwort-Counter (für alle Antworten, richtig oder falsch)
+			answersGiven++;
+			console.log('Answers given:', answersGiven);
+
+			const cellKey = getCellKey(row, col);
+			
 			if (isCorrect) {
-				// Directly mutate the grid and trigger reactivity
+				// Nur richtige Antworten in die Zelle eintragen
 				gameGrid[row][col] = player;
 				gameGrid = gameGrid; // Trigger reactivity
 
-				const cellKey = getCellKey(row, col);
 				addCorrectCell(cellKey);
 				feedback = `✓ Richtig! ${player.name}`;
 			} else {
 				feedback = `✗ Falsch! ${player.name} passt nicht hier.`;
-				const cellKey = getCellKey(row, col);
 				addIncorrectCell(cellKey);
 			}
 
@@ -94,6 +91,16 @@
 			setTimeout(() => {
 				feedback = '';
 			}, 3000);
+
+			// Überprüfe, ob 9 Antworten gegeben wurden
+			if (answersGiven === 9 && !isAutoSubmitting) {
+				console.log('9 answers given - auto-submitting...');
+				isAutoSubmitting = true;
+				setTimeout(() => {
+					submitSolution();
+					isAutoSubmitting = false;
+				}, 100);
+			}
 		}
 	}
 
@@ -199,7 +206,7 @@
 
 	<!-- Correct cells counter -->
 	<div class="mt-6 text-center text-sm text-gray-600">
-		{correctCells.length}/9 Zellen korrekt gefüllt
+		{answersGiven}/9 Antworten gegeben
 	</div>
 
 	<!-- Feedback Message -->
@@ -231,6 +238,7 @@
 				incorrectCells = [];
 				selectedCell = null;
 				feedback = '';
+				answersGiven = 0; // Reset counter
 			}}
 			class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
 		>

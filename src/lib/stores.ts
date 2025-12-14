@@ -71,16 +71,23 @@ function createGameStore() {
 }
 
 function createStatsStore() {
-	const stored = typeof window !== 'undefined' ? localStorage.getItem('del_doku_stats') : null;
-	let initial = stored ? JSON.parse(stored) : defaultStats;
+	let initial = defaultStats;
 	
-	// Migration: Add gameHistory if missing
-	if (stored && !initial.gameHistory) {
-		initial = {
-			...defaultStats,
-			...initial,
-			gameHistory: []
-		};
+	// Versuche localStorage zu laden, nur auf Client-Seite
+	if (typeof window !== 'undefined') {
+		const stored = localStorage.getItem('del_doku_stats');
+		if (stored) {
+			try {
+				initial = JSON.parse(stored);
+				// Sicherstelle, dass gameHistory existiert
+				if (!initial.gameHistory) {
+					initial.gameHistory = [];
+				}
+			} catch (e) {
+				console.error('Error parsing stats from localStorage:', e);
+				initial = defaultStats;
+			}
+		}
 	}
 
 	const { subscribe, set, update } = writable<PlayerStats>(initial);
@@ -102,7 +109,7 @@ function createStatsStore() {
 					gamesWon: won ? state.gamesWon + 1 : state.gamesWon,
 					currentStreak: won ? state.currentStreak + 1 : 0,
 					lastPlayedDate: today,
-					gameHistory: [...state.gameHistory, newEntry]
+					gameHistory: [...(state.gameHistory || []), newEntry]
 				};
 
 				if (typeof window !== 'undefined') {
