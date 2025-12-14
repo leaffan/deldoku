@@ -27,9 +27,9 @@
 			suggestions = samplePlayers.filter(
 				(p) =>
 					p.name.toLowerCase().includes(input.toLowerCase()) ||
-					p.number.toString().includes(input)
+					(p.number && p.number.toString().includes(input))
 			);
-            console.log('Suggestions for "', input, '":', suggestions);
+			console.log('Suggestions for "', input, '":', suggestions);
 		} else {
 			suggestions = [];
 		}
@@ -73,17 +73,20 @@
 			{#each suggestions as player (player.id)}
 				{@const isUsed = usedPlayerIds.includes(player.id)}
 				<li>
-					<button
-						onclick={() => !isUsed && selectPlayer(player)}
-						disabled={isUsed}
-						class={`w-full text-left px-3 py-2 flex justify-between items-center transition-colors
-							${isUsed ? 'opacity-50 cursor-not-allowed line-through text-gray-400' : 'hover:bg-gray-100 cursor-pointer'}`}
-					>
+					<div class="w-full px-3 py-2 flex justify-between items-center hover:bg-gray-50 transition-colors">
 						<div>
-							<div class="font-semibold">{player.name}</div>
+							<div class="font-semibold {isUsed ? 'line-through text-gray-400' : ''}">{player.name}</div>
 							<div class="text-sm text-gray-600">{player.first_season} – {player.last_season}</div>
 						</div>
-					</button>
+						<button
+							onclick={() => !isUsed && selectPlayer(player)}
+							disabled={isUsed}
+							class={`ml-2 px-3 py-1 rounded text-sm font-semibold transition-colors
+								${isUsed ? 'opacity-30 cursor-not-allowed bg-gray-200 text-gray-400' : 'bg-blue-500 text-white hover:bg-blue-600 cursor-pointer'}`}
+						>
+							Auswählen
+						</button>
+					</div>
 				</li>
 			{/each}
 		</ul>
