@@ -35,7 +35,7 @@
 				{#each $statsStore.gameHistory as game}
 					<div class="border rounded-lg p-4 {game.won ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}">
 						<div class="flex justify-between items-start mb-2">
-							<div class="font-semibold text-sm">{game.date}</div>
+							<div class="font-semibold text-sm">{new Date(game.timestamp).toLocaleString('de-DE')}</div>
 							<div class="text-sm font-bold {game.won ? 'text-green-600' : 'text-red-600'}">
 								{game.won ? '✓ Gewonnen' : '✗ Verloren'}
 							</div>
