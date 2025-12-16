@@ -54,15 +54,9 @@
 								{#if game.score !== undefined}
 									<span class="text-xs sm:text-sm font-bold text-blue-600">
 									{#if game.won}
-										{#if game.score <= 900}
-											<!-- Altes Spiel ohne Bonus -->
-											{game.score} + 100 = {game.score + 100}/1000
-										{:else}
-											<!-- Neues Spiel mit Bonus -->
-											{game.score - 100} + 100 = {game.score}/1000
-										{/if}
+										{game.score - 100} + 100 = {game.score}/1000
 									{:else}
-										{game.score}/900
+										{game.score}/1000
 									{/if}
 									</span>
 								{/if}

@@ -193,7 +193,7 @@ export function calculateRarityScore(
 		}
 	});
 
-	debug(`✅ Total Score: ${totalScore}/900`);
+	debug(`✅ Total Score: ${totalScore}/1000 (inkl. Bonus)`);
 
 	return { totalScore, cellScores };
 }

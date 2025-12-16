@@ -16,7 +16,7 @@ export interface GameEntry {
 	timestamp: string; // ISO 8601 full timestamp
 	won: boolean;
 	playerSelections: Record<string, string>; // "0-0": "p1", "0-1": "p2", etc.
-	score?: number; // Punktzahl (0-900)
+	score?: number; // Punktzahl (0-1000, inkl. 100 Bonus für Gewinn)
 	cellScores?: Record<string, number>; // Punkte pro Zelle
 }
 

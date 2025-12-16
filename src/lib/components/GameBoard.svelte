@@ -225,7 +225,7 @@
 	{#if currentScore !== undefined}
 		<div class="mt-6 p-4 rounded-lg font-bold w-full max-w-2xl text-center bg-blue-50 border-2 border-blue-300">
 			<div class="text-3xl text-blue-700">
-				{t('score', $languageStore)}: {currentScore}/900
+				{t('score', $languageStore)}: {currentScore}/1000
 			</div>
 		</div>
 	{/if}
