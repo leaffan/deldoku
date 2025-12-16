@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { DELPlayer } from '$lib/data';
 	import { playersStore } from '$lib/stores';
+	import { debug } from '$lib/debug';
 
 	interface Props {
 		onPlayerSelect: (player: DELPlayer) => void;
@@ -29,7 +30,6 @@
 			suggestions = $playersStore.filter(
 				(p) => p.name.toLowerCase().includes(input.toLowerCase())
 			);
-			console.log('Suggestions for "', input, '":', suggestions);
 		} else {
 			suggestions = [];
 		}
@@ -65,7 +65,6 @@
 		
 		if (availableSuggestions.length === 0) return;
 
-		onkeydown={handleKeyDown}
 		switch (e.key) {
 			case 'ArrowDown':
 				e.preventDefault();

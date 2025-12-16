@@ -3,6 +3,7 @@
 	import { validatePlayerMatch } from '$lib/data';
 	import { playersStore, languageStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
+	import { debug } from '$lib/debug';
 	import GameCell from './GameCell.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
 	import { gameStore, statsStore } from '$lib/stores';
@@ -71,11 +72,11 @@
 				col
 			);
 
-			console.log('Validating:', player.name, 'at', row, col, '- Correct:', isCorrect);
+			debug('Validating:', player.name, 'at', row, col, '- Correct:', isCorrect);
 
 			// Inkrementiere Antwort-Counter (für alle Antworten, richtig oder falsch)
 			answersGiven++;
-			console.log('Answers given:', answersGiven);
+			debug('Answers given:', answersGiven);
 
 			const cellKey = getCellKey(row, col);
 			
@@ -98,7 +99,7 @@
 
 			// Überprüfe, ob 9 Antworten gegeben wurden
 			if (answersGiven === 9 && !isAutoSubmitting) {
-				console.log('9 answers given - auto-submitting...');
+				debug('9 answers given - auto-submitting...');
 				isAutoSubmitting = true;
 				setTimeout(() => {
 					submitSolution();
@@ -214,7 +215,7 @@
 							onCellClick={() => {
 								selectedCell = [rowIdx, colIdx];
 								playerSearchComponent?.focusInput();
-								console.log('Cell clicked:', rowIdx, colIdx, 'selectedCell now:', selectedCell);
+								debug('Cell clicked:', rowIdx, colIdx, 'selectedCell now:', selectedCell);
 							}}
 							isSelected={selectedCell?.[0] === rowIdx && selectedCell?.[1] === colIdx}
 							isCorrect={correctCells.includes(getCellKey(rowIdx, colIdx))}

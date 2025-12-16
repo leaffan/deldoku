@@ -119,7 +119,6 @@ export function validatePlayerMatch(
 ): boolean {
 	// Hole die gültigen Player-IDs für diese Zelle
 	const expectedPlayerIds = answers[rowIdx][colIdx];
-    console.log(`Validating player ${player.id} for cell [${rowIdx}, ${colIdx}] with expected IDs:`, expectedPlayerIds);
 	
 	// Überprüfe ob der ausgewählte Spieler in den gültigen IDs enthalten ist
 	if (!expectedPlayerIds.includes(player.id)) {
