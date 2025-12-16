@@ -30,18 +30,20 @@ function saveAllStats(stats: Record<string, any>) {
 	fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 2));
 }
 
-// GET: Lade Stats für einen User
+// GET: Lade Stats für einen User oder alle Stats
 export const GET: RequestHandler = async ({ url }) => {
 	const userId = url.searchParams.get('userId');
 	
-	if (!userId) {
-		return json({ error: 'userId required' }, { status: 400 });
-	}
-
 	const allStats = loadAllStats();
-	const userStats = allStats[userId] || null;
-
-	return json({ userId, stats: userStats });
+	
+	// Wenn userId angegeben, gebe nur diesen User zurück
+	if (userId) {
+		const userStats = allStats[userId] || null;
+		return json({ userId, stats: userStats });
+	}
+	
+	// Wenn keine userId angegeben, gebe alle Stats zurück (für Score-Berechnung)
+	return json(allStats);
 };
 
 // POST: Speichere/Update Stats für einen User
