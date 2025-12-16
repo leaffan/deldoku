@@ -128,3 +128,62 @@ export function validatePlayerMatch(
 
     return true;
 }
+
+export function calculateRarityScore(
+	playerSelections: Record<string, string>,
+	allStats: Record<string, any>
+): { totalScore: number; cellScores: Record<string, number> } {
+	const cellScores: Record<string, number> = {};
+	let totalScore = 0;
+
+	// Zähle wie oft jeder Spieler in jeder Position verwendet wurde
+	const usageCounts: Record<string, Record<string, number>> = {};
+	
+	// Initialisiere Zähler für alle 9 Positionen
+	for (let row = 0; row < 3; row++) {
+		for (let col = 0; col < 3; col++) {
+			const cellKey = `${row}-${col}`;
+			usageCounts[cellKey] = {};
+		}
+	}
+
+	// Durchlaufe alle Spielerstatistiken
+	Object.values(allStats).forEach((stats: any) => {
+		stats.gameHistory?.forEach((game: any) => {
+			Object.entries(game.playerSelections).forEach(([cellKey, playerId]) => {
+				if (playerId && playerId !== '') {
+					if (!usageCounts[cellKey]) {
+						usageCounts[cellKey] = {};
+					}
+					usageCounts[cellKey][playerId as string] = (usageCounts[cellKey][playerId as string] || 0) + 1;
+				}
+			});
+		});
+	});
+
+	// Finde die maximale Verwendung pro Position (für Normalisierung)
+	const maxUsagePerCell: Record<string, number> = {};
+	Object.entries(usageCounts).forEach(([cellKey, playerCounts]) => {
+		const counts = Object.values(playerCounts);
+		maxUsagePerCell[cellKey] = counts.length > 0 ? Math.max(...counts) : 1;
+	});
+
+	// Berechne Punkte für jede Zelle
+	Object.entries(playerSelections).forEach(([cellKey, playerId]) => {
+		if (!playerId || playerId === '') {
+			// Leere Zelle = 0 Punkte
+			cellScores[cellKey] = 0;
+		} else {
+			const usageCount = usageCounts[cellKey]?.[playerId] || 0;
+			const maxUsage = maxUsagePerCell[cellKey] || 1;
+			
+			// Dynamische Formel: 100 * (1 - usageCount / maxUsage)
+			// Minimum 10 Punkte für richtige Antworten
+			const score = Math.max(10, Math.round(100 * (1 - usageCount / maxUsage)));
+			cellScores[cellKey] = score;
+			totalScore += score;
+		}
+	});
+
+	return { totalScore, cellScores };
+}
