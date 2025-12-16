@@ -37,8 +37,15 @@
 					<div class="border rounded-lg p-4 {game.won ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}">
 						<div class="flex justify-between items-start mb-2">
 							<div class="font-semibold text-sm">{new Date(game.timestamp).toLocaleString($languageStore === 'en' ? 'en-US' : 'de-DE')}</div>
+						<div class="flex gap-2 items-center">
+							{#if game.score !== undefined}
+								<span class="text-sm font-bold text-blue-600">
+									{game.score} / 900
+								</span>
+							{/if}
 							<div class="text-sm font-bold {game.won ? 'text-green-600' : 'text-red-600'}">
 								{game.won ? t('won', $languageStore) : t('lost', $languageStore)}
+							</div>
 							</div>
 						</div>
 						<div class="text-xs text-gray-600 space-y-1">
