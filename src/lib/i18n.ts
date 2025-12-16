@@ -23,7 +23,11 @@ export const translations = {
 		gameHistory: 'Spielhistorie',
 		won: '✓ Gewonnen',
 		lost: '✗ Verloren',
-		currentStreak: 'Aktuelle Serie'
+		currentStreak: 'Aktuelle Serie',
+		score: 'Punkte',
+		maxScore: 'Max. Punkte',
+		cellScore: 'Zellpunkte',
+		rarity: 'Seltenheit'
 	},
 	en: {
 		title: 'DEL-Doku',
@@ -47,7 +51,11 @@ export const translations = {
 		gameHistory: 'Game History',
 		won: '✓ Won',
 		lost: '✗ Lost',
-		currentStreak: 'Current Streak'
+		currentStreak: 'Current Streak',
+		score: 'Score',
+		maxScore: 'Max. Score',
+		cellScore: 'Cell Score',
+		rarity: 'Rarity'
 	}
 };
 
