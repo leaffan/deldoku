@@ -140,7 +140,12 @@ function createStatsStore() {
 
 			// Berechne Punkte basierend auf Seltenheit
 			const { calculateRarityScore } = await import('./data');
-			const { totalScore, cellScores } = calculateRarityScore(playerSelections, allStats);
+		let { totalScore, cellScores } = calculateRarityScore(playerSelections, allStats);
+		
+		// Bonus für gewonnene Spiele: 100 Punkte extra
+		if (won) {
+			totalScore += 100;
+		}
 
 			update((state) => {
 				const timestamp = new Date().toISOString();

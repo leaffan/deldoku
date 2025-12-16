@@ -53,7 +53,17 @@
 							<div class="flex gap-2 items-center">
 								{#if game.score !== undefined}
 									<span class="text-xs sm:text-sm font-bold text-blue-600">
+									{#if game.won}
+										{#if game.score <= 900}
+											<!-- Altes Spiel ohne Bonus -->
+											{game.score} + 100 = {game.score + 100}/1000
+										{:else}
+											<!-- Neues Spiel mit Bonus -->
+											{game.score - 100} + 100 = {game.score}/1000
+										{/if}
+									{:else}
 										{game.score}/900
+									{/if}
 									</span>
 								{/if}
 								<div class="text-xs sm:text-sm font-bold {game.won ? 'text-green-600' : 'text-red-600'}">
