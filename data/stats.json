@@ -1,0 +1,291 @@
+{
+  "user_qv3x5r2by": {
+    "totalGames": 7,
+    "gamesWon": 3,
+    "currentStreak": 1,
+    "lastPlayedDate": "2025-12-16T17:59:25.180Z",
+    "gameHistory": [
+      {
+        "timestamp": "2025-12-14T23:31:06.946Z",
+        "won": false,
+        "playerSelections": {
+          "0-0": "",
+          "0-1": "",
+          "0-2": "",
+          "1-0": "",
+          "1-1": "",
+          "1-2": "",
+          "2-0": "42810/mathias-niederberger",
+          "2-1": "",
+          "2-2": ""
+        }
+      },
+      {
+        "timestamp": "2025-12-14T23:59:47.236Z",
+        "won": false,
+        "playerSelections": {
+          "0-0": "",
+          "0-1": "",
+          "0-2": "",
+          "1-0": "",
+          "1-1": "",
+          "1-2": "",
+          "2-0": "",
+          "2-1": "",
+          "2-2": "81881/nils-antons"
+        },
+        "score": 100,
+        "cellScores": {
+          "0-0": 0,
+          "0-1": 0,
+          "0-2": 0,
+          "1-0": 0,
+          "1-1": 0,
+          "1-2": 0,
+          "2-0": 0,
+          "2-1": 0,
+          "2-2": 100
+        }
+      },
+      {
+        "timestamp": "2025-12-15T00:01:19.164Z",
+        "won": true,
+        "playerSelections": {
+          "0-0": "20962/alexander-barta",
+          "0-1": "8573/marco-sturm",
+          "0-2": "9228/petr-pohl",
+          "1-0": "15011/jason-ulmer",
+          "1-1": "9029/jason-jaspers",
+          "1-2": "9202/justin-pogge",
+          "2-0": "20573/jochen-reimer",
+          "2-1": "95507/maximilian-kammerer",
+          "2-2": "81881/nils-antons"
+        },
+        "score": 900,
+        "cellScores": {
+          "0-0": 100,
+          "0-1": 100,
+          "0-2": 100,
+          "1-0": 100,
+          "1-1": 100,
+          "1-2": 100,
+          "2-0": 100,
+          "2-1": 100,
+          "2-2": 100
+        }
+      },
+      {
+        "timestamp": "2025-12-15T00:07:14.544Z",
+        "won": false,
+        "playerSelections": {
+          "0-0": "",
+          "0-1": "",
+          "0-2": "",
+          "1-0": "",
+          "1-1": "",
+          "1-2": "",
+          "2-0": "",
+          "2-1": "",
+          "2-2": "81881/nils-antons"
+        },
+        "score": 10,
+        "cellScores": {
+          "0-0": 0,
+          "0-1": 0,
+          "0-2": 0,
+          "1-0": 0,
+          "1-1": 0,
+          "1-2": 0,
+          "2-0": 0,
+          "2-1": 0,
+          "2-2": 10
+        }
+      },
+      {
+        "timestamp": "2025-12-15T00:08:37.733Z",
+        "won": true,
+        "playerSelections": {
+          "0-0": "15229/patrick-hager",
+          "0-1": "37500/louis-marc-aubry",
+          "0-2": "195952/ty-ronning",
+          "1-0": "34837/dominik-bittner",
+          "1-1": "85174/fabio-pfohl",
+          "1-2": "9029/jason-jaspers",
+          "2-0": "10612/philip-gogulla",
+          "2-1": "85498/mirko-pantkowski",
+          "2-2": "17640/marco-nowak"
+        },
+        "score": 470,
+        "cellScores": {
+          "0-0": 100,
+          "0-1": 10,
+          "0-2": 10,
+          "1-0": 10,
+          "1-1": 10,
+          "1-2": 100,
+          "2-0": 50,
+          "2-1": 100,
+          "2-2": 80
+        }
+      },
+      {
+        "timestamp": "2025-12-15T00:12:27.820Z",
+        "won": false,
+        "playerSelections": {
+          "0-0": "10613/felix-schutz",
+          "0-1": "15229/patrick-hager",
+          "0-2": "37500/louis-marc-aubry",
+          "1-0": "",
+          "1-1": "18632/bjorn-krupp",
+          "1-2": "12505/spencer-machacek",
+          "2-0": "42810/mathias-niederberger",
+          "2-1": "83585/benoit-doucet",
+          "2-2": "17640/marco-nowak"
+        },
+        "score": 490,
+        "cellScores": {
+          "0-0": 10,
+          "0-1": 100,
+          "0-2": 100,
+          "1-0": 0,
+          "1-1": 100,
+          "1-2": 10,
+          "2-0": 10,
+          "2-1": 100,
+          "2-2": 60
+        }
+      },
+      {
+        "timestamp": "2025-12-16T17:59:25.180Z",
+        "won": true,
+        "playerSelections": {
+          "0-0": "85176/fabio-wagner",
+          "0-1": "8573/marco-sturm",
+          "0-2": "37500/louis-marc-aubry",
+          "1-0": "34837/dominik-bittner",
+          "1-1": "85174/fabio-pfohl",
+          "1-2": "9202/justin-pogge",
+          "2-0": "42810/mathias-niederberger",
+          "2-1": "57034/carter-proft",
+          "2-2": "31514/ryan-mckiernan"
+        },
+        "score": 513,
+        "cellScores": {
+          "0-0": 100,
+          "0-1": 75,
+          "0-2": 75,
+          "1-0": 10,
+          "1-1": 10,
+          "1-2": 33,
+          "2-0": 10,
+          "2-1": 100,
+          "2-2": 100
+        }
+      }
+    ]
+  },
+  "user_s83vaxzp5": {
+    "totalGames": 4,
+    "gamesWon": 3,
+    "currentStreak": 1,
+    "lastPlayedDate": "2025-12-15T00:15:31.998Z",
+    "gameHistory": [
+      {
+        "timestamp": "2025-12-14T23:33:25.716Z",
+        "won": true,
+        "playerSelections": {
+          "0-0": "10613/felix-schutz",
+          "0-1": "37500/louis-marc-aubry",
+          "0-2": "195952/ty-ronning",
+          "1-0": "34837/dominik-bittner",
+          "1-1": "85174/fabio-pfohl",
+          "1-2": "12505/spencer-machacek",
+          "2-0": "42810/mathias-niederberger",
+          "2-1": "10612/philip-gogulla",
+          "2-2": "17640/marco-nowak"
+        }
+      },
+      {
+        "timestamp": "2025-12-15T00:03:51.839Z",
+        "won": true,
+        "playerSelections": {
+          "0-0": "13962/yannic-seidenberg",
+          "0-1": "37500/louis-marc-aubry",
+          "0-2": "195952/ty-ronning",
+          "1-0": "34837/dominik-bittner",
+          "1-1": "85174/fabio-pfohl",
+          "1-2": "12505/spencer-machacek",
+          "2-0": "10612/philip-gogulla",
+          "2-1": "95507/maximilian-kammerer",
+          "2-2": "81881/nils-antons"
+        },
+        "score": 900,
+        "cellScores": {
+          "0-0": 100,
+          "0-1": 100,
+          "0-2": 100,
+          "1-0": 100,
+          "1-1": 100,
+          "1-2": 100,
+          "2-0": 100,
+          "2-1": 100,
+          "2-2": 100
+        }
+      },
+      {
+        "timestamp": "2025-12-15T00:04:13.656Z",
+        "won": false,
+        "playerSelections": {
+          "0-0": "",
+          "0-1": "",
+          "0-2": "",
+          "1-0": "",
+          "1-1": "",
+          "1-2": "",
+          "2-0": "",
+          "2-1": "",
+          "2-2": "81881/nils-antons"
+        },
+        "score": 100,
+        "cellScores": {
+          "0-0": 0,
+          "0-1": 0,
+          "0-2": 0,
+          "1-0": 0,
+          "1-1": 0,
+          "1-2": 0,
+          "2-0": 0,
+          "2-1": 0,
+          "2-2": 100
+        }
+      },
+      {
+        "timestamp": "2025-12-15T00:15:31.998Z",
+        "won": true,
+        "playerSelections": {
+          "0-0": "10613/felix-schutz",
+          "0-1": "37500/louis-marc-aubry",
+          "0-2": "195952/ty-ronning",
+          "1-0": "12383/david-leggio",
+          "1-1": "9029/jason-jaspers",
+          "1-2": "9202/justin-pogge",
+          "2-0": "11844/jerome-flaake",
+          "2-1": "82551/leo-stefan",
+          "2-2": "80201/thomas-schinko"
+        },
+        "score": 564,
+        "cellScores": {
+          "0-0": 10,
+          "0-1": 10,
+          "0-2": 10,
+          "1-0": 100,
+          "1-1": 67,
+          "1-2": 67,
+          "2-0": 100,
+          "2-1": 100,
+          "2-2": 100
+        }
+      }
+    ]
+  }
+}
