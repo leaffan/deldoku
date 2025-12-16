@@ -30,6 +30,8 @@
 	let playerSearchComponent: any = $state(null);
 	let isAutoSubmitting = $state(false);
 	let answersGiven = $state(0); // Zählt alle Antworten (richtig oder falsch)
+	let currentScore = $state<number | undefined>(undefined); // Aktuelle Punktzahl
+	let cellScores = $state<Record<string, number>>({}); // Punkte pro Zelle
 
 	// Derived state: Liste der verwendeten Spieler-IDs
 	let usedPlayerIds = $derived.by(() => {
@@ -106,7 +108,7 @@
 		}
 	}
 
-	function submitSolution() {
+	async function submitSolution() {
 		let correctCount = 0;
 		const playerSelections: Record<string, string> = {};
 
@@ -141,13 +143,31 @@
 			}
 		}
 
+		// Berechne Score
+		try {
+			const { getApiBasePath } = await import('$lib/data');
+			const { calculateRarityScore } = await import('$lib/data');
+			const apiPath = getApiBasePath();
+			const response = await fetch(`${apiPath}api/stats`);
+			let allStats = {};
+			if (response.ok) {
+				allStats = await response.json();
+			}
+			const scoreResult = calculateRarityScore(playerSelections, allStats);
+			currentScore = scoreResult.totalScore;
+			cellScores = scoreResult.cellScores;
+		} catch (error) {
+			console.error('Error calculating score:', error);
+			currentScore = undefined;
+		}
+
 		// Gebe Feedback
 		if (correctCount === 9) {
 			feedback = t('correctAnswer', $languageStore);
-			statsStore.addGame(true, playerSelections);
+			await statsStore.addGame(true, playerSelections);
 		} else {
 			feedback = `⏁ ${correctCount}/9 ${t('partialAnswer', $languageStore)}`;
-			statsStore.addGame(false, playerSelections);
+			await statsStore.addGame(false, playerSelections);
 		}
 
 		setTimeout(() => {
@@ -211,10 +231,19 @@
 		{answersGiven}/9 {t('answersGiven', $languageStore)}
 	</div>
 
+	<!-- Score Display (permanent after submission) -->
+	{#if currentScore !== undefined}
+		<div class="mt-6 p-4 rounded-lg font-bold w-full max-w-2xl text-center bg-blue-50 border-2 border-blue-300">
+			<div class="text-3xl text-blue-700">
+				{t('score', $languageStore)}: {currentScore}/900
+			</div>
+		</div>
+	{/if}
+
 	<!-- Feedback Message -->
 	{#if feedback}
 		<div
-			class={`mt-6 p-4 rounded-lg font-semibold w-full max-w-2xl text-center ${correctCells.length === 9 ? 'bg-green-100 text-green-800' : feedback.startsWith('✓') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+			class={`mt-4 p-4 rounded-lg font-semibold w-full max-w-2xl text-center ${correctCells.length === 9 ? 'bg-green-100 text-green-800' : feedback.startsWith('✓') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
 		>
 			{feedback}
 		</div>
@@ -241,6 +270,8 @@
 				selectedCell = null;
 				feedback = '';
 				answersGiven = 0; // Reset counter
+				currentScore = undefined; // Reset score
+				cellScores = {}; // Reset cell scores
 			}}
 			class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
 		>
