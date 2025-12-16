@@ -16,6 +16,8 @@ export interface GameEntry {
 	timestamp: string; // ISO 8601 full timestamp
 	won: boolean;
 	playerSelections: Record<string, string>; // "0-0": "p1", "0-1": "p2", etc.
+	score?: number; // Punktzahl (0-900)
+	cellScores?: Record<string, number>; // Punkte pro Zelle
 }
 
 export interface PlayerStats {
@@ -121,13 +123,33 @@ function createStatsStore() {
 			}
 		},
 		
-		addGame: (won: boolean, playerSelections: Record<string, string>) => {
+		addGame: async (won: boolean, playerSelections: Record<string, string>) => {
+			// Lade alle Stats vom Server um Seltenheit zu berechnen
+			let allStats: Record<string, any> = {};
+			
+			try {
+				const apiPath = getApiBasePath();
+				const response = await fetch(`${apiPath}api/stats`);
+				if (response.ok) {
+					const data = await response.json();
+					allStats = data;
+				}
+			} catch (error) {
+				console.error('Error loading all stats for score calculation:', error);
+			}
+
+			// Berechne Punkte basierend auf Seltenheit
+			const { calculateRarityScore } = await import('./data');
+			const { totalScore, cellScores } = calculateRarityScore(playerSelections, allStats);
+
 			update((state) => {
 				const timestamp = new Date().toISOString();
 				const newEntry: GameEntry = {
 					timestamp,
 					won,
-					playerSelections
+					playerSelections,
+					score: totalScore,
+					cellScores
 				};
 
 				const newStats = {
