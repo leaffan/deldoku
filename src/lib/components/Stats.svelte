@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { statsStore, languageStore, winRate } from '$lib/stores';
+	import { statsStore, languageStore, winRate, playersStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
 
 	interface Props {
@@ -7,6 +7,13 @@
 	}
 
 	let { showStats = false }: Props = $props();
+
+	// Finde Spielernamen basierend auf ID
+	function getPlayerName(playerId: string): string {
+		if (!playerId) return '(leer)';
+		const player = $playersStore.find(p => p.id === playerId);
+		return player ? player.name : playerId;
+	}
 </script>
 
 <div class="bg-white rounded-lg shadow-lg p-6">
@@ -43,23 +50,32 @@
 								hour: '2-digit',
 								minute: '2-digit'
 							})}</div>
-						<div class="flex gap-2 items-center">
-							{#if game.score !== undefined}
-								<span class="text-xs sm:text-sm font-bold text-blue-600">
-									{game.score}/900
-								</span>
-							{/if}
-							<div class="text-xs sm:text-sm font-bold {game.won ? 'text-green-600' : 'text-red-600'}">
-								{game.won ? t('won', $languageStore) : t('lost', $languageStore)}
-							</div>
+							<div class="flex gap-2 items-center">
+								{#if game.score !== undefined}
+									<span class="text-xs sm:text-sm font-bold text-blue-600">
+										{game.score}/900
+									</span>
+								{/if}
+								<div class="text-xs sm:text-sm font-bold {game.won ? 'text-green-600' : 'text-red-600'}">
+									{game.won ? t('won', $languageStore) : t('lost', $languageStore)}
+								</div>
 							</div>
 						</div>
 						<details class="text-xs text-gray-600">
 							<summary class="cursor-pointer hover:text-gray-800">Details anzeigen</summary>
 							<div class="mt-2 space-y-1">
 								{#each Object.entries(game.playerSelections) as [cellKey, playerId]}
-									<div class="ml-2">
-										<span class="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-xs">{cellKey}</span>: {playerId}
+									{@const score = game.cellScores?.[cellKey] ?? 0}
+									<div class="ml-2 flex justify-between items-center">
+										<div>
+											<span class="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-xs">{cellKey}</span>: 
+											<span class={playerId ? 'font-semibold' : 'text-gray-400 italic'}>
+												{getPlayerName(playerId)}
+											</span>
+										</div>
+										<span class="text-xs font-bold {score > 0 ? 'text-blue-600' : 'text-red-600'}">
+											{score} Pkt
+										</span>
 									</div>
 								{/each}
 							</div>
