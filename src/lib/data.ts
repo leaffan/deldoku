@@ -128,12 +128,16 @@ export function validatePlayerMatch(
     return true;
 }
 
+import { debug } from './debug';
+
 export function calculateRarityScore(
 	playerSelections: Record<string, string>,
 	allStats: Record<string, any>
 ): { totalScore: number; cellScores: Record<string, number> } {
 	const cellScores: Record<string, number> = {};
 	let totalScore = 0;
+
+	debug('🎯 Starting score calculation...');
 
 	// Zähle wie oft jeder Spieler in jeder Position verwendet wurde
 	const usageCounts: Record<string, Record<string, number>> = {};
@@ -160,29 +164,36 @@ export function calculateRarityScore(
 		});
 	});
 
-	// Finde die maximale Verwendung pro Position (für Normalisierung)
-	const maxUsagePerCell: Record<string, number> = {};
+	// Berechne die Gesamtzahl aller Antworten pro Zelle (für Normalisierung)
+	const totalAnswersPerCell: Record<string, number> = {};
 	Object.entries(usageCounts).forEach(([cellKey, playerCounts]) => {
 		const counts = Object.values(playerCounts);
-		maxUsagePerCell[cellKey] = counts.length > 0 ? Math.max(...counts) : 1;
+		totalAnswersPerCell[cellKey] = counts.reduce((sum, count) => sum + count, 0);
 	});
+
+	debug('📊 Total answers per cell:', totalAnswersPerCell);
 
 	// Berechne Punkte für jede Zelle
 	Object.entries(playerSelections).forEach(([cellKey, playerId]) => {
 		if (!playerId || playerId === '') {
 			// Leere Zelle = 0 Punkte
 			cellScores[cellKey] = 0;
+			debug(`  ${cellKey}: (leer) → 0 Punkte`);
 		} else {
 			const usageCount = usageCounts[cellKey]?.[playerId] || 0;
-			const maxUsage = maxUsagePerCell[cellKey] || 1;
+			const totalAnswers = totalAnswersPerCell[cellKey] || 1;
 			
-			// Dynamische Formel: 100 * (1 - usageCount / maxUsage)
+			// Dynamische Formel: 100 * (1 - usageCount / totalAnswers)
 			// Minimum 10 Punkte für richtige Antworten
-			const score = Math.max(10, Math.round(100 * (1 - usageCount / maxUsage)));
+			const score = Math.max(10, Math.round(100 * (1 - usageCount / totalAnswers)));
 			cellScores[cellKey] = score;
 			totalScore += score;
+			
+			debug(`  ${cellKey}: ${playerId.split('/')[1] || playerId} → ${usageCount}/${totalAnswers} Verwendungen = ${score} Punkte`);
 		}
 	});
+
+	debug(`✅ Total Score: ${totalScore}/900`);
 
 	return { totalScore, cellScores };
 }

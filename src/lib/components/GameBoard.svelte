@@ -144,31 +144,20 @@
 			}
 		}
 
-		// Berechne Score
-		try {
-			const { getApiBasePath } = await import('$lib/data');
-			const { calculateRarityScore } = await import('$lib/data');
-			const apiPath = getApiBasePath();
-			const response = await fetch(`${apiPath}api/stats`);
-			let allStats = {};
-			if (response.ok) {
-				allStats = await response.json();
-			}
-			const scoreResult = calculateRarityScore(playerSelections, allStats);
-			currentScore = scoreResult.totalScore;
-			cellScores = scoreResult.cellScores;
-		} catch (error) {
-			console.error('Error calculating score:', error);
-			currentScore = undefined;
-		}
-
-		// Gebe Feedback
+		// Gebe Feedback und berechne Score
+		let result;
 		if (correctCount === 9) {
 			feedback = t('correctAnswer', $languageStore);
-			await statsStore.addGame(true, playerSelections);
+			result = await statsStore.addGame(true, playerSelections);
 		} else {
 			feedback = `⏁ ${correctCount}/9 ${t('partialAnswer', $languageStore)}`;
-			await statsStore.addGame(false, playerSelections);
+			result = await statsStore.addGame(false, playerSelections);
+		}
+
+		// Setze Score aus dem Ergebnis
+		if (result) {
+			currentScore = result.score;
+			cellScores = result.cellScores;
 		}
 
 		setTimeout(() => {

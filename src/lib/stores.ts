@@ -175,6 +175,9 @@ function createStatsStore() {
 
 				return newStats;
 			});
+			
+			// Gebe Score und cellScores zurück
+			return { score: totalScore, cellScores };
 		},
 		
 		resetStats: () => {
