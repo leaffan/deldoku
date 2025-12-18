@@ -7,13 +7,28 @@ import cgitb
 import json
 import os
 import sys
+from datetime import date
 from pathlib import Path
 
 # Aktiviere CGI-Fehlerausgabe für Debugging
 cgitb.enable()
 
-# Pfad zur Stats-Datei (zwei Ebenen höher als das Script)
-STATS_FILE = Path(__file__).parent.parent.parent / 'data' / 'stats.json'
+# Basis-Pfad für Stats-Dateien
+DATA_DIR = Path(__file__).parent.parent.parent / 'data'
+
+
+def get_challenge_date(stats):
+    """Extrahiere Challenge-Datum aus Stats"""
+    if isinstance(stats, dict) and 'currentChallenge' in stats:
+        return stats['currentChallenge']
+    return date.today().isoformat()
+
+
+def get_stats_file(challenge_date=None):
+    """Pfad zur Stats-Datei für ein Challenge-Datum"""
+    if not challenge_date:
+        challenge_date = date.today().isoformat()
+    return DATA_DIR / f'stats_{challenge_date}.json'
 
 
 def send_response(data, status=200):
@@ -28,20 +43,24 @@ def send_response(data, status=200):
     sys.exit(0)
 
 
-def load_stats():
-    """Lade alle Stats aus der Datei"""
-    if STATS_FILE.exists():
-        with open(STATS_FILE, 'r', encoding='utf-8') as f:
+def load_stats(challenge_date=None):
+    """Lade Stats für ein Challenge-Datum"""
+    stats_file = get_stats_file(challenge_date)
+    
+    if stats_file.exists():
+        with open(stats_file, 'r', encoding='utf-8') as f:
             return json.load(f)
     return {}
 
 
-def save_stats(stats):
-    """Speichere Stats in die Datei"""
+def save_stats(stats, challenge_date=None):
+    """Speichere Stats für ein Challenge-Datum"""
+    stats_file = get_stats_file(challenge_date)
+    
     # Erstelle Verzeichnis falls nicht vorhanden
-    STATS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    stats_file.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(STATS_FILE, 'w', encoding='utf-8') as f:
+    with open(stats_file, 'w', encoding='utf-8') as f:
         json.dump(stats, f, indent=2, ensure_ascii=False)
 
 
@@ -49,8 +68,9 @@ def handle_get():
     """GET Request: Lade Stats"""
     form = cgi.FieldStorage()
     user_id = form.getvalue('userId')
+    challenge_date = form.getvalue('challengeDate')  # Optional: Challenge-Datum
 
-    all_stats = load_stats()
+    all_stats = load_stats(challenge_date)
 
     if user_id:
         # Gebe nur Stats für einen User zurück
@@ -78,19 +98,23 @@ def handle_post():
         if not user_id or not stats:
             send_response({'error': 'userId and stats required'}, 400)
 
-        # Lade existierende Stats
-        all_stats = load_stats()
+        # Bestimme Challenge-Datum aus Stats
+        challenge_date = get_challenge_date(stats)
+
+        # Lade existierende Stats für dieses Challenge-Datum
+        all_stats = load_stats(challenge_date)
 
         # Update Stats für diesen User
         all_stats[user_id] = stats
 
-        # Speichere zurück
-        save_stats(all_stats)
+        # Speichere zurück in die challenge-spezifische Datei
+        save_stats(all_stats, challenge_date)
 
         send_response({
             'success': True,
             'userId': user_id,
-            'stats': stats
+            'stats': stats,
+            'challengeDate': challenge_date
         })
     except json.JSONDecodeError:
         send_response({'error': 'Invalid JSON'}, 400)

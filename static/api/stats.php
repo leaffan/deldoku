@@ -5,11 +5,24 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Pfad zur Stats-Datei
-$statsFile = __DIR__ . '/../../data/stats.json';
+// Funktion um Challenge-Datum aus Stats zu extrahieren
+function getChallengeDate($stats) {
+    if (isset($stats['currentChallenge'])) {
+        return $stats['currentChallenge'];
+    }
+    return date('Y-m-d'); // Fallback: heutiges Datum
+}
+
+// Funktion um Stats-Datei für ein Challenge-Datum zu bekommen
+function getStatsFile($challengeDate = null) {
+    if (!$challengeDate) {
+        $challengeDate = date('Y-m-d');
+    }
+    return __DIR__ . "/../../data/stats_$challengeDate.json";
+}
 
 // Stelle sicher, dass das data-Verzeichnis existiert
-$dataDir = dirname($statsFile);
+$dataDir = __DIR__ . '/../../data';
 if (!file_exists($dataDir)) {
     mkdir($dataDir, 0755, true);
 }
@@ -23,8 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // GET: Lade Stats
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $userId = $_GET['userId'] ?? null;
+    $challengeDate = $_GET['challengeDate'] ?? date('Y-m-d');
     
-    // Lade alle Stats
+    $statsFile = getStatsFile($challengeDate);
+    
+    // Lade alle Stats für dieses Challenge-Datum
     $allStats = [];
     if (file_exists($statsFile)) {
         $content = file_get_contents($statsFile);
@@ -59,7 +75,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userId = $data['userId'];
     $stats = $data['stats'];
     
-    // Lade existierende Stats
+    // Extrahiere Challenge-Datum aus Stats
+    $challengeDate = getChallengeDate($stats);
+    $statsFile = getStatsFile($challengeDate);
+    
+    // Lade existierende Stats für dieses Challenge-Datum
     $allStats = [];
     if (file_exists($statsFile)) {
         $content = file_get_contents($statsFile);
@@ -75,7 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode([
         'success' => true,
         'userId' => $userId,
-        'stats' => $stats
+        'stats' => $stats,
+        'challengeDate' => $challengeDate
     ]);
     exit;
 }
