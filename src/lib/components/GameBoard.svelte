@@ -169,7 +169,6 @@
 <div class="w-full flex flex-col items-center">
 	<div class="mb-6 text-center">
 		<h1 class="text-2xl sm:text-3xl font-bold mb-4">{t('title', $languageStore)}</h1>
-		<p class="text-sm sm:text-base text-gray-600">{t('subtitle', $languageStore)}</p>
 	</div>
 
 	<div class="mb-6 p-4 bg-blue-50 rounded-lg w-full max-w-2xl px-3 sm:px-4">
