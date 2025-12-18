@@ -23,9 +23,9 @@ export interface GameEntry {
 export interface PlayerStats {
 	totalGames: number;
 	gamesWon: number;
-	currentStreak: number;
 	lastPlayedDate: string; // ISO 8601 full timestamp
 	gameHistory: GameEntry[];
+	currentChallenge?: string; // Challenge-Datum (YYYY-MM-DD)
 }
 
 const defaultGameState: GameState = {
@@ -42,7 +42,6 @@ const defaultGameState: GameState = {
 const defaultStats: PlayerStats = {
 	totalGames: 0,
 	gamesWon: 0,
-	currentStreak: 0,
 	lastPlayedDate: '',
 	gameHistory: []
 };
@@ -160,12 +159,9 @@ function createStatsStore() {
 				const newStats = {
 					...state,
 					totalGames: state.totalGames + 1,
-					gamesWon: won ? state.gamesWon + 1 : state.gamesWon,
-					currentStreak: won ? state.currentStreak + 1 : 0,
-					lastPlayedDate: timestamp,
-					gameHistory: [...(state.gameHistory || []), newEntry]
-				};
-
+					gamesWon: won ? state.gamesWon + 1 : state.gamesWon,				lastPlayedDate: timestamp,
+				gameHistory: [...(state.gameHistory || []), newEntry]
+			};
 				// Speichere auf Server und localStorage
 				if (typeof window !== 'undefined' && userId) {
 					const apiPath = getApiBasePath();
