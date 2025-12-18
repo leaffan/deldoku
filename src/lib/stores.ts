@@ -122,30 +122,8 @@ function createStatsStore() {
 			}
 		},
 		
-		addGame: async (won: boolean, playerSelections: Record<string, string>) => {
-			// Lade alle Stats vom Server um Seltenheit zu berechnen
-			let allStats: Record<string, any> = {};
-			
-			try {
-				const apiPath = getApiBasePath();
-				const response = await fetch(`${apiPath}api/stats`);
-				if (response.ok) {
-					const data = await response.json();
-					allStats = data;
-				}
-			} catch (error) {
-				console.error('Error loading all stats for score calculation:', error);
-			}
-
-			// Berechne Punkte basierend auf Seltenheit
-			const { calculateRarityScore } = await import('./data');
-		let { totalScore, cellScores } = calculateRarityScore(playerSelections, allStats);
-		
-		// Bonus für gewonnene Spiele: 100 Punkte extra
-		if (won) {
-			totalScore += 100;
-		}
-
+		addGame: async (won: boolean, playerSelections: Record<string, string>, totalScore: number, cellScores: Record<string, number>) => {
+			// Score und cellScores werden jetzt von außen übergeben (bereits während des Spiels berechnet)
 			update((state) => {
 				const timestamp = new Date().toISOString();
 				const newEntry: GameEntry = {
@@ -176,9 +154,6 @@ function createStatsStore() {
 
 				return newStats;
 			});
-			
-			// Gebe Score und cellScores zurück
-			return { score: totalScore, cellScores };
 		},
 		
 		resetStats: () => {
