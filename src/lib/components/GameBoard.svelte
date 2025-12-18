@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { DELPlayer, DELDokuChallenge } from '$lib/data';
-	import { validatePlayerMatch } from '$lib/data';
+	import { validatePlayerMatch, getApiBasePath } from '$lib/data';
 	import { playersStore, languageStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
 	import { debug } from '$lib/debug';
@@ -28,11 +28,14 @@
 	let feedback = $state<string>('');
 	let correctCells = $state<string[]>([]);
 	let incorrectCells = $state<string[]>([]);
+	let incorrectPlayersByCell = $state<Record<string, string[]>>({}); // Falsche Spieler pro Zelle
 	let playerSearchComponent: any = $state(null);
 	let isAutoSubmitting = $state(false);
 	let answersGiven = $state(0); // Zählt alle Antworten (richtig oder falsch)
-	let currentScore = $state<number | undefined>(undefined); // Aktuelle Punktzahl
+	let currentScore = $state<number>(0); // Aktuelle Punktzahl
 	let cellScores = $state<Record<string, number>>({}); // Punkte pro Zelle
+	let cachedStats: Record<string, any> | null = null; // Zwischenspeicher für Stats
+	let gameFinished = $state(false); // Ob das Spiel beendet wurde
 
 	// Derived state: Liste der verwendeten Spieler-IDs
 	let usedPlayerIds = $derived.by(() => {
@@ -42,6 +45,34 @@
 	// Derived state: Anzahl gefüllter Zellen (egal ob richtig oder falsch)
 	let filledCells = $derived.by(() => {
 		return gameGrid.flat().filter(p => p !== null).length;
+	});
+
+	// Lade Stats beim Mounting der Komponente
+	async function preloadStats() {
+		if (!cachedStats) {
+			try {
+				const apiPath = getApiBasePath();
+				const response = await fetch(`${apiPath}api/stats`);
+				cachedStats = await response.json();
+				debug('📥 Stats vorab geladen und gecached');
+			} catch (error) {
+				console.error('Error preloading stats:', error);
+			}
+		}
+	}
+
+	// Stats beim Laden der Seite vorladen
+	$effect(() => {
+		preloadStats();
+	});
+
+	// Fokussiere das Eingabefeld wenn eine Zelle ausgewählt wird
+	$effect(() => {
+		if (selectedCell !== null) {
+			setTimeout(() => {
+				playerSearchComponent?.focusInput();
+			}, 100);
+		}
 	});
 
 	function getCellKey(row: number, col: number): string {
@@ -62,7 +93,7 @@
 		correctCells = correctCells.filter((k) => k !== key);
 	}
 
-	function handlePlayerSelect(player: DELPlayer) {
+	async function handlePlayerSelect(player: DELPlayer) {
 		if (selectedCell) {
 			const [row, col] = selectedCell;
 			const isCorrect = validatePlayerMatch(
@@ -87,26 +118,78 @@
 
 				addCorrectCell(cellKey);
 				feedback = `✓ Richtig! ${player.name}`;
-			} else {
-				feedback = `✗ Falsch! ${player.name} passt nicht hier.`;
-				addIncorrectCell(cellKey);
-			}
-
-			selectedCell = null;
+				playerSearchComponent?.showFeedback(true);
+				
+				// Berechne Score nur für diese eine Zelle
+				await updateScoreForCell(cellKey, player.id);
+			
+			// Overlay verzögert schließen bei richtiger Antwort
 			setTimeout(() => {
-				feedback = '';
-			}, 3000);
-
-			// Überprüfe, ob 9 Antworten gegeben wurden
-			if (answersGiven === 9 && !isAutoSubmitting) {
-				debug('9 answers given - auto-submitting...');
-				isAutoSubmitting = true;
-				setTimeout(() => {
-					submitSolution();
-					isAutoSubmitting = false;
-				}, 100);
+				selectedCell = null;
+			}, 600);
+		} else {
+			feedback = `✗ Falsch! ${player.name} passt nicht hier.`;
+			addIncorrectCell(cellKey);
+			playerSearchComponent?.showFeedback(false);			// Speichere falsche Antwort für diese Zelle
+			if (!incorrectPlayersByCell[cellKey]) {
+				incorrectPlayersByCell[cellKey] = [];
 			}
+			if (!incorrectPlayersByCell[cellKey].includes(player.id)) {
+				incorrectPlayersByCell[cellKey] = [...incorrectPlayersByCell[cellKey], player.id];
+			}			// Overlay bleibt offen bei falscher Antwort
 		}
+
+		setTimeout(() => {
+			feedback = '';
+		}, 3000);
+
+		// Überprüfe, ob 9 Antworten gegeben wurden
+		if (answersGiven === 9 && !isAutoSubmitting) {
+			debug('9 answers given - auto-submitting...');
+			isAutoSubmitting = true;
+			setTimeout(() => {
+				submitSolution();
+				isAutoSubmitting = false;
+			}, 800);
+		}
+		}
+	}
+
+	async function updateScoreForCell(cellKey: string, playerId: string) {
+		// Lade Stats nur beim ersten Mal, danach aus Cache
+		if (!cachedStats) {
+			const apiPath = getApiBasePath();
+			const response = await fetch(`${apiPath}api/stats`);
+			cachedStats = await response.json();
+			debug('📥 Stats geladen und gecached');
+		}
+		const allStats = cachedStats;
+
+		// Zähle wie oft dieser Spieler in dieser Position verwendet wurde
+		const usageCounts: Record<string, number> = {};
+		
+		// Durchlaufe alle Spielerstatistiken
+		Object.values(allStats).forEach((stats: any) => {
+			stats.gameHistory?.forEach((game: any) => {
+				const playerInCell = game.playerSelections?.[cellKey];
+				if (playerInCell && playerInCell !== '') {
+					usageCounts[playerInCell] = (usageCounts[playerInCell] || 0) + 1;
+				}
+			});
+		});
+
+		// Berechne Gesamtzahl aller Antworten für diese Zelle
+		const totalAnswers = Object.values(usageCounts).reduce((sum, count) => sum + count, 0) || 1;
+		const usageCount = usageCounts[playerId] || 0;
+		
+		// Dynamische Formel: 100 * (1 - usageCount / totalAnswers), Minimum 10 Punkte
+		const score = Math.max(10, Math.round(100 * (1 - usageCount / totalAnswers)));
+		
+		// Update Score und cellScores
+		cellScores[cellKey] = score;
+		currentScore += score;
+		
+		debug(`Score für ${cellKey}: ${playerId} → ${usageCount}/${totalAnswers} Verwendungen = ${score} Punkte (Total: ${currentScore})`);
 	}
 
 	async function submitSolution() {
@@ -144,21 +227,20 @@
 			}
 		}
 
-		// Gebe Feedback und berechne Score
-		let result;
-		if (correctCount === 9) {
+		// Gebe Feedback und füge Bonus hinzu
+		const won = correctCount === 9;
+		gameFinished = true; // Spiel ist beendet
+		if (won) {
 			feedback = t('correctAnswer', $languageStore);
-			result = await statsStore.addGame(true, playerSelections);
+			// Bonus für gewonnene Spiele: 100 Punkte extra
+			currentScore += 100;
+			debug(`🎉 Spiel gewonnen! Bonus +100 Punkte → Total: ${currentScore}/1000`);
 		} else {
 			feedback = `⏁ ${correctCount}/9 ${t('partialAnswer', $languageStore)}`;
-			result = await statsStore.addGame(false, playerSelections);
 		}
-
-		// Setze Score aus dem Ergebnis
-		if (result) {
-			currentScore = result.score;
-			cellScores = result.cellScores;
-		}
+		
+		// Speichere das Spiel in den Stats (Score ist bereits berechnet)
+		await statsStore.addGame(won, playerSelections, currentScore, cellScores);
 
 		setTimeout(() => {
 			feedback = '';
@@ -167,16 +249,47 @@
 </script>
 
 <div class="w-full flex flex-col items-center">
-	<div class="mb-6 text-center">
-		<h1 class="text-2xl sm:text-3xl font-bold mb-4">{t('title', $languageStore)}</h1>
+	<div class="mb-3 text-center">
+		<h1 class="text-2xl sm:text-3xl font-bold mb-2">{t('title', $languageStore)}</h1>
 	</div>
 
-	<div class="mb-6 p-4 bg-blue-50 rounded-lg w-full max-w-2xl px-3 sm:px-4">
-		<PlayerSearch bind:this={playerSearchComponent} onPlayerSelect={handlePlayerSelect} usedPlayerIds={usedPlayerIds} />
+	<!-- Action Buttons (above game board) -->
+	<div class="mb-2 flex items-stretch gap-2 w-80 sm:w-96 md:w-112 mx-auto">
+		<button
+			onclick={submitSolution}
+			disabled={gameFinished}
+			class="flex-1 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-2 rounded-lg transition-colors text-sm whitespace-nowrap"
+		>
+			{t('submitSolution', $languageStore)}
+		</button>
+		
+		<button
+			onclick={async () => {
+				gameGrid = [
+					[null, null, null],
+					[null, null, null],
+					[null, null, null]
+				];
+				correctCells = [];
+				incorrectCells = [];
+				incorrectPlayersByCell = {}; // Reset incorrect players
+				selectedCell = null;
+				feedback = '';
+				answersGiven = 0; // Reset counter
+				currentScore = 0; // Reset score
+				cellScores = {}; // Reset cell scores
+				cachedStats = null; // Reset cache
+				gameFinished = false; // Reset game state
+				await preloadStats(); // Stats neu laden
+			}}
+			class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-2 rounded-lg transition-colors text-sm whitespace-nowrap"
+		>
+			{t('restartGame', $languageStore)}
+		</button>
 	</div>
 
 	<!-- Game Grid -->
-	<div class="inline-block bg-white shadow-lg rounded-lg overflow-hidden mb-6 max-w-full">
+	<div class="inline-block bg-white shadow-lg rounded-lg overflow-hidden max-w-full">
 		<!-- Header with column categories -->
 		<div class="flex">
 			<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gray-200 flex items-center justify-center font-bold text-center text-xs p-2">
@@ -215,56 +328,57 @@
 		{/each}
 	</div>
 
-	<!-- Correct cells counter -->
-	<div class="mt-6 text-center text-sm text-gray-600">
-		{answersGiven}/9 {t('answersGiven', $languageStore)}
+	<!-- Counter and Score Display (below game board) -->
+	<div class="mt-2 flex items-stretch gap-2 w-80 sm:w-96 md:w-112 mx-auto">
+		<div class={`flex-1 p-2 rounded-lg ${gameFinished ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50 border-2 border-gray-300'}`}>
+			<div class={`text-xs sm:text-sm ${gameFinished ? 'font-bold text-blue-800' : 'font-semibold text-gray-700'} text-center whitespace-nowrap`}>
+				{t('answersGiven', $languageStore)}: {answersGiven} / 9
+			</div>
+		</div>
+		
+		<div class={`flex-1 p-2 rounded-lg ${gameFinished ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50 border-2 border-gray-300'}`}>
+			<div class={`text-xs sm:text-sm ${gameFinished ? 'font-bold text-blue-800' : 'font-semibold text-gray-700'} text-center whitespace-nowrap`}>
+				{t('score', $languageStore)}: {currentScore} / 1000
+			</div>
+		</div>
 	</div>
 
-	<!-- Score Display (permanent after submission) -->
-	{#if currentScore !== undefined}
-		<div class="mt-6 p-4 rounded-lg font-bold w-full max-w-2xl text-center bg-blue-50 border-2 border-blue-300">
-			<div class="text-3xl text-blue-700">
-				{t('score', $languageStore)}: {currentScore}/1000
+	<!-- Overlay für Spielereingabe -->
+	{#if selectedCell !== null}
+		<div 
+			class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+			onclick={(e) => {
+				if (e.target === e.currentTarget) {
+					selectedCell = null;
+				}
+			}}
+			onkeydown={(e) => {
+				if (e.key === 'Escape') {
+					selectedCell = null;
+				}
+			}}
+		>
+			<div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl">
+				<div class="mb-4">
+					<h2 class="text-lg font-bold text-gray-800 mb-2 text-center">Spieler auswählen</h2>
+					<div class="text-sm text-gray-600 text-center">
+						<span class="font-semibold">Zeile:</span> {rowCategories[selectedCell[0]]} · 
+						<span class="font-semibold">Spalte:</span> {colCategories[selectedCell[1]]}
+					</div>
+				</div>
+				<PlayerSearch 
+					bind:this={playerSearchComponent} 
+					onPlayerSelect={handlePlayerSelect} 
+					usedPlayerIds={usedPlayerIds}
+					incorrectPlayerIds={selectedCell ? (incorrectPlayersByCell[getCellKey(selectedCell[0], selectedCell[1])] || []) : []}
+				/>
+				<button
+					onclick={() => selectedCell = null}
+					class="mt-4 w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors"
+				>
+					Abbrechen (ESC)
+				</button>
 			</div>
 		</div>
 	{/if}
-
-	<!-- Feedback Message -->
-	{#if feedback}
-		<div
-			class={`mt-4 p-4 rounded-lg font-semibold w-full max-w-2xl text-center ${correctCells.length === 9 ? 'bg-green-100 text-green-800' : feedback.startsWith('✓') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
-		>
-			{feedback}
-		</div>
-	{/if}
-
-	<!-- Action Buttons -->
-	<div class="w-full max-w-2xl space-y-3 mt-6">
-		<button
-			onclick={submitSolution}
-			class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
-		>
-			{t('submitSolution', $languageStore)}
-		</button>
-		
-		<button
-			onclick={() => {
-				gameGrid = [
-					[null, null, null],
-					[null, null, null],
-					[null, null, null]
-				];
-				correctCells = [];
-				incorrectCells = [];
-				selectedCell = null;
-				feedback = '';
-				answersGiven = 0; // Reset counter
-				currentScore = undefined; // Reset score
-				cellScores = {}; // Reset cell scores
-			}}
-			class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
-		>
-			{t('restartGame', $languageStore)}
-		</button>
-	</div>
 </div>
