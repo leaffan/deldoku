@@ -1,5 +1,7 @@
 <script lang="ts">
 	import './layout.css';
+	import { languageStore } from '$lib/stores';
+	import { t } from '$lib/i18n';
 
 	let { children } = $props();
 </script>
@@ -14,7 +16,7 @@
 			<p class="footer-title">DEL-Doku</p>
 			<div class="footer-links">
 				<a href="https://www.leaffan.net/del" target="_blank" rel="noopener noreferrer" class="footer-link">
-					DEL-Statistiken
+					{t('delStats', $languageStore)}
 				</a>
 				<span class="footer-separator">•</span>
 				<a href="mailto:deldoku@leaffan.net" class="footer-link">

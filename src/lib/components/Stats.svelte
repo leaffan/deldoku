@@ -90,7 +90,7 @@
 		</div>
 	{:else}
 		<div class="border-t pt-6 text-center text-gray-500 text-sm">
-			Noch keine Spiele gespielt. Starten Sie ein Spiel um Statistiken zu sammeln!
+			{t('noGamesYet', $languageStore)}
 		</div>
 	{/if}
 </div>

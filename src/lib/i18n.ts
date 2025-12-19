@@ -40,7 +40,10 @@ export const translations = {
 		rulesScoring1: 'Jede richtige Antwort bringt 10-100 Punkte basierend auf der Seltenheit',
 		rulesScoring2: 'Seltenere Spieler (weniger oft verwendet) bringen mehr Punkte',
 		rulesScoring3: 'Bei vollständig gelöstem Rätsel gibt es 100 Bonuspunkte',
-		rulesScoring4: 'Maximale Punktzahl: 1000 Punkte'
+		rulesScoring4: 'Maximale Punktzahl: 1000 Punkte',
+		points: 'Pkt',
+		noGamesYet: 'Noch keine Spiele gespielt. Starten Sie ein Spiel um Statistiken zu sammeln!',
+		delStats: 'DEL-Statistiken'
 	},
 	en: {
 		title: 'DEL-Doku',
@@ -81,7 +84,10 @@ export const translations = {
 		rulesScoring1: 'Each correct answer earns 10-100 points based on rarity',
 		rulesScoring2: 'Rarer players (used less often) earn more points',
 		rulesScoring3: 'Completely solved puzzles earn 100 bonus points',
-		rulesScoring4: 'Maximum score: 1000 points'
+		rulesScoring4: 'Maximum score: 1000 points',
+		points: 'Pts',
+		noGamesYet: 'No games played yet. Start a game to collect statistics!',
+		delStats: 'DEL Statistics'
 	}
 };
 
