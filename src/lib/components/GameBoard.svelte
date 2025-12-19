@@ -6,7 +6,7 @@
 	import { debug } from '$lib/debug';
 	import GameCell from './GameCell.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
-	import { gameStore, statsStore } from '$lib/stores';
+	import { statsStore } from '$lib/stores';
 
 	interface Props {
 		rowCategories: string[];

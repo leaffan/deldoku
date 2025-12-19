@@ -173,7 +173,6 @@ function createStatsStore() {
 	};
 }
 
-export const gameStore = createGameStore();
 export const statsStore = createStatsStore();
 
 export const winRate = derived(statsStore, ($stats) =>
