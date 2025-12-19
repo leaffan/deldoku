@@ -125,7 +125,7 @@ export function validatePlayerMatch(
 		return false;
 	}
 
-    return true;
+	return true;
 }
 
 import { debug } from './debug';

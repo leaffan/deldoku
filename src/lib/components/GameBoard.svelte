@@ -33,6 +33,9 @@
 	let isAutoSubmitting = $state(false);
 	let answersGiven = $state(0); // Zählt alle Antworten (richtig oder falsch)
 	let currentScore = $state<number>(0); // Aktuelle Punktzahl
+	let flashAnswers = $state(false); // Für Flash-Animation bei Antworten
+	let flashScore = $state(false); // Für Flash-Animation bei Punkten
+	let showRules = $state(false); // Für Spielregeln-Overlay
 	let cellScores = $state<Record<string, number>>({}); // Punkte pro Zelle
 	let cachedStats: Record<string, any> | null = null; // Zwischenspeicher für Stats
 	let gameFinished = $state(false); // Ob das Spiel beendet wurde
@@ -69,8 +72,20 @@
 	// Fokussiere das Eingabefeld wenn eine Zelle ausgewählt wird
 	$effect(() => {
 		if (selectedCell !== null) {
+			// Kürzeres Timeout und requestAnimationFrame für bessere Mobile-Kompatibilität
+			requestAnimationFrame(() => {
+				setTimeout(() => {
+					playerSearchComponent?.focusInput();
+				}, 50);
+			});
+		}
+	});
+
+	// Fokussiere das Overlay wenn es geöffnet wird (für ESC-Taste)
+	$effect(() => {
+		if (showRules) {
 			setTimeout(() => {
-				playerSearchComponent?.focusInput();
+				document.querySelector('[data-rules-overlay]')?.focus();
 			}, 100);
 		}
 	});
@@ -108,6 +123,10 @@
 			// Inkrementiere Antwort-Counter (für alle Antworten, richtig oder falsch)
 			answersGiven++;
 			debug('Answers given:', answersGiven);
+			
+			// Triggere Flash-Animation
+			flashAnswers = true;
+			setTimeout(() => flashAnswers = false, 400);
 
 			const cellKey = getCellKey(row, col);
 			
@@ -122,6 +141,10 @@
 				
 				// Berechne Score nur für diese eine Zelle
 				await updateScoreForCell(cellKey, player.id);
+				
+				// Triggere Flash-Animation für Score
+				flashScore = true;
+				setTimeout(() => flashScore = false, 400);
 			
 			// Overlay verzögert schließen bei richtiger Antwort
 			setTimeout(() => {
@@ -169,7 +192,8 @@
 		const usageCounts: Record<string, number> = {};
 		
 		// Durchlaufe alle Spielerstatistiken
-		Object.values(allStats).forEach((stats: any) => {
+		if (allStats) {
+			Object.values(allStats).forEach((stats: any) => {
 			stats.gameHistory?.forEach((game: any) => {
 				const playerInCell = game.playerSelections?.[cellKey];
 				if (playerInCell && playerInCell !== '') {
@@ -177,6 +201,7 @@
 				}
 			});
 		});
+		}
 
 		// Berechne Gesamtzahl aller Antworten für diese Zelle
 		const totalAnswers = Object.values(usageCounts).reduce((sum, count) => sum + count, 0) || 1;
@@ -251,6 +276,15 @@
 <div class="w-full flex flex-col items-center">
 	<div class="mb-3 text-center">
 		<h1 class="text-2xl sm:text-3xl font-bold mb-2">{t('title', $languageStore)}</h1>
+		<button 
+			onclick={() => showRules = true}
+			class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors border border-blue-200 hover:border-blue-300"
+		>
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+			</svg>
+			{t('howToPlay', $languageStore)}
+		</button>
 	</div>
 
 	<!-- Action Buttons (above game board) -->
@@ -330,13 +364,13 @@
 
 	<!-- Counter and Score Display (below game board) -->
 	<div class="mt-2 flex items-stretch gap-2 w-80 sm:w-96 md:w-112 mx-auto">
-		<div class={`flex-1 p-2 rounded-lg ${gameFinished ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50 border-2 border-gray-300'}`}>
+		<div class={`flex-1 p-2 rounded-lg transition-all ${flashAnswers ? 'scale-105 ring-2 ring-blue-500' : ''} ${gameFinished ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50 border-2 border-gray-300'}`}>
 			<div class={`text-xs sm:text-sm ${gameFinished ? 'font-bold text-blue-800' : 'font-semibold text-gray-700'} text-center whitespace-nowrap`}>
 				{t('answersGiven', $languageStore)}: {answersGiven} / 9
 			</div>
 		</div>
 		
-		<div class={`flex-1 p-2 rounded-lg ${gameFinished ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50 border-2 border-gray-300'}`}>
+		<div class={`flex-1 p-2 rounded-lg transition-all ${flashScore ? 'scale-105 ring-2 ring-green-500' : ''} ${gameFinished ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50 border-2 border-gray-300'}`}>
 			<div class={`text-xs sm:text-sm ${gameFinished ? 'font-bold text-blue-800' : 'font-semibold text-gray-700'} text-center whitespace-nowrap`}>
 				{t('score', $languageStore)}: {currentScore} / 1000
 			</div>
@@ -346,6 +380,9 @@
 	<!-- Overlay für Spielereingabe -->
 	{#if selectedCell !== null}
 		<div 
+			role="dialog"
+			aria-modal="true"
+			tabindex="-1"
 			class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
 			onclick={(e) => {
 				if (e.target === e.currentTarget) {
@@ -360,10 +397,10 @@
 		>
 			<div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl">
 				<div class="mb-4">
-					<h2 class="text-lg font-bold text-gray-800 mb-2 text-center">Spieler auswählen</h2>
+					<h2 class="text-lg font-bold text-gray-800 mb-2 text-center">{t('selectPlayer', $languageStore)}</h2>
 					<div class="text-sm text-gray-600 text-center">
-						<span class="font-semibold">Zeile:</span> {rowCategories[selectedCell[0]]} · 
-						<span class="font-semibold">Spalte:</span> {colCategories[selectedCell[1]]}
+						<span class="font-semibold">{t('row', $languageStore)}:</span> {rowCategories[selectedCell[0]]} · 
+						<span class="font-semibold">{t('column', $languageStore)}:</span> {colCategories[selectedCell[1]]}
 					</div>
 				</div>
 				<PlayerSearch 
@@ -376,7 +413,64 @@
 					onclick={() => selectedCell = null}
 					class="mt-4 w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors"
 				>
-					Abbrechen (ESC)
+					{t('cancel', $languageStore)} (ESC)
+				</button>
+			</div>
+		</div>
+	{/if}
+
+	<!-- Overlay für Spielregeln -->
+	{#if showRules}
+		<div 
+			data-rules-overlay
+			class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+			tabindex="-1"
+			onclick={(e) => {
+				if (e.target === e.currentTarget) {
+					showRules = false;
+				}
+			}}
+			onkeydown={(e) => {
+				if (e.key === 'Escape') {
+					showRules = false;
+				}
+			}}
+		>
+			<div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+				<h2 class="text-2xl font-bold text-gray-800 mb-4">{t('howToPlay', $languageStore)}</h2>
+				
+				<div class="space-y-4 text-gray-700">
+					<div>
+						<h3 class="font-bold text-lg mb-2">{t('rulesGoal', $languageStore)}</h3>
+						<p>{t('rulesGoalText', $languageStore)}</p>
+					</div>
+					
+					<div>
+						<h3 class="font-bold text-lg mb-2">{t('rulesHowTo', $languageStore)}</h3>
+						<ul class="list-disc list-inside space-y-1">
+							<li>{t('rulesHowTo1', $languageStore)}</li>
+							<li>{t('rulesHowTo2', $languageStore)}</li>
+							<li>{t('rulesHowTo3', $languageStore)}</li>
+							<li>{t('rulesHowTo4', $languageStore)}</li>
+						</ul>
+					</div>
+					
+					<div>
+						<h3 class="font-bold text-lg mb-2">{t('rulesScoring', $languageStore)}</h3>
+						<ul class="list-disc list-inside space-y-1">
+							<li>{t('rulesScoring1', $languageStore)}</li>
+							<li>{t('rulesScoring2', $languageStore)}</li>
+							<li>{t('rulesScoring3', $languageStore)}</li>
+							<li>{t('rulesScoring4', $languageStore)}</li>
+						</ul>
+					</div>
+				</div>
+				
+				<button
+					onclick={() => showRules = false}
+					class="mt-6 w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors"
+				>
+					{t('close', $languageStore)}
 				</button>
 			</div>
 		</div>

@@ -19,7 +19,11 @@
 
 	// Exportiere eine Funktion zum Fokussieren des Input-Felds
 	export function focusInput() {
-		inputElement?.focus();
+		if (inputElement) {
+			inputElement.focus();
+			// Für Mobile: Explizit die Tastatur öffnen durch click-Event
+			inputElement.click();
+		}
 	}
 
 	// Exportiere eine Funktion zum Anzeigen von Feedback

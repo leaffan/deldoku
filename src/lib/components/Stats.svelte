@@ -54,9 +54,9 @@
 								{#if game.score !== undefined}
 									<span class="text-xs sm:text-sm font-bold text-blue-600">
 									{#if game.won}
-										{game.score - 100} + 100 = {game.score}/1000
+										{game.score - 100} + 100 = {game.score} / 1000
 									{:else}
-										{game.score}/1000
+										{game.score} / 1000
 									{/if}
 									</span>
 								{/if}
@@ -66,7 +66,7 @@
 							</div>
 						</div>
 						<details class="text-xs text-gray-600">
-							<summary class="cursor-pointer hover:text-gray-800">Details anzeigen</summary>
+						<summary class="cursor-pointer hover:text-gray-800">{t('showDetails', $languageStore)}</summary>
 							<div class="mt-2 space-y-1">
 								{#each Object.entries(game.playerSelections) as [cellKey, playerId]}
 									{@const score = game.cellScores?.[cellKey] ?? 0}
