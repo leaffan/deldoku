@@ -37,7 +37,16 @@ export async function loadPlayers(): Promise<DELPlayer[]> {
 	if (samplePlayers.length === 0 && typeof window !== 'undefined') {
 		const basePath = getBasePath();
 		const response = await fetch(`${basePath}all_players.json`);
-		samplePlayers = await response.json();
+		const compressed = await response.json();
+		
+		// Transformiere komprimierte Daten zurück zum vollen Format
+		samplePlayers = compressed.map((p: any) => ({
+			id: p.i,
+			name: p.n,
+			nationality: p.t,
+			first_season: p.f,
+			last_season: p.l
+		}));
 	}
 	return samplePlayers;
 }
