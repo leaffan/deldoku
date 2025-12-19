@@ -17,12 +17,20 @@
 	let selectedIndex = $state(-1); // Index des aktuell markierten Spielers
 	let feedbackStatus = $state<'correct' | 'incorrect' | null>(null); // Feedback-Status
 
+	// Auto-focus when component mounts
+	$effect(() => {
+		if (inputElement) {
+			inputElement.focus();
+		}
+	});
+
 	// Exportiere eine Funktion zum Fokussieren des Input-Felds
 	export function focusInput() {
 		if (inputElement) {
-			inputElement.focus();
-			// Für Mobile: Explizit die Tastatur öffnen durch click-Event
-			inputElement.click();
+			// Fokussieren mit Workaround für Mobile-Browser
+			inputElement.focus({ preventScroll: false });
+			// Trigger input event für bessere Mobile-Kompatibilität
+			inputElement.dispatchEvent(new Event('focus', { bubbles: true }));
 		}
 	}
 
@@ -123,6 +131,7 @@
 		onfocus={handleFocus}
 		onblur={handleBlur}
 		onkeydown={handleKeyDown}
+		autofocus
 		class="w-full px-3 py-2 border-2 rounded-lg transition-colors
 			{feedbackStatus === 'correct' ? 'border-green-500 bg-green-50' : 
 			 feedbackStatus === 'incorrect' ? 'border-red-500 bg-red-50' : 
