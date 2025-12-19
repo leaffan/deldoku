@@ -140,7 +140,7 @@ function createStatsStore() {
 					gamesWon: won ? state.gamesWon + 1 : state.gamesWon,				lastPlayedDate: timestamp,
 				gameHistory: [...(state.gameHistory || []), newEntry]
 			};
-				// Speichere auf Server und localStorage
+				// Speichere auf Server
 				if (typeof window !== 'undefined' && userId) {
 					const apiPath = getApiBasePath();
 					fetch(`${apiPath}api/stats`, {
@@ -148,8 +148,6 @@ function createStatsStore() {
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({ userId, stats: newStats })
 					}).catch(err => console.error('Error saving stats:', err));
-					
-					localStorage.setItem('del_doku_stats', JSON.stringify(newStats));
 				}
 
 				return newStats;
@@ -158,16 +156,13 @@ function createStatsStore() {
 		
 		resetStats: () => {
 			set(defaultStats);
-			if (typeof window !== 'undefined') {
-				localStorage.removeItem('del_doku_stats');
-				if (userId) {
-					const apiPath = getApiBasePath();
-					fetch(`${apiPath}api/stats`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ userId, stats: defaultStats })
-					}).catch(err => console.error('Error resetting stats:', err));
-				}
+			if (typeof window !== 'undefined' && userId) {
+				const apiPath = getApiBasePath();
+				fetch(`${apiPath}api/stats`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ userId, stats: defaultStats })
+				}).catch(err => console.error('Error resetting stats:', err));
 			}
 		}
 	};
