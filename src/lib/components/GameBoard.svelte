@@ -72,12 +72,8 @@
 	// Fokussiere das Eingabefeld wenn eine Zelle ausgewählt wird
 	$effect(() => {
 		if (selectedCell !== null) {
-			// Kürzeres Timeout und requestAnimationFrame für bessere Mobile-Kompatibilität
-			requestAnimationFrame(() => {
-				setTimeout(() => {
-					playerSearchComponent?.focusInput();
-				}, 50);
-			});
+			// Direkter Aufruf ohne Verzögerung für bessere Mobile-Kompatibilität
+			playerSearchComponent?.focusInput();
 		}
 	});
 
@@ -348,6 +344,13 @@
 							colCategory={colCat}
 							player={gameGrid[rowIdx][colIdx]}
 							onCellClick={() => {
+								// Verhindere Eingabe wenn Spiel beendet ist
+								if (gameFinished) return;
+								
+								// Verhindere Eingabe in Zellen mit korrekten Antworten
+								const cellKey = getCellKey(rowIdx, colIdx);
+								if (correctCells.includes(cellKey)) return;
+								
 								selectedCell = [rowIdx, colIdx];
 								playerSearchComponent?.focusInput();
 								debug('Cell clicked:', rowIdx, colIdx, 'selectedCell now:', selectedCell);
@@ -423,6 +426,7 @@
 	{#if showRules}
 		<div 
 			data-rules-overlay
+			role="presentation"
 			class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
 			tabindex="-1"
 			onclick={(e) => {
