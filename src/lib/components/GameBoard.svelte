@@ -56,7 +56,7 @@
 				const apiPath = getApiBasePath();
 				const response = await fetch(`${apiPath}api/stats`);
 				cachedStats = await response.json();
-				debug('📥 Stats vorab geladen und gecached');
+				debug('📥 Stats preloaded and cached');
 			} catch (error) {
 				console.error('Error preloading stats:', error);
 			}
@@ -126,34 +126,35 @@
 			const cellKey = getCellKey(row, col);
 			
 			if (isCorrect) {
-				// Nur richtige Antworten in die Zelle eintragen
+				// Only enter correct answers into the cell
 				gameGrid[row][col] = player;
 				gameGrid = gameGrid; // Trigger reactivity
 
 				addCorrectCell(cellKey);
 				
-				// Berechne Score nur für diese eine Zelle
+				// Calculate score only for this cell
 				await updateScoreForCell(cellKey, player.id);
 				
-				// Triggere Flash-Animation für Score
+				// Trigger flash animation for score
 				flashScore = true;
 				setTimeout(() => flashScore = false, 400);
 			
-			// Overlay verzögert schließen bei richtiger Antwort
-			setTimeout(() => {
-				selectedCell = null;
-			}, 600);
-		} else {
-			addIncorrectCell(cellKey);
-			if (!incorrectPlayersByCell[cellKey]) {
-				incorrectPlayersByCell[cellKey] = [];
+				// Delay closing overlay on correct answer
+				setTimeout(() => {
+					selectedCell = null;
+				}, 600);
+			} else {
+				addIncorrectCell(cellKey);
+				if (!incorrectPlayersByCell[cellKey]) {
+					incorrectPlayersByCell[cellKey] = [];
+					}
+				if (!incorrectPlayersByCell[cellKey].includes(player.id)) {
+					incorrectPlayersByCell[cellKey] = [...incorrectPlayersByCell[cellKey], player.id];
+				}
+				// Keep overlay open on incorrect answer
 			}
-			if (!incorrectPlayersByCell[cellKey].includes(player.id)) {
-				incorrectPlayersByCell[cellKey] = [...incorrectPlayersByCell[cellKey], player.id];
-			}			// Overlay bleibt offen bei falscher Antwort
-		}
 
-		// Überprüfe, ob 9 Antworten gegeben wurden
+		// Check if 9 answers have been given
 		if (answersGiven === 9 && !isAutoSubmitting) {
 			debug('9 answers given - auto-submitting...');
 			isAutoSubmitting = true;
@@ -171,14 +172,14 @@
 			const apiPath = getApiBasePath();
 			const response = await fetch(`${apiPath}api/stats`);
 			cachedStats = await response.json();
-			debug('📥 Stats geladen und gecached');
+			debug('📥 Stats loaded and cached');
 		}
 		const allStats = cachedStats;
 
-		// Zähle wie oft dieser Spieler in dieser Position verwendet wurde
+		// Count how often this player was used in this position
 		const usageCounts: Record<string, number> = {};
 		
-		// Durchlaufe alle Spielerstatistiken
+		// Iterate all player statistics
 		if (allStats) {
 			Object.values(allStats).forEach((stats: any) => {
 			stats.gameHistory?.forEach((game: any) => {
@@ -190,35 +191,35 @@
 		});
 		}
 
-		// Berechne Gesamtzahl aller Antworten für diese Zelle
+		// Calculate total number of answers for this cell
 		const totalAnswers = Object.values(usageCounts).reduce((sum, count) => sum + count, 0) || 1;
 		const usageCount = usageCounts[playerId] || 0;
 		
-		// Dynamische Formel: 100 * (1 - usageCount / totalAnswers), Minimum 10 Punkte
+		// Dynamic formula: 100 * (1 - usageCount / totalAnswers), minimum 10 points
 		const score = Math.max(10, Math.round(100 * (1 - usageCount / totalAnswers)));
 		
-		// Update Score und cellScores
+		// Update score and cellScores
 		cellScores[cellKey] = score;
 		currentScore += score;
 		
-		debug(`Score für ${cellKey}: ${playerId} → ${usageCount}/${totalAnswers} Verwendungen = ${score} Punkte (Total: ${currentScore})`);
+		debug(`Score for ${cellKey}: ${playerId} → ${usageCount}/${totalAnswers} usages = ${score} points (Total: ${currentScore})`);
 	}
 
 	async function submitSolution() {
 		let correctCount = 0;
 		const playerSelections: Record<string, string> = {};
 
-		// Überprüfe alle 9 Zellen
+		// Check all 9 cells
 		for (let row = 0; row < 3; row++) {
 			for (let col = 0; col < 3; col++) {
 				const cellKey = getCellKey(row, col);
 				const player = gameGrid[row][col];
 
-				// Speichere Spielerauswahl (oder leerer String wenn leer)
+				// Store player selection (or empty string if empty)
 				playerSelections[cellKey] = player ? player.id : '';
 
 				if (player) {
-					// Zelle ist gefüllt - prüfe ob korrekt
+					// Cell is filled - check if correct
 					const isCorrect = validatePlayerMatch(
 						player,
 						challenge.answers,
@@ -233,21 +234,21 @@
 						addIncorrectCell(cellKey);
 					}
 				} else {
-					// Zelle ist leer - zählt als falsch
+					// Cell is empty - counts as incorrect
 					addIncorrectCell(cellKey);
 				}
 			}
 		}
 
 		const won = correctCount === 9;
-		gameFinished = true; // Spiel ist beendet
+		gameFinished = true; // Game is finished
 		if (won) {
-			// Bonus für gewonnene Spiele: 100 Punkte extra
+			// Bonus for won games: 100 extra points
 			currentScore += 100;
-			debug(`🎉 Spiel gewonnen! Bonus +100 Punkte → Total: ${currentScore}/1000`);
+			debug(`🎉 Game won! Bonus +100 points → Total: ${currentScore}/1000`);
 		}
 		
-		// Speichere das Spiel in den Stats (Score ist bereits berechnet)
+		// Store the game in stats (score is already calculated)
 		await statsStore.addGame(won, playerSelections, currentScore, cellScores);
 	}
 </script>
@@ -326,10 +327,10 @@
 							colCategory={colCat}
 							player={gameGrid[rowIdx][colIdx]}
 							onCellClick={() => {
-								// Verhindere Eingabe wenn Spiel beendet ist
+								// Prevent input if game is finished
 								if (gameFinished) return;
 								
-								// Verhindere Eingabe in Zellen mit korrekten Antworten
+								// Prevent input in cells with correct answers
 								const cellKey = getCellKey(rowIdx, colIdx);
 								if (correctCells.includes(cellKey)) return;
 								
