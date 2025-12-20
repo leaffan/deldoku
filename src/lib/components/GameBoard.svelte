@@ -25,7 +25,6 @@
 	]);
 
 	let selectedCell: [number, number] | null = $state(null);
-	let feedback = $state<string>('');
 	let correctCells = $state<string[]>([]);
 	let incorrectCells = $state<string[]>([]);
 	let incorrectPlayersByCell = $state<Record<string, string[]>>({}); // Incorrect players per cell
@@ -132,8 +131,6 @@
 				gameGrid = gameGrid; // Trigger reactivity
 
 				addCorrectCell(cellKey);
-				feedback = `✓ Richtig! ${player.name}`;
-				playerSearchComponent?.showFeedback(true);
 				
 				// Berechne Score nur für diese eine Zelle
 				await updateScoreForCell(cellKey, player.id);
@@ -147,9 +144,7 @@
 				selectedCell = null;
 			}, 600);
 		} else {
-			feedback = `✗ Falsch! ${player.name} passt nicht hier.`;
 			addIncorrectCell(cellKey);
-			playerSearchComponent?.showFeedback(false);			// Speichere falsche Antwort für diese Zelle
 			if (!incorrectPlayersByCell[cellKey]) {
 				incorrectPlayersByCell[cellKey] = [];
 			}
@@ -157,10 +152,6 @@
 				incorrectPlayersByCell[cellKey] = [...incorrectPlayersByCell[cellKey], player.id];
 			}			// Overlay bleibt offen bei falscher Antwort
 		}
-
-		setTimeout(() => {
-			feedback = '';
-		}, 3000);
 
 		// Überprüfe, ob 9 Antworten gegeben wurden
 		if (answersGiven === 9 && !isAutoSubmitting) {
@@ -248,24 +239,16 @@
 			}
 		}
 
-		// Gebe Feedback und füge Bonus hinzu
 		const won = correctCount === 9;
 		gameFinished = true; // Spiel ist beendet
 		if (won) {
-			feedback = t('correctAnswer', $languageStore);
 			// Bonus für gewonnene Spiele: 100 Punkte extra
 			currentScore += 100;
 			debug(`🎉 Spiel gewonnen! Bonus +100 Punkte → Total: ${currentScore}/1000`);
-		} else {
-			feedback = `⏁ ${correctCount}/9 ${t('partialAnswer', $languageStore)}`;
 		}
 		
 		// Speichere das Spiel in den Stats (Score ist bereits berechnet)
 		await statsStore.addGame(won, playerSelections, currentScore, cellScores);
-
-		setTimeout(() => {
-			feedback = '';
-		}, 4000);
 	}
 </script>
 
@@ -304,7 +287,6 @@
 				incorrectCells = [];
 				incorrectPlayersByCell = {}; // Reset incorrect players
 				selectedCell = null;
-				feedback = '';
 				answersGiven = 0; // Reset counter
 				currentScore = 0; // Reset score
 				cellScores = {}; // Reset cell scores
