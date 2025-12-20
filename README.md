@@ -1,38 +1,48 @@
-# sv
+# DELdoku
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Ein Eishockey-Rätselspiel ähnlich wie Immaculate Grid, bei dem Spieler erraten werden müssen, die bestimmte Kriterien erfüllen.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Interaktives 3x3-Raster mit verschiedenen Herausforderungen
+- Spielersuche mit Autovervollständigung
+- Statistiken-Tracking für Spieler
+- Täglich neue Herausforderungen
+- Responsive Design mit TailwindCSS
 
-```sh
-# create a new project in the current directory
-npx sv create
+## Entwicklung
 
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Das Projekt verwendet SvelteKit und pnpm. Um zu starten:
 
 ```sh
-npm run dev
+# Abhängigkeiten installieren
+pnpm install
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+# Entwicklungsserver starten
+pnpm run dev
+
+# Oder direkt im Browser öffnen
+pnpm run dev -- --open
 ```
 
-## Building
+## Build
 
-To create a production version of your app:
+Production-Version erstellen:
 
 ```sh
-npm run build
+pnpm run build
 ```
 
-You can preview the production build with `npm run preview`.
+Die Production-Version kann mit `pnpm run preview` getestet werden.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Technologie-Stack
+
+- **Framework**: SvelteKit 2
+- **Styling**: TailwindCSS 4
+- **TypeScript**: Für Type-Safety
+- **Build-Tool**: Vite
+- **Package Manager**: pnpm
+
+## Lizenz
+
+MIT
