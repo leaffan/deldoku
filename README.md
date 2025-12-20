@@ -1,48 +1,48 @@
 # DELdoku
 
-Ein Eishockey-Rätselspiel ähnlich wie Immaculate Grid, bei dem Spieler erraten werden müssen, die bestimmte Kriterien erfüllen.
+A hockey puzzle game similar to Immaculate Grid, where players must guess players that meet specific criteria.
 
 ## Features
 
-- Interaktives 3x3-Raster mit verschiedenen Herausforderungen
-- Spielersuche mit Autovervollständigung
-- Statistiken-Tracking für Spieler
-- Täglich neue Herausforderungen
-- Responsive Design mit TailwindCSS
+- Interactive 3x3 grid with various challenges
+- Player search with autocomplete
+- Statistics tracking for players
+- Daily new challenges
+- Responsive design with TailwindCSS
 
-## Entwicklung
+## Development
 
-Das Projekt verwendet SvelteKit und pnpm. Um zu starten:
+This project uses SvelteKit and pnpm. To get started:
 
 ```sh
-# Abhängigkeiten installieren
+# Install dependencies
 pnpm install
 
-# Entwicklungsserver starten
+# Start development server
 pnpm run dev
 
-# Oder direkt im Browser öffnen
+# Or open directly in browser
 pnpm run dev -- --open
 ```
 
 ## Build
 
-Production-Version erstellen:
+Create a production version:
 
 ```sh
 pnpm run build
 ```
 
-Die Production-Version kann mit `pnpm run preview` getestet werden.
+You can preview the production build with `pnpm run preview`.
 
-## Technologie-Stack
+## Technology Stack
 
 - **Framework**: SvelteKit 2
 - **Styling**: TailwindCSS 4
-- **TypeScript**: Für Type-Safety
-- **Build-Tool**: Vite
+- **TypeScript**: For type safety
+- **Build Tool**: Vite
 - **Package Manager**: pnpm
 
-## Lizenz
+## License
 
 MIT
