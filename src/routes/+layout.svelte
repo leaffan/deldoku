@@ -26,6 +26,10 @@
 				<a href="https://bsky.app/profile/leaffan.bsky.social" target="_blank" rel="noopener noreferrer" class="footer-link">
 					@leaffan.bsky.social
 				</a>
+				<span class="footer-separator">•</span>
+				<a href="https://github.com/leaffan/deldoku" target="_blank" rel="noopener noreferrer" class="footer-link">
+					deldoku @ GitHub
+				</a>
 			</div>
 		</div>
 	</footer>
