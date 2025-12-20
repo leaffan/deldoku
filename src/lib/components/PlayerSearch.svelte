@@ -14,8 +14,8 @@
 	let suggestions = $state<DELPlayer[]>([]);
 	let isOpen = $state(false);
 	let inputElement: HTMLInputElement | null = $state(null);
-	let selectedIndex = $state(-1); // Index des aktuell markierten Spielers
-	let feedbackStatus = $state<'correct' | 'incorrect' | null>(null); // Feedback-Status
+	let selectedIndex = $state(-1); // Index of the currently highlighted player
+	let feedbackStatus = $state<'correct' | 'incorrect' | null>(null); // Feedback status
 
 	// Auto-focus when component mounts
 	$effect(() => {
@@ -24,22 +24,22 @@
 		}
 	});
 
-	// Exportiere eine Funktion zum Fokussieren des Input-Felds
+	// Export a function to focus the input field
 	export function focusInput() {
 		if (inputElement) {
-			// Fokussieren mit Workaround für Mobile-Browser
+			// Focusing with workaround for mobile browsers
 			inputElement.focus({ preventScroll: false });
-			// Trigger input event für bessere Mobile-Kompatibilität
+			// Trigger input event for better mobile compatibility
 			inputElement.dispatchEvent(new Event('focus', { bubbles: true }));
 		}
 	}
 
-	// Exportiere eine Funktion zum Anzeigen von Feedback
+	// Export a function to show feedback
 	export function showFeedback(isCorrect: boolean) {
 		feedbackStatus = isCorrect ? 'correct' : 'incorrect';
 		setTimeout(() => {
 			feedbackStatus = null;
-			// Nach Feedback das Eingabefeld leeren
+			// Clear the input field after feedback
 			if (isCorrect) {
 				searchQuery = '';
 			}
@@ -50,19 +50,19 @@
 		const input = (e.target as HTMLInputElement).value;
 		searchQuery = input;
 		isOpen = true;
-		selectedIndex = -1; // Reset selection bei neuer Eingabe
+		selectedIndex = -1; // Reset selection on new input
 
-		// Hole alle falschen Antworten (immer am Anfang)
+		// Get all incorrect answers (always at the beginning)
 		const incorrectPlayers = $playersStore.filter(p => incorrectPlayerIds.includes(p.id));
 		
 		if (input.length > 0) {
 			const filtered = $playersStore.filter(
 				(p) => p.name.toLowerCase().includes(input.toLowerCase()) && !incorrectPlayerIds.includes(p.id)
 			);
-			// Falsche Antworten zuerst, dann gefilterte Rest
+			// Incorrect answers first, then filtered rest
 			suggestions = [...incorrectPlayers, ...filtered];
 		} else {
-			// Auch wenn Eingabefeld leer ist, zeige falsche Antworten
+			// Even if input field is empty, show incorrect answers
 			suggestions = incorrectPlayers.length > 0 ? incorrectPlayers : [];
 		}
 	}
@@ -92,7 +92,7 @@
 	function handleKeyDown(e: KeyboardEvent) {
 		if (!isOpen || suggestions.length === 0) return;
 
-		// Filtere nur verfügbare (nicht verwendete und nicht bereits falsch) Spieler
+		// Filter only available (not used and not already incorrect) players
 		const availableSuggestions = suggestions.filter(p => !usedPlayerIds.includes(p.id) && !incorrectPlayerIds.includes(p.id));
 		
 		if (availableSuggestions.length === 0) return;

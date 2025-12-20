@@ -28,29 +28,29 @@
 	let feedback = $state<string>('');
 	let correctCells = $state<string[]>([]);
 	let incorrectCells = $state<string[]>([]);
-	let incorrectPlayersByCell = $state<Record<string, string[]>>({}); // Falsche Spieler pro Zelle
+	let incorrectPlayersByCell = $state<Record<string, string[]>>({}); // Incorrect players per cell
 	let playerSearchComponent: any = $state(null);
 	let isAutoSubmitting = $state(false);
-	let answersGiven = $state(0); // Zählt alle Antworten (richtig oder falsch)
-	let currentScore = $state<number>(0); // Aktuelle Punktzahl
-	let flashAnswers = $state(false); // Für Flash-Animation bei Antworten
-	let flashScore = $state(false); // Für Flash-Animation bei Punkten
-	let showRules = $state(false); // Für Spielregeln-Overlay
-	let cellScores = $state<Record<string, number>>({}); // Punkte pro Zelle
-	let cachedStats: Record<string, any> | null = null; // Zwischenspeicher für Stats
-	let gameFinished = $state(false); // Ob das Spiel beendet wurde
+	let answersGiven = $state(0); // Counts all answers (correct or incorrect)
+	let currentScore = $state<number>(0); // Current score
+	let flashAnswers = $state(false); // For flash animation on answers
+	let flashScore = $state(false); // For flash animation on score
+	let showRules = $state(false); // For rules overlay
+	let cellScores = $state<Record<string, number>>({}); // Points per cell
+	let cachedStats: Record<string, any> | null = null; // Cache for stats
+	let gameFinished = $state(false); // Whether the game is finished
 
-	// Derived state: Liste der verwendeten Spieler-IDs
+	// Derived state: list of used player IDs
 	let usedPlayerIds = $derived.by(() => {
 		return gameGrid.flat().filter(p => p !== null).map(p => p!.id);
 	});
 
-	// Derived state: Anzahl gefüllter Zellen (egal ob richtig oder falsch)
+	// Derived state: number of filled cells (correct or incorrect)
 	let filledCells = $derived.by(() => {
 		return gameGrid.flat().filter(p => p !== null).length;
 	});
 
-	// Lade Stats beim Mounting der Komponente
+	// Load stats when component mounts
 	async function preloadStats() {
 		if (!cachedStats) {
 			try {
@@ -64,20 +64,20 @@
 		}
 	}
 
-	// Stats beim Laden der Seite vorladen
+	// Preload stats when page loads
 	$effect(() => {
 		preloadStats();
 	});
 
-	// Fokussiere das Eingabefeld wenn eine Zelle ausgewählt wird
+	// Focus the input field when a cell is selected
 	$effect(() => {
 		if (selectedCell !== null) {
-			// Direkter Aufruf ohne Verzögerung für bessere Mobile-Kompatibilität
+			// Direct call without delay for better mobile compatibility
 			playerSearchComponent?.focusInput();
 		}
 	});
 
-	// Fokussiere das Overlay wenn es geöffnet wird (für ESC-Taste)
+	// Focus the overlay when opened (for ESC key)
 	$effect(() => {
 		if (showRules) {
 			setTimeout(() => {
@@ -116,7 +116,7 @@
 
 			debug('Validating:', player.name, 'at', row, col, '- Correct:', isCorrect);
 
-			// Inkrementiere Antwort-Counter (für alle Antworten, richtig oder falsch)
+			// Increment answer counter (for all answers, correct or incorrect)
 			answersGiven++;
 			debug('Answers given:', answersGiven);
 			
@@ -380,7 +380,7 @@
 		</div>
 	</div>
 
-	<!-- Overlay für Spielereingabe -->
+	<!-- Overlay for player input -->
 	{#if selectedCell !== null}
 		<div 
 			role="dialog"
@@ -422,7 +422,7 @@
 		</div>
 	{/if}
 
-	<!-- Overlay für Spielregeln -->
+	<!-- Overlay for game rules -->
 	{#if showRules}
 		<div 
 			data-rules-overlay

@@ -8,7 +8,7 @@
 
 	let { showStats = false }: Props = $props();
 
-	// Finde Spielernamen basierend auf ID
+	// Find player name based on ID
 	function getPlayerName(playerId: string): string {
 		if (!playerId) return '(leer)';
 		const player = $playersStore.find(p => p.id === playerId);

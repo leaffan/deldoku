@@ -13,12 +13,12 @@
 
 	let { rowCategory, colCategory, player, onCellClick, isSelected, isCorrect, isIncorrect }: Props = $props();
 
-	// Kürzt Vornamen zu Initialen ab (für Mobilansicht)
+	// Abbreviates first names to initials (for mobile view)
 	function abbreviateName(fullName: string): string {
 		const parts = fullName.split(' ');
 		if (parts.length <= 1) return fullName;
 		
-		// Erster Teil = Initial, Rest = vollständiger Name
+		// First part = initial, rest = full name
 		const firstInitial = parts[0].charAt(0) + '.';
 		const lastName = parts.slice(1).join(' ');
 		return `${firstInitial} ${lastName}`;
@@ -34,7 +34,7 @@
 	{#if player}
 		<div class="flex flex-col items-center justify-center gap-1">
 			<span class="fi fi-{player.nationality}" style="font-size: 1rem;"></span>
-			<!-- Vollständiger Name auf größeren Bildschirmen, abgekürzter Name auf Mobilgeräten -->
+			<!-- Full name on larger screens, abbreviated name on mobile devices -->
 			<div class="font-bold text-xs leading-tight">
 				<span class="hidden sm:inline">{player.name}</span>
 				<span class="sm:hidden">{abbreviateName(player.name)}</span>
