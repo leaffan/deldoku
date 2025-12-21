@@ -2,7 +2,7 @@
 	import type { DELPlayer, DELDokuChallenge } from '$lib/data';
 	import { validatePlayerMatch, getApiBasePath } from '$lib/data';
 	import { playersStore, languageStore } from '$lib/stores';
-	import { t } from '$lib/i18n';
+	import { t, translations } from '$lib/i18n';
 	import { debug } from '$lib/debug';
 	import GameCell from './GameCell.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
@@ -48,6 +48,12 @@
 
 	// Logo loading state: map of slug -> boolean (true if logo exists)
 	let logoMap: Record<string, string | null> = $state<Record<string, string>>({});
+
+	function getCategoryName(category: string): string {
+		const lang = $languageStore === 'de' ? 'de' : 'en';
+		const categoryNames = translations[lang].categoryNames;
+		return categoryNames[category] || category; // Fallback to original if no mapping exists
+	}
 
 	async function findLogo(category: string) {
 		const appBase = import.meta.env.BASE_URL || '/';
@@ -350,7 +356,7 @@
 					{#if logoMap[colCat]}
 						<img src={logoMap[colCat]} alt={colCat} class="h-14 w-auto" />
 					{:else}
-						{colCat}
+						{getCategoryName(colCat)}
 					{/if}
 				</div>
 			{/each}
@@ -364,7 +370,7 @@
 					{#if logoMap[rowCat]}
 						<img src="{logoMap[rowCat]}" alt="{rowCat}" class="h-14 w-auto" />
 					{:else}
-						{rowCat}
+						{getCategoryName(rowCat)}
 					{/if}
 				</div>
 				{#each colCategories as colCat, colIdx}
@@ -432,8 +438,8 @@
 				<div class="mb-4">
 					<h2 class="text-lg font-bold text-gray-800 mb-2 text-center">{t('selectPlayer', $languageStore)}</h2>
 					<div class="text-sm text-gray-600 text-center">
-						<span class="font-semibold">{t('row', $languageStore)}:</span> {rowCategories[selectedCell[0]]} · 
-						<span class="font-semibold">{t('column', $languageStore)}:</span> {colCategories[selectedCell[1]]}
+					<span class="font-semibold">{t('row', $languageStore)}:</span> {getCategoryName(rowCategories[selectedCell[0]])} · 
+					<span class="font-semibold">{t('column', $languageStore)}:</span> {getCategoryName(colCategories[selectedCell[1]])}
 					</div>
 				</div>
 				<PlayerSearch 

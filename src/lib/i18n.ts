@@ -1,12 +1,63 @@
 export type Language = 'de' | 'en';
 
-export const translations = {
+export type Translations = {
+	title: string;
+	subtitle: string;
+	loading: string;
+	error: string;
+	errorConsole: string;
+	categoryNames: Record<string, string>;
+	showStats: string;
+	hideStats: string;
+	correctAnswer: string;
+	partialAnswer: string;
+	answersGiven: string;
+	submitSolution: string;
+	restartGame: string;
+	statistics: string;
+	totalGames: string;
+	winRate: string;
+	gamesWon: string;
+	gameHistory: string;
+	won: string;
+	lost: string;
+	score: string;
+	selectPlayer: string;
+	row: string;
+	column: string;
+	cancel: string;
+	showDetails: string;
+	howToPlay: string;
+	close: string;
+	rulesGoal: string;
+	rulesGoalText: string;
+	rulesHowTo: string;
+	rulesHowTo1: string;
+	rulesHowTo2: string;
+	rulesHowTo3: string;
+	rulesHowTo4: string;
+	rulesScoring: string;
+	rulesScoring1: string;
+	rulesScoring2: string;
+	rulesScoring3: string;
+	rulesScoring4: string;
+	points: string;
+	noGamesYet: string;
+	delStats: string;
+};
+
+export const translations: Record<Language, Translations> = {
 	de: {
 		title: 'DEL-Doku',
 		subtitle: 'Finde die Spieler basierend auf Team- und Positionskombinationen!',
 		loading: 'Laden...',
 		error: 'Fehler beim Laden: ',
 		errorConsole: 'Bitte öffne die Browser-Konsole (F12) für mehr Details.',
+		categoryNames: {
+			'20_goal': '20-Tore-Saison',
+			'30_assist': '30-Vorlagen-Saison',
+			'50_point': '50-Punkte-Saison'
+		},
 		showStats: 'Statistiken anzeigen',
 		hideStats: 'Statistiken ausblenden',
 		correctAnswer: '🎉 Glückwunsch! Rätsel gelöst!',
@@ -51,6 +102,11 @@ export const translations = {
 		loading: 'Loading...',
 		error: 'Error loading: ',
 		errorConsole: 'Please open the browser console (F12) for more details.',
+		categoryNames: {
+			'20_goal': '20 Goals Season',
+			'30_assist': '30 Assists Season',
+			'50_point': '50 Points Season'
+		},
 		showStats: 'Show Statistics',
 		hideStats: 'Hide Statistics',
 		correctAnswer: '🎉 Congratulations! Puzzle solved!',
@@ -91,7 +147,7 @@ export const translations = {
 	}
 };
 
-export function t(key: keyof typeof translations.de, lang: Language | undefined): string {
+export function t(key: keyof typeof translations.de, lang: Language | undefined): string | Record<string, string> {
 	const language: Language = lang === 'en' ? 'en' : 'de';
 	return translations[language][key] || translations.de[key];
 }
