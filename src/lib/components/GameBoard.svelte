@@ -7,6 +7,8 @@
 	import GameCell from './GameCell.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
 	import { statsStore } from '$lib/stores';
+	import { onMount } from 'svelte';
+	import { base } from '$app/paths';
 
 	interface Props {
 		rowCategories: string[];
@@ -42,6 +44,41 @@
 	// Derived state: list of used player IDs
 	let usedPlayerIds = $derived.by(() => {
 		return gameGrid.flat().filter(p => p !== null).map(p => p!.id);
+	});
+
+	// Logo loading state: map of slug -> boolean (true if logo exists)
+	let logoMap: Record<string, string | null> = $state<Record<string, string>>({});
+
+	async function findLogo(category: string) {
+		const appBase = import.meta.env.BASE_URL || '/';
+		const logo_template = `img/logos/logo_${category.toUpperCase()}.svg`;
+
+		function join(prefix: string, path: string) {
+			return `${prefix.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
+		}
+
+		const url = join(appBase, logo_template);
+		try {
+			const resp = await fetch(url, { method: 'HEAD' });
+			if (resp.ok) {
+				debug('Found logo URL', url, 'for category', category);
+				logoMap = { ...logoMap, [category]: url };
+				return;
+			}
+		} catch (e) {
+			debug('No logo found for', category);
+			logoMap = { ...logoMap, [category]: null };
+		}
+	}
+
+	onMount(() => {
+		// Pre-check logos for all categories (fire-and-forget)
+		const cats = new Set<string>([...rowCategories, ...colCategories]);
+		cats.forEach((c) => {
+			debug('Preloading logo for category:', c);
+			if (/^\d/.test(c)) return; // skipping categories starting with a digit
+			findLogo(c);
+		});
 	});
 
 	// Derived state: number of filled cells (correct or incorrect)
@@ -308,17 +345,27 @@
 			<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gray-200 flex items-center justify-center font-bold text-center text-xs p-2">
 			</div>
 			{#each colCategories as colCat}
+				<!-- {@const slug = slugify(colCat)} -->
 				<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-2">
-					{colCat}
+					{#if logoMap[colCat]}
+						<img src={logoMap[colCat]} alt={colCat} class="h-14 w-auto" />
+					{:else}
+						{colCat}
+					{/if}
 				</div>
 			{/each}
 		</div>
 
 		<!-- Grid rows -->
 		{#each rowCategories as rowCat, rowIdx}
+			<!-- {@const rslug = slugify(rowCat)} -->
 			<div class="flex">
 				<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-2">
-					{rowCat}
+					{#if logoMap[rowCat]}
+						<img src="{logoMap[rowCat]}" alt="{rowCat}" class="h-14 w-auto" />
+					{:else}
+						{rowCat}
+					{/if}
 				</div>
 				{#each colCategories as colCat, colIdx}
 					<div class="">
