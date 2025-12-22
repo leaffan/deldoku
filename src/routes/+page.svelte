@@ -31,6 +31,18 @@
 <svelte:head>
 	<title>DELDoku - {t('title', $languageStore)}</title>
 	<meta name="description" content={t('subtitle', $languageStore)} />
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="DELDoku" />
+	<meta property="og:description" content={t('subtitle', $languageStore)} />
+	<meta property="og:image" content="/img/deldoku.png" />
+	<meta property="og:image:type" content="image/png" />
+	<meta property="og:image:alt" content="DELDoku Logo" />
+	<!-- Twitter -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="DELDoku" />
+	<meta name="twitter:description" content={t('subtitle', $languageStore)} />
+	<meta name="twitter:image" content="/img/deldoku.png" />
 </svelte:head>
 
 <header class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-4">
