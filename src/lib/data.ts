@@ -10,6 +10,7 @@ export interface DELPlayer {
 
 export interface DELDokuChallenge {
 	date: string;
+	title?: string;
 	rowCategories: string[];
 	colCategories: string[];
 	grid: (DELPlayer | null)[][];
@@ -89,6 +90,7 @@ export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELD
 
 		return {
 			date,
+			title: challengeData.title,
 			rowCategories: challengeData.rowCategories,
 			colCategories: challengeData.colCategories,
 			grid,
