@@ -17,6 +17,7 @@
 		challenge: DELDokuChallenge;
 	}
 
+	let showRules = $state(false); // For rules modal visibility
 	let { rowCategories, colCategories, grid: initialGrid, challenge }: Props = $props();
 
 	// Create local reactive grid instead of using prop
@@ -122,7 +123,7 @@
 	$effect(() => {
 		if (showRules) {
 			setTimeout(() => {
-				document.querySelector('[data-rules-overlay]')?.focus();
+				(document.querySelector('[data-rules-overlay]') as HTMLElement | null)?.focus();
 			}, 100);
 		}
 	});
