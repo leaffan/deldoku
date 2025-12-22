@@ -13,7 +13,7 @@
 
 	<footer>
 		<div class="footer-content">
-			<p class="footer-title">DEL-Doku</p>
+			<p class="footer-title">DELDoku</p>
 			<div class="footer-links">
 				<a href="https://www.leaffan.net/del" target="_blank" rel="noopener noreferrer" class="footer-link">
 					{t('delStats', $languageStore)}
