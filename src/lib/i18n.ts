@@ -44,11 +44,12 @@ export type Translations = {
 	points: string;
 	noGamesYet: string;
 	delStats: string;
+	todaysTopic: string;
 };
 
 export const translations: Record<Language, Translations> = {
 	de: {
-		title: 'DEL-Doku',
+		title: 'DELDoku',
 		subtitle: 'Finde die Spieler basierend auf Team- und Positionskombinationen!',
 		loading: 'Laden...',
 		error: 'Fehler beim Laden: ',
@@ -94,10 +95,11 @@ export const translations: Record<Language, Translations> = {
 		rulesScoring4: 'Maximale Punktzahl: 1000 Punkte',
 		points: 'Pkt',
 		noGamesYet: 'Noch keine Spiele gespielt. Starten Sie ein Spiel um Statistiken zu sammeln!',
-		delStats: 'DEL-Statistiken'
+		delStats: 'DEL-Statistiken',
+		todaysTopic: 'Heutiges Thema'
 	},
 	en: {
-		title: 'DEL-Doku',
+		title: "DELDoku",
 		subtitle: 'Find the players based on team and position combinations!',
 		loading: 'Loading...',
 		error: 'Error loading: ',
@@ -143,7 +145,8 @@ export const translations: Record<Language, Translations> = {
 		rulesScoring4: 'Maximum score: 1000 points',
 		points: 'Pts',
 		noGamesYet: 'No games played yet. Start a game to collect statistics!',
-		delStats: 'DEL Statistics'
+		delStats: 'DEL Statistics',
+		todaysTopic: 'Topic Today'
 	}
 };
 
