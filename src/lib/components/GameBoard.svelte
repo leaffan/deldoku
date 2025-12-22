@@ -36,7 +36,6 @@
 	let currentScore = $state<number>(0); // Current score
 	let flashAnswers = $state(false); // For flash animation on answers
 	let flashScore = $state(false); // For flash animation on score
-	let showRules = $state(false); // For rules overlay
 	let cellScores = $state<Record<string, number>>({}); // Points per cell
 	let cachedStats: Record<string, any> | null = null; // Cache for stats
 	let gameFinished = $state(false); // Whether the game is finished
@@ -299,15 +298,12 @@
 <div class="w-full flex flex-col items-center">
 	<div class="mb-3 text-center">
 		<h1 class="text-2xl sm:text-3xl font-bold mb-2">{t('title', $languageStore)}</h1>
-		<button 
-			onclick={() => showRules = true}
-			class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors border border-blue-200 hover:border-blue-300"
-		>
-			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-			</svg>
-			{t('howToPlay', $languageStore)}
-		</button>
+		   {#if challenge?.title}
+			   <p class="text-sm text-gray-600 mb-1 flex flex-wrap justify-center items-center gap-2">
+				   <span class="font-medium text-gray-500">{t('todaysTopic', $languageStore)}:</span>
+				   <span><b>{challenge.title}</b></span>
+			   </p>
+		   {/if}
 	</div>
 
 	<!-- Action Buttons (above game board) -->
@@ -453,64 +449,6 @@
 					class="mt-4 w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors"
 				>
 					{t('cancel', $languageStore)} (ESC)
-				</button>
-			</div>
-		</div>
-	{/if}
-
-	<!-- Overlay for game rules -->
-	{#if showRules}
-		<div 
-			data-rules-overlay
-			role="presentation"
-			class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-			tabindex="-1"
-			onclick={(e) => {
-				if (e.target === e.currentTarget) {
-					showRules = false;
-				}
-			}}
-			onkeydown={(e) => {
-				if (e.key === 'Escape') {
-					showRules = false;
-				}
-			}}
-		>
-			<div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-				<h2 class="text-2xl font-bold text-gray-800 mb-4">{t('howToPlay', $languageStore)}</h2>
-				
-				<div class="space-y-4 text-gray-700">
-					<div>
-						<h3 class="font-bold text-lg mb-2">{t('rulesGoal', $languageStore)}</h3>
-						<p>{t('rulesGoalText', $languageStore)}</p>
-					</div>
-					
-					<div>
-						<h3 class="font-bold text-lg mb-2">{t('rulesHowTo', $languageStore)}</h3>
-						<ul class="list-disc list-inside space-y-1">
-							<li>{t('rulesHowTo1', $languageStore)}</li>
-							<li>{t('rulesHowTo2', $languageStore)}</li>
-							<li>{t('rulesHowTo3', $languageStore)}</li>
-							<li>{t('rulesHowTo4', $languageStore)}</li>
-						</ul>
-					</div>
-					
-					<div>
-						<h3 class="font-bold text-lg mb-2">{t('rulesScoring', $languageStore)}</h3>
-						<ul class="list-disc list-inside space-y-1">
-							<li>{t('rulesScoring1', $languageStore)}</li>
-							<li>{t('rulesScoring2', $languageStore)}</li>
-							<li>{t('rulesScoring3', $languageStore)}</li>
-							<li>{t('rulesScoring4', $languageStore)}</li>
-						</ul>
-					</div>
-				</div>
-				
-				<button
-					onclick={() => showRules = false}
-					class="mt-6 w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors"
-				>
-					{t('close', $languageStore)}
 				</button>
 			</div>
 		</div>
