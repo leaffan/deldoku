@@ -150,7 +150,7 @@ export const translations: Record<Language, Translations> = {
 		points: 'Pts',
 		noGamesYet: 'No games played yet. Start a game to collect statistics!',
 		delStats: 'DEL Statistics',
-		todaysTopic: 'Topic Today'
+		todaysTopic: "Today's Topic"
 	}
 };
 
