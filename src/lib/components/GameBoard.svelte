@@ -8,7 +8,7 @@
 	import PlayerSearch from './PlayerSearch.svelte';
 	import { statsStore } from '$lib/stores';
 	import { onMount } from 'svelte';
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 
 	interface Props {
 		rowCategories: string[];
@@ -298,13 +298,15 @@
 
 <div class="w-full flex flex-col items-center">
 	<div class="mb-3 text-center">
-		<h1 class="text-2xl sm:text-3xl font-bold mb-2">{t('title', $languageStore)}</h1>
-		   {#if challenge?.title}
-			   <p class="text-sm text-gray-600 mb-1 flex flex-wrap justify-center items-center gap-2">
-				   <span class="font-medium text-gray-500">{t('todaysTopic', $languageStore)}:</span>
-				   <span><b>{challenge.title}</b></span>
-			   </p>
-		   {/if}
+		<!-- svelte-ignore a11y_missing_attribute -->
+		<img src="{resolve('/img/deldoku.png')}" alt="DELDoku Logo" class="h-20 sm:h-28 md:h-32 w-auto mx-auto mb-2" />
+		<!-- <h1 class="text-2xl sm:text-3xl font-bold mb-2">{t('title', $languageStore)}</h1> -->
+		{#if challenge?.title}
+			<p class="text-sm text-gray-600 mb-1 flex flex-wrap justify-center items-center gap-2">
+				<span class="font-medium text-gray-500">{t('todaysTopic', $languageStore)}:</span>
+				<span><b>{challenge.title}</b></span>
+			</p>
+		{/if}
 	</div>
 
 	<!-- Action Buttons (above game board) -->
