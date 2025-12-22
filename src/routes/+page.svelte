@@ -31,18 +31,6 @@
 <svelte:head>
 	<title>DELDoku - {t('title', $languageStore)}</title>
 	<meta name="description" content={t('subtitle', $languageStore)} />
-	<!-- Open Graph / Facebook -->
-	<meta property="og:type" content="website" />
-	<meta property="og:title" content="DELDoku" />
-	<meta property="og:description" content={t('subtitle', $languageStore)} />
-	<meta property="og:image" content="/img/deldoku.png" />
-	<meta property="og:image:type" content="image/png" />
-	<meta property="og:image:alt" content="DELDoku Logo" />
-	<!-- Twitter -->
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="DELDoku" />
-	<meta name="twitter:description" content={t('subtitle', $languageStore)} />
-	<meta name="twitter:image" content="/img/deldoku.png" />
 </svelte:head>
 
 <header class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-4">
@@ -54,7 +42,7 @@
 			<button
 				onclick={() => showRules = true}
 				class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
-				aria-label={t('howToPlay', $languageStore)}
+				aria-label={typeof t('howToPlay', $languageStore) === 'string' ? t('howToPlay', $languageStore) : ''}
 			>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
