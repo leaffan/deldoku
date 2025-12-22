@@ -6,7 +6,6 @@ export type Translations = {
 	loading: string;
 	error: string;
 	errorConsole: string;
-	categoryNames: Record<string, string>;
 	showStats: string;
 	hideStats: string;
 	correctAnswer: string;
@@ -47,6 +46,21 @@ export type Translations = {
 	todaysTopic: string;
 };
 
+export type CategoryKey = '20_goal' | '30_assist' | '50_point';
+
+export const categories: Record<Language, Record<CategoryKey, string>> = {
+	de: {
+		'20_goal': '20-Tore-Saison',
+		'30_assist': '30-Vorlagen-Saison',
+		'50_point': '50-Punkte-Saison'
+	},
+	en: {
+		'20_goal': '20 Goals Season',
+		'30_assist': '30 Assists Season',
+		'50_point': '50 Points Season'
+	}
+};
+
 export const translations: Record<Language, Translations> = {
 	de: {
 		title: 'DELDoku',
@@ -54,11 +68,6 @@ export const translations: Record<Language, Translations> = {
 		loading: 'Laden...',
 		error: 'Fehler beim Laden: ',
 		errorConsole: 'Bitte öffne die Browser-Konsole (F12) für mehr Details.',
-		categoryNames: {
-			'20_goal': '20-Tore-Saison',
-			'30_assist': '30-Vorlagen-Saison',
-			'50_point': '50-Punkte-Saison'
-		},
 		showStats: 'Statistiken anzeigen',
 		hideStats: 'Statistiken ausblenden',
 		correctAnswer: '🎉 Glückwunsch! Rätsel gelöst!',
@@ -104,11 +113,6 @@ export const translations: Record<Language, Translations> = {
 		loading: 'Loading...',
 		error: 'Error loading: ',
 		errorConsole: 'Please open the browser console (F12) for more details.',
-		categoryNames: {
-			'20_goal': '20 Goals Season',
-			'30_assist': '30 Assists Season',
-			'50_point': '50 Points Season'
-		},
 		showStats: 'Show Statistics',
 		hideStats: 'Hide Statistics',
 		correctAnswer: '🎉 Congratulations! Puzzle solved!',
@@ -150,7 +154,12 @@ export const translations: Record<Language, Translations> = {
 	}
 };
 
-export function t(key: keyof typeof translations.de, lang: Language | undefined): string | Record<string, string> {
+export function t(key: keyof typeof translations.de, lang: Language | undefined): string {
 	const language: Language = lang === 'en' ? 'en' : 'de';
 	return translations[language][key] || translations.de[key];
+}
+
+export function c(key: keyof typeof categories.de, lang: Language | undefined): string {
+	const language: Language = lang === 'en' ? 'en' : 'de';
+	return categories[language][key] || categories.de[key];
 }

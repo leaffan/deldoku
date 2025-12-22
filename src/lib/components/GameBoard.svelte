@@ -2,7 +2,7 @@
 	import type { DELPlayer, DELDokuChallenge } from '$lib/data';
 	import { validatePlayerMatch, getApiBasePath } from '$lib/data';
 	import { playersStore, languageStore } from '$lib/stores';
-	import { t, translations } from '$lib/i18n';
+	import { t, translations, c, categories } from '$lib/i18n';
 	import { debug } from '$lib/debug';
 	import GameCell from './GameCell.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
@@ -51,8 +51,8 @@
 
 	function getCategoryName(category: string): string {
 		const lang = $languageStore === 'de' ? 'de' : 'en';
-		const categoryNames = translations[lang].categoryNames;
-		return categoryNames[category] || category; // Fallback to original if no mapping exists
+		const categoryNames = categories[lang];
+		return categoryNames[category as keyof typeof categoryNames] || category; // Fallback to original if no mapping exists
 	}
 
 	async function findLogo(category: string) {
