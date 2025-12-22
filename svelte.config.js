@@ -15,9 +15,9 @@ const config = {
 			precompress: false,
 			strict: false
 		}),
-		paths: {
-			base: '/deldoku'
-		}
+		   paths: {
+			   base: process.env.VITE_BUILD_ENV === 'test' ? '/deldoku_tst' : '/deldoku'
+		   }
 	}
 };
 
