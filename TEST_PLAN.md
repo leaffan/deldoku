@@ -1,8 +1,8 @@
-# Test-Plan für DEL-Doku
+# Test-Plan für DELDoku
 
 ## Übersicht
 
-Dieses Dokument beschreibt die Teststrategie für das DEL-Doku Projekt mit automatisierten Tests und GitHub Actions Integration.
+Dieses Dokument beschreibt die Teststrategie für das DELDoku Projekt mit automatisierten Tests und GitHub Actions Integration.
 
 ## 1. Test-Framework Setup
 

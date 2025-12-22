@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Stats API für DEL-Doku (Python CGI)
+Stats API für DELDoku (Python CGI)
 """
 import cgi
 import cgitb

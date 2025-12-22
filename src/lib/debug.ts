@@ -1,4 +1,4 @@
-// Debug-Utility für DEL-Doku
+// Debug-Utility für DELDoku
 // Aktiviere Debug-Logs mit ?debug=true in der URL
 
 let debugEnabled = false;
