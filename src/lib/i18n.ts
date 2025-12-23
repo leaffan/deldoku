@@ -46,7 +46,7 @@ export type Translations = {
 	todaysTopic: string;
 };
 
-export type CategoryKey = '20_goal' | '30_assist' | '50_point';
+export type CategoryKey = '20_goal' | '30_assist' | '50_point' | 'single_team' | 'championship' | '100_penalty_minutes' | '1994';
 
 export const categories: Record<Language, Record<CategoryKey, string>> = {
 	de: {
@@ -55,7 +55,8 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'50_point': '50-Punkte-Saison',
 		'single_team': 'Nur ein Team',
 		'championship': 'DEL-Meister',
-		'100_penalty_minutes': '100 Strafminuten-Saison'
+		'100_penalty_minutes': '100 Strafminuten-Saison',
+		'1994': '1994/95 aktive Spieler'
 	},
 	en: {
 		'20_goal': '20 Goals Season',
@@ -63,7 +64,8 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'50_point': '50 Points Season',
 		'single_team': 'Single Team',
 		'championship': 'DEL Champion',
-		'100_penalty_minutes': '100 Penalty Minutes Season'
+		'100_penalty_minutes': '100 Penalty Minutes Season',
+		'1994': '1994/95 Active Players'
 	}
 };
 
