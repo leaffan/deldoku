@@ -39,7 +39,12 @@
 				<span class="hidden sm:inline">{player.name}</span>
 				<span class="sm:hidden">{abbreviateName(player.name)}</span>
 			</div>
-			<div class="text-xs opacity-80">{player.first_season} – {player.last_season}</div>
+			<div class="text-xs opacity-80">
+				{player.first_season} – 
+				{#if player.last_season !== 2025}
+					{player.last_season + 1}
+				{/if}
+			</div>
 		</div>
 	{:else}
 		<div>?</div>
