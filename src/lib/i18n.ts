@@ -52,12 +52,18 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 	de: {
 		'20_goal': '20-Tore-Saison',
 		'30_assist': '30-Vorlagen-Saison',
-		'50_point': '50-Punkte-Saison'
+		'50_point': '50-Punkte-Saison',
+		'single_team': 'Nur ein Team',
+		'championship': 'DEL-Meister',
+		'100_penalty_minutes': '100 Strafminuten-Saison'
 	},
 	en: {
 		'20_goal': '20 Goals Season',
 		'30_assist': '30 Assists Season',
-		'50_point': '50 Points Season'
+		'50_point': '50 Points Season',
+		'single_team': 'Single Team',
+		'championship': 'DEL Champion',
+		'100_penalty_minutes': '100 Penalty Minutes Season'
 	}
 };
 
