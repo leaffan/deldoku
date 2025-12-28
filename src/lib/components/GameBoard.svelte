@@ -3,6 +3,7 @@
 	import { validatePlayerMatch, getApiBasePath } from '$lib/data';
 	import { playersStore, languageStore } from '$lib/stores';
 	import { t, translations, c, categories } from '$lib/i18n';
+	import { pngLogoCategories } from '$lib/pngLogoCategories';
 	import { debug } from '$lib/debug';
 	import GameCell from './GameCell.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
@@ -57,7 +58,13 @@
 
 	async function findLogo(category: string) {
 		const appBase = import.meta.env.BASE_URL || '/';
-		const logo_template = `img/logos/logo_${category.toUpperCase()}.svg`;
+		let extension = ""
+		if (pngLogoCategories.includes(category)) {
+			extension = '.png';
+		} else {
+			extension = '.svg';
+		}
+		const logo_template = `img/logos/logo_${category.toUpperCase()}${extension}`;
 
 		function join(prefix: string, path: string) {
 			return `${prefix.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
@@ -83,6 +90,7 @@
 		cats.forEach((c) => {
 			debug('Preloading logo for category:', c);
 			if (/^\d/.test(c)) return; // skipping categories starting with a digit
+			if (/^WJC/.test(c)) return; // skipping categories starting with a digit
 			findLogo(c);
 		});
 	});
@@ -353,7 +361,7 @@
 				<!-- {@const slug = slugify(colCat)} -->
 				<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-2">
 					{#if logoMap[colCat]}
-						<img src={logoMap[colCat]} alt={colCat} class="h-14 w-auto" />
+						<img src={logoMap[colCat]} alt={colCat} class="h-14 w-auto" title={getCategoryName(colCat)} />
 					{:else}
 						{getCategoryName(colCat)}
 					{/if}
@@ -367,7 +375,7 @@
 			<div class="flex">
 				<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-2">
 					{#if logoMap[rowCat]}
-						<img src="{logoMap[rowCat]}" alt="{rowCat}" class="h-14 w-auto" />
+						<img src="{logoMap[rowCat]}" alt="{rowCat}" class="h-14 w-auto" title={getCategoryName(rowCat)} />
 					{:else}
 						{getCategoryName(rowCat)}
 					{/if}
