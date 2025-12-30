@@ -3,31 +3,39 @@ import type { RequestHandler } from '@sveltejs/kit';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Pfad zur Datei, wo wir Stats speichern
-const STATS_FILE = path.join(process.cwd(), 'data', 'stats.json');
+// Liefert den Pfad zur Stats-Datei für das aktuelle UTC-Datum
+function getStatsFilePath() {
+	const now = new Date();
+	const year = now.getUTCFullYear();
+	const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+	const day = String(now.getUTCDate()).padStart(2, '0');
+	return path.join(process.cwd(), 'data', `stats_${year}-${month}-${day}.json`);
+}
 
 // Stelle sicher, dass das Verzeichnis existiert
 function ensureDataDir() {
-	const dir = path.dirname(STATS_FILE);
+	const dir = path.join(process.cwd(), 'data');
 	if (!fs.existsSync(dir)) {
 		fs.mkdirSync(dir, { recursive: true });
 	}
 }
 
-// Lade alle Stats aus der Datei
+// Lade alle Stats aus der Datei für das aktuelle UTC-Datum
 function loadAllStats(): Record<string, any> {
 	ensureDataDir();
-	if (fs.existsSync(STATS_FILE)) {
-		const data = fs.readFileSync(STATS_FILE, 'utf-8');
+	const statsFile = getStatsFilePath();
+	if (fs.existsSync(statsFile)) {
+		const data = fs.readFileSync(statsFile, 'utf-8');
 		return JSON.parse(data);
 	}
 	return {};
 }
 
-// Speichere Stats in die Datei
+// Speichere Stats in die Datei für das aktuelle UTC-Datum
 function saveAllStats(stats: Record<string, any>) {
 	ensureDataDir();
-	fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 2));
+	const statsFile = getStatsFilePath();
+	fs.writeFileSync(statsFile, JSON.stringify(stats, null, 2));
 }
 
 // GET: Lade Stats für einen User oder alle Stats
