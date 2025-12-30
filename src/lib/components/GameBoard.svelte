@@ -402,7 +402,7 @@ https://www.leaffan.net/deldoku
 			}}
 			class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-2 rounded-lg transition-colors text-sm whitespace-nowrap"
 		>
-			{t('shareResult', $languageStore)}
+			{t('restartGame', $languageStore)}
 		</button>
 	</div>
 
@@ -485,7 +485,7 @@ https://www.leaffan.net/deldoku
 				   style="width:100%"
 				   onclick={copyResultToClipboard}
 			   >
-				   Ergebnis teilen
+				{t('shareResult', $languageStore)}
 			   </button>
 		   </div>
 	{/if}
