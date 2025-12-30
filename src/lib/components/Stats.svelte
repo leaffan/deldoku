@@ -1,6 +1,41 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { statsStore, languageStore, winRate, playersStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
+
+
+	// Gesamtstatistiken für den aktuellen Tag (Svelte 5 $state)
+	let avgCorrectAnswers = $state<number | null>(null);
+	let avgScore = $state<number | null>(null);
+	let totalGamesToday = $state<number | null>(null);
+	let loadingGlobalStats = $state<boolean>(true);
+	let errorGlobalStats = $state<string | null>(null);
+
+	onMount(async () => {
+		loadingGlobalStats = true;
+		errorGlobalStats = null;
+		try {
+			const apiPath = typeof window !== 'undefined' ? new URL('.', window.location.href).pathname + 'api/stats' : '/api/stats';
+			const res = await fetch(apiPath);
+			if (!res.ok) throw new Error('HTTP ' + res.status);
+			const allStats = await res.json();
+			const allGames = Object.values(allStats)
+				.map((user: any) => Array.isArray(user.gameHistory) ? user.gameHistory : [])
+				.flat();
+			totalGamesToday = allGames.length;
+			if (allGames.length === 0) {
+				avgCorrectAnswers = null;
+				avgScore = null;
+			} else {
+				avgCorrectAnswers = allGames.reduce((sum, g) => sum + Object.values(g.cellScores||{}).filter((v) => typeof v === 'number' && v > 0).length, 0) / allGames.length;
+				avgScore = allGames.reduce((sum, g) => sum + (g.score || 0), 0) / allGames.length;
+			}
+		} catch (e) {
+			errorGlobalStats = e instanceof Error ? e.message : String(e);
+		} finally {
+			loadingGlobalStats = false;
+		}
+	});
 
 	interface Props {
 		showStats?: boolean;
@@ -18,6 +53,30 @@
 
 <div class="bg-white rounded-lg shadow-lg p-6">
 	<h2 class="text-2xl font-bold mb-4">{t('statistics', $languageStore)}</h2>
+
+	<div class="mb-6">
+		<h3 class="text-lg font-semibold mb-2">🌍 Gesamtstatistiken (heute)</h3>
+		{#if loadingGlobalStats}
+			<div>Lade Gesamtstatistiken...</div>
+		{:else if errorGlobalStats}
+			<div class="text-red-600">Fehler: {errorGlobalStats}</div>
+		{:else}
+			<div class="grid grid-cols-3 gap-2 sm:gap-4">
+				<div class="bg-gray-50 p-2 sm:p-4 rounded-lg">
+					<div class="text-xl sm:text-2xl font-bold text-gray-700">{totalGamesToday ?? 0}</div>
+					<div class="text-xs sm:text-sm text-gray-600">Spiele heute</div>
+				</div>
+				<div class="bg-gray-50 p-2 sm:p-4 rounded-lg">
+					<div class="text-xl sm:text-2xl font-bold text-gray-700">{avgCorrectAnswers !== null ? avgCorrectAnswers.toFixed(2) : '-'}</div>
+					<div class="text-xs sm:text-sm text-gray-600">Ø richtige Antworten</div>
+				</div>
+				<div class="bg-gray-50 p-2 sm:p-4 rounded-lg">
+					<div class="text-xl sm:text-2xl font-bold text-gray-700">{avgScore !== null ? Math.round(avgScore) : '-'}</div>
+					<div class="text-xs sm:text-sm text-gray-600">Ø Punkte</div>
+				</div>
+			</div>
+		{/if}
+	</div>
 
 	<div class="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
 		<div class="bg-blue-50 p-2 sm:p-4 rounded-lg">
