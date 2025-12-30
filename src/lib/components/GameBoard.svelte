@@ -8,7 +8,7 @@
 	import GameCell from './GameCell.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
 	import { statsStore } from '$lib/stores';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { resolve } from '$app/paths';
 
 	interface Props {
@@ -41,6 +41,61 @@
 	let cellScores = $state<Record<string, number>>({}); // Points per cell
 	let cachedStats: Record<string, any> | null = null; // Cache for stats
 	let gameFinished = $state(false); // Whether the game is finished
+
+	function formatDate(dateStr: string, lang: string): string {
+		if (!dateStr) return '';
+		const [y, m, d] = dateStr.split('-');
+		if (lang === 'de') return `${d}.${m}.${y}`;
+		return `${y}-${m}-${d}`;
+	}
+
+	// Emoji für grün/rot (🟩/🟥) oder Unicode-Quadrate
+	const GREEN = '🟩';
+	const RED = '🟥';
+
+	// Entwickler-Template für das Ergebnis. Hier editierbar:
+	const resultTemplate = ({
+		grid,
+		score,
+		t,
+		$languageStore,
+		date
+	}: {
+		grid: string;
+		score: number;
+		t: (key: string, lang: string) => string;
+		$languageStore: string;
+		date: string;
+	}) =>
+`DELDoku ${formatDate(date, $languageStore)}\n 
+${grid}\n
+${t('score', $languageStore)}: ${score} / 1000\n
+#DELDoku
+https://www.leaffan.net/deldoku
+`;
+
+	function generateResultText() {
+		// 3x3-Gitter mit grünen/roten Quadraten je nach Korrektheit
+		let grid = '';
+		for (let row = 0; row < 3; row++) {
+			for (let col = 0; col < 3; col++) {
+				const cellKey = getCellKey(row, col);
+				grid += correctCells.includes(cellKey)
+					? GREEN
+					: (gameGrid[row][col] ? RED : '⬜'); // Leere Zellen als weißes Quadrat
+			}
+			if (row < 2) grid += '\n';
+		}
+		const date = challenge?.date || '';
+		return resultTemplate({ grid, score: currentScore, t, $languageStore, date });
+	}
+
+	function copyResultToClipboard() {
+		const text = generateResultText();
+		navigator.clipboard.writeText(text);
+	}
+
+
 
 	// Derived state: list of used player IDs
 	let usedPlayerIds = $derived.by(() => {
@@ -347,7 +402,7 @@
 			}}
 			class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-2 rounded-lg transition-colors text-sm whitespace-nowrap"
 		>
-			{t('restartGame', $languageStore)}
+			{t('shareResult', $languageStore)}
 		</button>
 	</div>
 
@@ -409,7 +464,7 @@
 	</div>
 
 	<!-- Counter and Score Display (below game board) -->
-	<div class="mt-2 flex items-stretch gap-2 w-80 sm:w-96 md:w-112 mx-auto">
+	<div class="mt-4 flex items-stretch gap-2 w-80 sm:w-96 md:w-112 mx-auto">
 		<div class={`flex-1 p-2 rounded-lg transition-all ${flashAnswers ? 'scale-105 ring-2 ring-blue-500' : ''} ${gameFinished ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50 border-2 border-gray-300'}`}>
 			<div class={`text-xs sm:text-sm ${gameFinished ? 'font-bold text-blue-800' : 'font-semibold text-gray-700'} text-center whitespace-nowrap`}>
 				{t('answersGiven', $languageStore)}: {answersGiven} / 9
@@ -422,6 +477,18 @@
 			</div>
 		</div>
 	</div>
+
+	{#if gameFinished}
+		   <div class="mt-4 flex items-stretch gap-2 w-80 sm:w-96 md:w-112 mx-auto">
+			   <button
+				   class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 text-sm sm:text-base rounded-lg transition-colors"
+				   style="width:100%"
+				   onclick={copyResultToClipboard}
+			   >
+				   Ergebnis teilen
+			   </button>
+		   </div>
+	{/if}
 
 	<!-- Overlay for player input -->
 	{#if selectedCell !== null}

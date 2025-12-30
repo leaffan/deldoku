@@ -44,6 +44,7 @@ export type Translations = {
 	noGamesYet: string;
 	delStats: string;
 	todaysTopic: string;
+	shareResult: string;
 };
 
 export type CategoryKey =
@@ -109,6 +110,8 @@ export const translations: Record<Language, Translations> = {
 		gameHistory: 'Spielhistorie',
 		won: '✓ Gewonnen',
 		lost: '✗ Verloren',
+		todaysTopic: 'Heutiges Thema',
+		shareResult: 'Ergebnis teilen',
 		score: 'Punkte',
 		selectPlayer: 'Spieler auswählen',
 		row: 'Zeile',
@@ -131,8 +134,7 @@ export const translations: Record<Language, Translations> = {
 		rulesScoring4: 'Maximale Punktzahl: 1000 Punkte',
 		points: 'Pkt',
 		noGamesYet: 'Noch keine Spiele gespielt. Starten Sie ein Spiel um Statistiken zu sammeln!',
-		delStats: 'DEL-Statistiken',
-		todaysTopic: 'Heutiges Thema'
+		delStats: 'DEL-Statistiken'
 	},
 	en: {
 		title: "DELDoku",
@@ -154,6 +156,8 @@ export const translations: Record<Language, Translations> = {
 		gameHistory: 'Game History',
 		won: '✓ Won',
 		lost: '✗ Lost',
+		todaysTopic: "Today's Topic",
+		shareResult: 'Share Result',
 		score: 'Score',
 		selectPlayer: 'Select Player',
 		row: 'Row',
@@ -176,8 +180,7 @@ export const translations: Record<Language, Translations> = {
 		rulesScoring4: 'Maximum score: 1000 points',
 		points: 'Pts',
 		noGamesYet: 'No games played yet. Start a game to collect statistics!',
-		delStats: 'DEL Statistics',
-		todaysTopic: "Today's Topic"
+		delStats: 'DEL Statistics'
 	}
 };
 
