@@ -51,6 +51,10 @@ export type CategoryKey =
 	| '20_goal'
 	| '30_assist'
 	| '50_point'
+	| '150_g_career'
+	| '250_a_career'
+	| '400_pts_career'
+	| '500_pts_career'
 	| 'single_team'
 	| 'championship'
 	| '100_penalty_minutes'
@@ -65,6 +69,10 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'20_goal': '20-Tore-Saison',
 		'30_assist': '30-Vorlagen-Saison',
 		'50_point': '50-Punkte-Saison',
+		'150_g_career': '150 Tore/Karriere',
+		'250_a_career': '250 Vorlagen/Karriere',
+		'400_pts_career': '400 Punkte/Karriere',
+		'500_pts_career': '500 Punkte / Karriere',
 		'single_team': 'Nur ein Team',
 		'championship': 'DEL-Meister',
 		'100_penalty_minutes': '100 Strafminuten-Saison',
@@ -78,6 +86,10 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'20_goal': '20 Goals Season',
 		'30_assist': '30 Assists Season',
 		'50_point': '50 Points Season',
+		'150_g_career': '150 Goals/Career',
+		'250_a_career': '250 Assists/Career',
+		'400_pts_career': '400 Points/Career',
+		'500_pts_career': '500 Points / Career',
 		'single_team': 'Single Team',
 		'championship': 'DEL Champion',
 		'100_penalty_minutes': '100 Penalty Minutes Season',
