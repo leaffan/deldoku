@@ -112,8 +112,13 @@ https://www.leaffan.net/deldoku
 	}
 
 	async function findLogo(category: string) {
+		// Keine Logo-Suche für zweistellige ISO-Ländercodes
+		if (/^[a-zA-Z]{2}$/.test(category)) {
+			logoMap = { ...logoMap, [category]: null };
+			return;
+		}
 		const appBase = import.meta.env.BASE_URL || '/';
-		let extension = ""
+		let extension = "";
 		if (pngLogoCategories.includes(category)) {
 			extension = '.png';
 		} else {
@@ -145,7 +150,8 @@ https://www.leaffan.net/deldoku
 		cats.forEach((c) => {
 			debug('Preloading logo for category:', c);
 			if (/^\d/.test(c)) return; // skipping categories starting with a digit
-			if (/^WJC/.test(c)) return; // skipping categories starting with a digit
+			if (/^WJC/.test(c)) return; // skipping categories starting with WJC
+			if (/^[a-zA-Z]{2}$/.test(c)) return; // keine Logo-Suche für ISO-Ländercode
 			findLogo(c);
 		});
 	});
@@ -417,6 +423,8 @@ https://www.leaffan.net/deldoku
 				<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-2">
 					{#if logoMap[colCat]}
 						<img src={logoMap[colCat]} alt={colCat} class="h-14 w-auto" title={getCategoryName(colCat)} />
+					{:else if /^([a-zA-Z]{2})$/.test(colCat) }
+						<span class={"fi fi-" + colCat.toLowerCase()} title={getCategoryName(colCat)} style="font-size:2.5rem;"></span>
 					{:else}
 						{getCategoryName(colCat)}
 					{/if}
@@ -431,6 +439,8 @@ https://www.leaffan.net/deldoku
 				<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-2">
 					{#if logoMap[rowCat]}
 						<img src="{logoMap[rowCat]}" alt="{rowCat}" class="h-14 w-auto" title={getCategoryName(rowCat)} />
+					{:else if /^([a-zA-Z]{2})$/.test(rowCat) }
+						<span class={"fi fi-" + rowCat.toLowerCase()} title={getCategoryName(rowCat)} style="font-size:2.5rem;"></span>
 					{:else}
 						{getCategoryName(rowCat)}
 					{/if}
