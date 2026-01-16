@@ -377,7 +377,7 @@ https://www.leaffan.net/deldoku
 	<div class="mb-2 flex items-stretch gap-2 w-80 sm:w-96 md:w-112 mx-auto">
 		<button
 			onclick={submitSolution}
-			disabled={gameFinished}
+			disabled={gameFinished || answersGiven === 0}
 			class="flex-1 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-2 rounded-lg transition-colors text-sm whitespace-nowrap"
 		>
 			{t('submitSolution', $languageStore)}
