@@ -112,11 +112,6 @@ https://www.leaffan.net/deldoku
 	}
 
 	async function findLogo(category: string) {
-		// Keine Logo-Suche für zweistellige ISO-Ländercodes
-		if (/^[a-zA-Z]{2}$/.test(category)) {
-			logoMap = { ...logoMap, [category]: null };
-			return;
-		}
 		const appBase = import.meta.env.BASE_URL || '/';
 		let extension = "";
 		if (pngLogoCategories.includes(category)) {
@@ -151,7 +146,7 @@ https://www.leaffan.net/deldoku
 			debug('Preloading logo for category:', c);
 			if (/^\d/.test(c)) return; // skipping categories starting with a digit
 			if (/^WJC/.test(c)) return; // skipping categories starting with WJC
-			if (/^[a-zA-Z]{2}$/.test(c)) return; // keine Logo-Suche für ISO-Ländercode
+			if (c !== 'OG' && /^[a-zA-Z]{2}$/.test(c)) return; // keine Logo-Suche für ISO-Ländercode
 			findLogo(c);
 		});
 	});
