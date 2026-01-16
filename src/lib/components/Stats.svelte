@@ -55,24 +55,24 @@
 	<h2 class="text-2xl font-bold mb-4">{t('statistics', $languageStore)}</h2>
 
 	<div class="mb-6">
-		<h3 class="text-lg font-semibold mb-2">🌍 Gesamtstatistiken (heute)</h3>
+		<h3 class="text-lg font-semibold mb-2">{t('globalStatsTitle', $languageStore)}</h3>
 		{#if loadingGlobalStats}
-			<div>Lade Gesamtstatistiken...</div>
+			<div>{t('globalStatsLoading', $languageStore)}</div>
 		{:else if errorGlobalStats}
-			<div class="text-red-600">Fehler: {errorGlobalStats}</div>
+			<div class="text-red-600">{t('globalStatsError', $languageStore)}{errorGlobalStats}</div>
 		{:else}
 			<div class="grid grid-cols-3 gap-2 sm:gap-4">
 				<div class="bg-gray-50 p-2 sm:p-4 rounded-lg">
 					<div class="text-xl sm:text-2xl font-bold text-gray-700">{totalGamesToday ?? 0}</div>
-					<div class="text-xs sm:text-sm text-gray-600">Spiele heute</div>
+					<div class="text-xs sm:text-sm text-gray-600">{t('globalStatsGamesToday', $languageStore)}</div>
 				</div>
 				<div class="bg-gray-50 p-2 sm:p-4 rounded-lg">
 					<div class="text-xl sm:text-2xl font-bold text-gray-700">{avgCorrectAnswers !== null ? avgCorrectAnswers.toFixed(2) : '-'}</div>
-					<div class="text-xs sm:text-sm text-gray-600">Ø richtige Antworten</div>
+					<div class="text-xs sm:text-sm text-gray-600">{t('globalStatsAvgCorrect', $languageStore)}</div>
 				</div>
 				<div class="bg-gray-50 p-2 sm:p-4 rounded-lg">
 					<div class="text-xl sm:text-2xl font-bold text-gray-700">{avgScore !== null ? Math.round(avgScore) : '-'}</div>
-					<div class="text-xs sm:text-sm text-gray-600">Ø Punkte</div>
+					<div class="text-xs sm:text-sm text-gray-600">{t('globalStatsAvgScore', $languageStore)}</div>
 				</div>
 			</div>
 		{/if}

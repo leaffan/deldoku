@@ -45,6 +45,14 @@ export type Translations = {
 	delStats: string;
 	todaysTopic: string;
 	shareResult: string;
+
+	// Aggregated stats
+	globalStatsTitle: string;
+	globalStatsLoading: string;
+	globalStatsError: string;
+	globalStatsGamesToday: string;
+	globalStatsAvgCorrect: string;
+	globalStatsAvgScore: string;
 };
 
 export type CategoryKey =
@@ -146,7 +154,13 @@ export const translations: Record<Language, Translations> = {
 		rulesScoring4: 'Maximale Punktzahl: 1000 Punkte',
 		points: 'Pkt',
 		noGamesYet: 'Noch keine Spiele gespielt. Starten Sie ein Spiel um Statistiken zu sammeln!',
-		delStats: 'DEL-Statistiken'
+		delStats: 'DEL-Statistiken',
+		globalStatsTitle: '🌍 Gesamtstatistiken (heute)',
+		globalStatsLoading: 'Lade Gesamtstatistiken...',
+		globalStatsError: 'Fehler: ',
+		globalStatsGamesToday: 'Spiele heute',
+		globalStatsAvgCorrect: 'Ø richtige Antworten',
+		globalStatsAvgScore: 'Ø Punkte'
 	},
 	en: {
 		title: "DELDoku",
@@ -192,7 +206,13 @@ export const translations: Record<Language, Translations> = {
 		rulesScoring4: 'Maximum score: 1000 points',
 		points: 'Pts',
 		noGamesYet: 'No games played yet. Start a game to collect statistics!',
-		delStats: 'DEL Statistics'
+		delStats: 'DEL Statistics',
+		globalStatsTitle: '🌍 Global Statistics (today)',
+		globalStatsLoading: 'Loading global statistics...',
+		globalStatsError: 'Error: ',
+		globalStatsGamesToday: 'Games today',
+		globalStatsAvgCorrect: 'Avg. correct answers',
+		globalStatsAvgScore: 'Avg. score'
 	}
 };
 
