@@ -66,7 +66,9 @@ export type CategoryKey =
 	| '250_a_career'
 	| '400_pts_career'
 	| '500_pts_career'
-	| 'single_team'
+	| '1_teams'
+	| '3_plus_teams'
+	| '5_plus_teams'
 	| 'championship'
 	| '100_penalty_minutes'
 	| '1994'
@@ -87,7 +89,9 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'250_a_career': '250 Vorlagen/Karriere',
 		'400_pts_career': '400 Punkte/Karriere',
 		'500_pts_career': '500 Punkte / Karriere',
-		'single_team': 'Nur ein Team',
+		'1_teams': 'Nur ein Team',
+		'3_plus_teams': '3+ Teams',
+		'5_plus_teams': '5+ Teams',
 		'championship': 'DEL-Meister',
 		'100_penalty_minutes': '100 Strafminuten-Saison',
 		'1994': '1994/95 aktive Spieler',
@@ -107,7 +111,9 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'250_a_career': '250 Assists/Career',
 		'400_pts_career': '400 Points/Career',
 		'500_pts_career': '500 Points / Career',
-		'single_team': 'Single Team',
+		'1_teams': 'Single Team',
+		'3_plus_teams': '3+ Teams',
+		'5_plus_teams': '5+ Teams',
 		'championship': 'DEL Champion',
 		'100_penalty_minutes': '100 Penalty Minutes Season',
 		'1994': '1994/95 Active Players',
