@@ -59,11 +59,16 @@ export type CategoryKey =
 	| '20_goal'
 	| '30_assist'
 	| '50_point'
+	| '20_g_season'
 	| '20_pts_season'
 	| '40_pts_season'
 	| '60_pts_season'
+	| '100_g_career'
 	| '150_g_career'
+	| '200_g_career'
+	| '100_a_career'
 	| '250_a_career'
+	| '250_pts_career'
 	| '400_pts_career'
 	| '500_pts_career'
 	| '1_teams'
@@ -82,11 +87,16 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'20_goal': '20-Tore-Saison',
 		'30_assist': '30-Vorlagen-Saison',
 		'50_point': '50-Punkte-Saison',
+		'20_g_season': '20-Tore-Saison',
 		'20_pts_season': 'Saison mit 20 Punkten',
 		'40_pts_season': 'Saison mit 40 Punkten',
 		'60_pts_season': 'Saison mit 60 Punkten',
+		'100_g_career': '100 Tore/Karriere',
 		'150_g_career': '150 Tore/Karriere',
+		'200_g_career': '200 Tore/Karriere',
+		'100_a_career': '100 Vorlagen/Karriere',
 		'250_a_career': '250 Vorlagen/Karriere',
+		'250_pts_career': '250 Punkte/Karriere',
 		'400_pts_career': '400 Punkte/Karriere',
 		'500_pts_career': '500 Punkte / Karriere',
 		'1_teams': 'Nur ein Team',
@@ -104,11 +114,16 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'20_goal': '20 Goals Season',
 		'30_assist': '30 Assists Season',
 		'50_point': '50 Points Season',
+		'20_g_season': '20 Goals Season',
 		'20_pts_season': '20 Points Season',
 		'40_pts_season': '40 Points Season',
 		'60_pts_season': '60 Points Season',
+		'100_g_career': '100 Goals/Career',
 		'150_g_career': '150 Goals/Career',
+		'200_g_career': '200 Goals/Career',
+		'100_a_career': '100 Assists/Career',
 		'250_a_career': '250 Assists/Career',
+		'250_pts_career': '250 Points/Career',
 		'400_pts_career': '400 Points/Career',
 		'500_pts_career': '500 Points / Career',
 		'1_teams': 'Single Team',
