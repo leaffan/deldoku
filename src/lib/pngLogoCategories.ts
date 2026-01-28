@@ -3,6 +3,7 @@ export const pngLogoCategories = [
   "DUI",
   "DRE",
   "MUC",
+  "CAP",
   "nhl-stanley-cup-champion",
   "icehl",
 ];
