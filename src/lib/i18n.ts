@@ -62,6 +62,7 @@ export type CategoryKey =
 	| '20_g_season'
 	| '20_pts_season'
 	| '40_pts_season'
+	| '50_pts_season'
 	| '60_pts_season'
 	| '100_g_career'
 	| '150_g_career'
@@ -71,9 +72,11 @@ export type CategoryKey =
 	| '250_pts_career'
 	| '400_pts_career'
 	| '500_pts_career'
+	| '500_pim_career'
 	| '1_teams'
 	| '3_plus_teams'
 	| '5_plus_teams'
+	| 'italy-champion'
 	| 'championship'
 	| '100_penalty_minutes'
 	| '1994'
@@ -88,21 +91,24 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'30_assist': '30-Vorlagen-Saison',
 		'50_point': '50-Punkte-Saison',
 		'20_g_season': '20-Tore-Saison',
-		'20_pts_season': 'Saison mit 20 Punkten',
-		'40_pts_season': 'Saison mit 40 Punkten',
-		'60_pts_season': 'Saison mit 60 Punkten',
-		'100_g_career': '100 Tore/Karriere',
-		'150_g_career': '150 Tore/Karriere',
-		'200_g_career': '200 Tore/Karriere',
-		'100_a_career': '100 Vorlagen/Karriere',
-		'250_a_career': '250 Vorlagen/Karriere',
-		'250_pts_career': '250 Punkte/Karriere',
-		'400_pts_career': '400 Punkte/Karriere',
+		'20_pts_season': '20-Punkte-Saison',
+		'40_pts_season': '40-Punkte-Saison',
+		'50_pts_season': '50-Punkte-Saison',
+		'60_pts_season': '60-Punkte-Saison',
+		'100_g_career': '100 Tore / Karriere',
+		'150_g_career': '150 Tore / Karriere',
+		'200_g_career': '200 Tore / Karriere',
+		'100_a_career': '100 Vorlagen / Karriere',
+		'250_a_career': '250 Vorlagen / Karriere',
+		'250_pts_career': '250 Punkte / Karriere',
+		'400_pts_career': '400 Punkte / Karriere',
 		'500_pts_career': '500 Punkte / Karriere',
+		'500_pim_career': '500 Strafminuten / Karriere',
 		'1_teams': 'Nur ein Team',
 		'3_plus_teams': '3+ Teams',
 		'5_plus_teams': '5+ Teams',
 		'championship': 'DEL-Meister',
+		'italy-champion': 'Italienischer Meister',
 		'100_penalty_minutes': '100 Strafminuten-Saison',
 		'1994': '1994/95 aktive Spieler',
 		'2025': '2025/26 aktive Spieler',
@@ -111,26 +117,29 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'WJC-20_GOLD_MEDAL': 'U20-WM-Titel'
 	},
 	en: {
-		'20_goal': '20 Goals Season',
-		'30_assist': '30 Assists Season',
-		'50_point': '50 Points Season',
-		'20_g_season': '20 Goals Season',
-		'20_pts_season': '20 Points Season',
-		'40_pts_season': '40 Points Season',
-		'60_pts_season': '60 Points Season',
-		'100_g_career': '100 Goals/Career',
-		'150_g_career': '150 Goals/Career',
-		'200_g_career': '200 Goals/Career',
-		'100_a_career': '100 Assists/Career',
-		'250_a_career': '250 Assists/Career',
-		'250_pts_career': '250 Points/Career',
-		'400_pts_career': '400 Points/Career',
+		'20_goal': '20 Goals / Season',
+		'30_assist': '30 Assists / Season',
+		'50_point': '50 Points / Season',
+		'20_g_season': '20 Goals / Season',
+		'20_pts_season': '20 Points / Season',
+		'40_pts_season': '40 Points / Season',
+		'50_pts_season': '50 Points / Season',
+		'60_pts_season': '60 Points / Season',
+		'100_g_career': '100 Goals / Career',
+		'150_g_career': '150 Goals / Career',
+		'200_g_career': '200 Goals / Career',
+		'100_a_career': '100 Assists / Career',
+		'250_a_career': '250 Assists / Career',
+		'250_pts_career': '250 Points / Career',
+		'400_pts_career': '400 Points / Career',
 		'500_pts_career': '500 Points / Career',
+		'500_pim_career': '500 PIMs / Career',
 		'1_teams': 'Single Team',
 		'3_plus_teams': '3+ Teams',
 		'5_plus_teams': '5+ Teams',
 		'championship': 'DEL Champion',
-		'100_penalty_minutes': '100 Penalty Minutes Season',
+		'italy-champion': 'Italian Champion',
+		'100_penalty_minutes': '100 PIMs / Season',
 		'1994': '1994/95 Active Players',
 		'2025': '2025/26 Active Players',
 		'WJC-20': 'U20s Participant',
