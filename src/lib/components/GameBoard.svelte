@@ -146,7 +146,7 @@ https://www.leaffan.net/deldoku
 			debug('Preloading logo for category:', c);
 			if (/^\d/.test(c)) return; // skipping categories starting with a digit
 			if (/^WJC/.test(c)) return; // skipping categories starting with WJC
-			if (c !== 'OG' && /^[a-zA-Z]{2}$/.test(c)) return; // keine Logo-Suche für ISO-Ländercode
+			if (c.toUpperCase() !== 'OG' && /^[a-zA-Z]{2}$/.test(c)) return; // keine Logo-Suche für ISO-Ländercode
 			findLogo(c);
 		});
 	});
