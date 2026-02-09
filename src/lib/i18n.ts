@@ -64,6 +64,9 @@ export type CategoryKey =
 	| '40_pts_season'
 	| '50_pts_season'
 	| '60_pts_season'
+	| '70_pts_season'
+	| '100_gp_career'
+	| '500_gp_career'
 	| '100_g_career'
 	| '150_g_career'
 	| '200_g_career'
@@ -74,10 +77,11 @@ export type CategoryKey =
 	| '500_pts_career'
 	| '500_pim_career'
 	| '1_teams'
+	| '2_teams'
 	| '3_plus_teams'
 	| '5_plus_teams'
 	| 'italy-champion'
-	| 'championship'
+	| 'del-champion'
 	| '100_penalty_minutes'
 	| '1994'
 	| '2025'
@@ -95,6 +99,9 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'40_pts_season': '40-Punkte-Saison',
 		'50_pts_season': '50-Punkte-Saison',
 		'60_pts_season': '60-Punkte-Saison',
+		'70_pts_season': '70-Punkte-Saison',
+		'100_gp_career': '100 Spiele / Karriere',
+		'500_gp_career': '500 Spiele / Karriere',
 		'100_g_career': '100 Tore / Karriere',
 		'150_g_career': '150 Tore / Karriere',
 		'200_g_career': '200 Tore / Karriere',
@@ -105,9 +112,10 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'500_pts_career': '500 Punkte / Karriere',
 		'500_pim_career': '500 Strafminuten / Karriere',
 		'1_teams': 'Nur ein Team',
+		'2_teams': 'Exakt 2 Teams',
 		'3_plus_teams': '3+ Teams',
 		'5_plus_teams': '5+ Teams',
-		'championship': 'DEL-Meister',
+		'del-champion': 'DEL-Meister',
 		'italy-champion': 'Italienischer Meister',
 		'100_penalty_minutes': '100 Strafminuten-Saison',
 		'1994': '1994/95 aktive Spieler',
@@ -125,6 +133,9 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'40_pts_season': '40 Points / Season',
 		'50_pts_season': '50 Points / Season',
 		'60_pts_season': '60 Points / Season',
+		'70_pts_season': '70 Points / Season',
+		'100_gp_career': '100 Games / Career',
+		'500_gp_career': '500 Games / Career',
 		'100_g_career': '100 Goals / Career',
 		'150_g_career': '150 Goals / Career',
 		'200_g_career': '200 Goals / Career',
@@ -135,9 +146,10 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'500_pts_career': '500 Points / Career',
 		'500_pim_career': '500 PIMs / Career',
 		'1_teams': 'Single Team',
+		'2_teams': 'Exactly 2 Teams',
 		'3_plus_teams': '3+ Teams',
 		'5_plus_teams': '5+ Teams',
-		'championship': 'DEL Champion',
+		'del-champion': 'DEL Champion',
 		'italy-champion': 'Italian Champion',
 		'100_penalty_minutes': '100 PIMs / Season',
 		'1994': '1994/95 Active Players',

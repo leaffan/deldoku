@@ -6,4 +6,8 @@ export const pngLogoCategories = [
   "CAP",
   "nhl-stanley-cup-champion",
   "icehl",
+  "dnl",
+  "alpshl",
+  "hockeyallsvenskan",
+  "ligue-magnus",
 ];
