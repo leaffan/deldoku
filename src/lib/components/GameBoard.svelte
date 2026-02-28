@@ -111,6 +111,14 @@ https://www.leaffan.net/deldoku
 		return categoryNames[category as keyof typeof categoryNames] || category; // Fallback to original if no mapping exists
 	}
 
+	function getChallengeTitle(): string {
+		if (!challenge?.title) return '';
+		if (typeof challenge.title === 'string') return challenge.title;
+		// If title is an object with language keys
+		const lang = $languageStore === 'de' ? 'de' : 'en';
+		return challenge.title[lang] || challenge.title.en || '';
+	}
+
 	async function findLogo(category: string) {
 		const appBase = import.meta.env.BASE_URL || '/';
 		let extension = "";
@@ -368,7 +376,7 @@ https://www.leaffan.net/deldoku
 		{#if challenge?.title}
 			<p class="text-sm text-gray-600 mb-1 flex flex-wrap justify-center items-center gap-2">
 				<span class="font-medium text-gray-500">{t('todaysTopic', $languageStore)}:</span>
-				<span><b>{challenge.title}</b></span>
+				<span><b>{getChallengeTitle()}</b></span>
 			</p>
 		{/if}
 	</div>
