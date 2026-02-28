@@ -65,29 +65,35 @@ export type CategoryKey =
 	| '50_pts_season'
 	| '60_pts_season'
 	| '70_pts_season'
+	| '1_so_season'
 	| '100_gp_career'
 	| '500_gp_career'
 	| '100_g_career'
 	| '150_g_career'
 	| '200_g_career'
 	| '100_a_career'
+	| '200_a_career'
 	| '250_a_career'
 	| '250_pts_career'
 	| '400_pts_career'
 	| '500_pts_career'
 	| '500_pim_career'
+	| '10_so_career'
 	| '1_teams'
 	| '2_teams'
 	| '3_plus_teams'
 	| '5_plus_teams'
 	| 'italy-champion'
 	| 'del-champion'
-	| '100_penalty_minutes'
+	| 'spengler-cup-winner'
+	| '100_pim_season'
 	| '1994'
 	| '2025'
 	| 'WJC-20'
 	| 'WJC-20_MEDAL'
-	| 'WJC-20_GOLD_MEDAL';
+	| 'WJC-20_GOLD_MEDAL'
+	| 'drafted'
+	| 'not_drafted';
 
 export const categories: Record<Language, Record<CategoryKey, string>> = {
 	de: {
@@ -100,29 +106,35 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'50_pts_season': '50-Punkte-Saison',
 		'60_pts_season': '60-Punkte-Saison',
 		'70_pts_season': '70-Punkte-Saison',
+		'100_pim_season': '100 Strafminuten-Saison',
+		'1_so_season': '1+ Shutout-Saison',
 		'100_gp_career': '100 Spiele / Karriere',
 		'500_gp_career': '500 Spiele / Karriere',
 		'100_g_career': '100 Tore / Karriere',
 		'150_g_career': '150 Tore / Karriere',
 		'200_g_career': '200 Tore / Karriere',
 		'100_a_career': '100 Vorlagen / Karriere',
+		'200_a_career': '200 Vorlagen / Karriere',
 		'250_a_career': '250 Vorlagen / Karriere',
 		'250_pts_career': '250 Punkte / Karriere',
 		'400_pts_career': '400 Punkte / Karriere',
 		'500_pts_career': '500 Punkte / Karriere',
 		'500_pim_career': '500 Strafminuten / Karriere',
+		'10_so_career': '10+ Shutouts / Karriere',
 		'1_teams': 'Nur ein Team',
 		'2_teams': 'Exakt 2 Teams',
 		'3_plus_teams': '3+ Teams',
 		'5_plus_teams': '5+ Teams',
 		'del-champion': 'DEL-Meister',
 		'italy-champion': 'Italienischer Meister',
-		'100_penalty_minutes': '100 Strafminuten-Saison',
+		'spengler-cup-winner': 'Spengler-Cup-Sieger',
 		'1994': '1994/95 aktive Spieler',
 		'2025': '2025/26 aktive Spieler',
 		'WJC-20': 'U20-WM-Teilnehmer',
 		'WJC-20_MEDAL': 'U20-WM-Medaille',
-		'WJC-20_GOLD_MEDAL': 'U20-WM-Titel'
+		'WJC-20_GOLD_MEDAL': 'U20-WM-Titel',
+		'drafted': 'Ausgewählt im NHL-Draft',
+		'not_drafted': 'Nicht ausgewählt im NHL-Draft'
 	},
 	en: {
 		'20_goal': '20 Goals / Season',
@@ -134,29 +146,35 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'50_pts_season': '50 Points / Season',
 		'60_pts_season': '60 Points / Season',
 		'70_pts_season': '70 Points / Season',
+		'100_pim_season': '100 PIMs / Season',
+		'1_so_season': '1+ Shutout Season',
 		'100_gp_career': '100 Games / Career',
 		'500_gp_career': '500 Games / Career',
 		'100_g_career': '100 Goals / Career',
 		'150_g_career': '150 Goals / Career',
 		'200_g_career': '200 Goals / Career',
 		'100_a_career': '100 Assists / Career',
+		'200_a_career': '200 Assists / Career',
 		'250_a_career': '250 Assists / Career',
 		'250_pts_career': '250 Points / Career',
 		'400_pts_career': '400 Points / Career',
 		'500_pts_career': '500 Points / Career',
 		'500_pim_career': '500 PIMs / Career',
+		'10_so_career': '10+ Shutouts / Career',
 		'1_teams': 'Single Team',
 		'2_teams': 'Exactly 2 Teams',
 		'3_plus_teams': '3+ Teams',
 		'5_plus_teams': '5+ Teams',
 		'del-champion': 'DEL Champion',
 		'italy-champion': 'Italian Champion',
-		'100_penalty_minutes': '100 PIMs / Season',
+		'spengler-cup-winner': 'Spengler Cup Champion',
 		'1994': '1994/95 Active Players',
 		'2025': '2025/26 Active Players',
 		'WJC-20': 'U20s Participant',
 		'WJC-20_MEDAL': 'U20s Medal',
-		'WJC-20_GOLD_MEDAL': 'U20s Champion'
+		'WJC-20_GOLD_MEDAL': 'U20s Champion',
+		'drafted': 'Selected in NHL Draft',
+		'not_drafted': 'Not selected in NHL Draft'
 	}
 };
 
