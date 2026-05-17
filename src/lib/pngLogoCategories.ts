@@ -2,5 +2,12 @@
 export const pngLogoCategories = [
   "DUI",
   "DRE",
-  "MUC"
+  "MUC",
+  "CAP",
+  "nhl-stanley-cup-champion",
+  "icehl",
+  "dnl",
+  "alpshl",
+  "hockeyallsvenskan",
+  "ligue-magnus",
 ];

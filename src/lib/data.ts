@@ -10,7 +10,7 @@ export interface DELPlayer {
 
 export interface DELDokuChallenge {
 	date: string;
-	title?: string;
+	title?: string | { de: string; en: string };
 	rowCategories: string[];
 	colCategories: string[];
 	grid: (DELPlayer | null)[][];

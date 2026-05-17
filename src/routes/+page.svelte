@@ -4,6 +4,7 @@
 	import { generateDailyChallenge, type DELDokuChallenge } from '$lib/data';
 	import { playersStore, languageStore, statsStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
+	import { getDebugChallenge, isDebugEnabled } from '$lib/debug';
 
 	let showStats = $state(false);
 	let showRules = $state(false);
@@ -16,10 +17,43 @@
 		playersStore.init(),
 		statsStore.init()
 	])
-		.then(() => generateDailyChallenge([]))
-		.then((data) => {
-			challenge = data;
-			loading = false;
+		.then(async () => {
+			let challengeDate: string | null = null;
+			if (isDebugEnabled()) {
+				challengeDate = getDebugChallenge();
+			}
+			if (challengeDate) {
+				// Challenge-Override: Lade gezielt die Datei
+				try {
+					const basePath = (typeof window !== 'undefined') ? new URL('.', window.location.href).pathname : '/deldoku/';
+					const response = await fetch(`${basePath}challenges/${challengeDate}.json`);
+					if (!response.ok) {
+						throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+					}
+					const challengeData = await response.json();
+					const grid = Array(3).fill(null).map(() => Array(3).fill(null));
+					challenge = {
+						date: challengeDate,
+						title: challengeData.title,
+						rowCategories: challengeData.rowCategories,
+						colCategories: challengeData.colCategories,
+						grid,
+						answers: challengeData.answers
+					};
+					loading = false;
+					return;
+				} catch (err) {
+					console.error('Error loading debug challenge:', err);
+					error = `${t('error', $languageStore)}${err instanceof Error ? err.message : err}`;
+					loading = false;
+					return;
+				}
+			}
+			// Standard: Lade die Tages-Challenge
+			return generateDailyChallenge([]).then((data) => {
+				challenge = data;
+				loading = false;
+			});
 		})
 		.catch((err) => {
 			console.error('Error loading game:', err);

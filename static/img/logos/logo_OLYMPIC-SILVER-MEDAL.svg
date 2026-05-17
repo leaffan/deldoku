@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="200"
+   height="200"
+   version="1.1"
+   id="svg18"
+   sodipodi:docname="logo_olympic-silver-medal.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs18" />
+  <sodipodi:namedview
+     id="namedview18"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1"
+     inkscape:cx="449.5"
+     inkscape:cy="231"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg18" />
+  <circle
+     cx="100"
+     cy="100"
+     r="97.192223"
+     fill="#cccccc"
+     stroke="#999999"
+     stroke-width="5.61555"
+     id="circle7" />
+  <g
+     fill="none"
+     stroke="#666666"
+     stroke-width="13"
+     id="g12"
+     transform="matrix(0.43196544,0,0,0.43196544,-94.384448,0)">
+    <circle
+       cx="585.79999"
+       cy="218.12"
+       r="55"
+       id="circle8" />
+    <circle
+       cx="451.5"
+       cy="218.12"
+       r="55"
+       id="circle9" />
+    <circle
+       cx="314.20001"
+       cy="218.12"
+       r="55"
+       id="circle10" />
+    <circle
+       cx="382.79999"
+       cy="274.01001"
+       r="55"
+       id="circle11" />
+    <circle
+       cx="517.20001"
+       cy="274.01001"
+       r="55"
+       id="circle12" />
+  </g>
+</svg>

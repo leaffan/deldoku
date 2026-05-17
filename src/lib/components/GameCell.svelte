@@ -33,7 +33,11 @@
 >
 	{#if player}
 		<div class="flex flex-col items-center justify-center gap-1">
-			<span class="fi fi-{player.nationality}" style="font-size: 1rem;"></span>
+			<div class="flex flex-row gap-1">
+				{#each player.nationality.split(',').map(n => n.trim()).sort() as nat}
+					<span class="fi fi-{nat}" style="font-size: 1rem;"></span>
+				{/each}
+			</div>
 			<!-- Full name on larger screens, abbreviated name on mobile devices -->
 			<div class="font-bold text-xs leading-tight">
 				<span class="hidden sm:inline">{player.name}</span>
