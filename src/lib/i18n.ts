@@ -62,7 +62,9 @@ export type CategoryKey =
 	| '30_g_season'
 	| '5_g_season_po'
 	| '5_a_season_po'
+	| '10_pts_season_po'
 	| '30_a_season'
+	| '40_a_season'
 	| '50_a_season'
 	| '20_pts_season'
 	| '40_pts_season'
@@ -84,13 +86,16 @@ export type CategoryKey =
 	| '150_g_career'
 	| '200_g_career'
 	| '10_g_career_po'
+	| '20_g_career_po'
 	| '100_a_career'
 	| '200_a_career'
 	| '250_a_career'
 	| '250_pts_career'
 	| '400_pts_career'
 	| '500_pts_career'
+	| '10_pts_career_po'
 	| '30_pts_career_po'
+	| '50_pts_career_po'
 	| '500_pim_career'
 	| '100_pim_career_po'
 	| '50_pim_career_po'
@@ -109,14 +114,16 @@ export type CategoryKey =
 	| 'dnl-champion'
 	| 'liiga-champion'
 	| 'nl-champion'
+	| 'czech-extraliga-champion'
 	| 'spengler-cup-winner'
 	| 'hobey-baker-memorial-award-finalist'
 	| 'memorial-cup'
+	| 'deutschland-cup'
 	| '100_pim_season'
 	| '50_pim_season_po'
 	| '1994'
 	| '2025'
-	| 'WJC-20'
+	| 'wjc-20'
 	| 'u20-wjc-gold-medal'
 	| 'u20-wjc-medals'
 	| 'world-championship-medal'
@@ -147,6 +154,7 @@ export type CategoryKey =
 	| '10_w_season'
 	| '20_w_season'
 	| '30_w_season'
+	| '5_w_season_po'
 	| '10_w_season_po'
 	| 'le_3.0_gaa_season_po'
 	| 'last_name_initial_A'
@@ -154,9 +162,14 @@ export type CategoryKey =
 	| 'last_name_initial_C'
 	| 'last_name_initial_D'
 	| 'last_name_initial_E'
+	| 'last_name_initial_F'
+	| 'last_name_initial_G'
+	| 'last_name_initial_H'
+	| 'last_name_initial_T'
 	| 'last_name_initial_Z'
 	| '2_plus_championships'
 	| '3_plus_championships'
+	| '5_plus_championships'
 	| '0_championships'
 	;
 
@@ -168,7 +181,9 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'30_g_season': '30-Tore-Saison',
 		'5_g_season_po': '5-Tore-Saison (Playoffs)',
 		'5_a_season_po': '5-Vorlagen-Saison (Playoffs)',
+		'10_pts_season_po': '10-Punkte-Saison (Playoffs)',
 		'30_a_season': '30-Vorlagen-Saison',
+		'40_a_season': '40-Vorlagen-Saison',
 		'50_a_season': '50-Vorlagen-Saison',
 		'20_pts_season': '20-Punkte-Saison',
 		'40_pts_season': '40-Punkte-Saison',
@@ -194,13 +209,16 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'150_g_career': '150 Tore / Karriere',
 		'200_g_career': '200 Tore / Karriere',
 		'10_g_career_po': '10 Playoff-Tore / Karriere',
+		'20_g_career_po': '20 Playoff-Tore / Karriere',
 		'100_a_career': '100 Vorlagen / Karriere',
 		'200_a_career': '200 Vorlagen / Karriere',
 		'250_a_career': '250 Vorlagen / Karriere',
 		'250_pts_career': '250 Punkte / Karriere',
 		'400_pts_career': '400 Punkte / Karriere',
 		'500_pts_career': '500 Punkte / Karriere',
+		'10_pts_career_po': '10 Playoff-Punkte / Karriere',
 		'30_pts_career_po': '30 Playoff-Punkte / Karriere',
+		'50_pts_career_po': '50 Playoff-Punkte / Karriere',
 		'500_pim_career': '500 Strafminuten / Karriere',
 		'100_pim_career_po': '100 Strafminuten in Playoffs / Karriere',
 		'50_pim_career_po': '50 Strafminuten in Playoffs / Karriere',
@@ -221,12 +239,14 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'liiga-champion': 'Liiga-Meister',
 		'italy-champion': 'Italienischer Meister',
 		'nl-champion': 'NL-Meister (Schweiz)',
+		'czech-extraliga-champion': 'Tschechischer Meister',
 		'spengler-cup-winner': 'Spengler-Cup-Sieger',
 		'hobey-baker-memorial-award-finalist': 'Finalist Hobey-Baker-Award',
 		'memorial-cup': 'Teilnehmer Memorial Cup',
+		'deutschland-cup': 'Teilnehmer Deutschland-Cup',
 		'1994': '1994/95 aktive Spieler',
 		'2025': '2025/26 aktive Spieler',
-		'WJC-20': 'U20-WM-Teilnehmer',
+		'wjc-20': 'U20-WM-Teilnehmer',
 		'u20-wjc-gold-medal': 'U20-WM-Titel',
 		'u20-wjc-medals': 'U20-WM-Medaille',
 		'world-championship-medal': 'WM-Medaille',
@@ -253,6 +273,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'10_w_season': '10+ Siege / Saison',
 		'20_w_season': '20+ Siege / Saison',
 		'30_w_season': '30+ Siege / Saison',
+		'5_w_season_po': '5+ Siege in Playoffs / Saison',
 		'10_w_season_po': '10+ Siege in Playoffs / Saison',
 		'le_3.0_gaa_season_po': 'Saison mit ≤ 3,0 GTS in Playoffs',
 		'last_name_initial_A': 'Nachname beginnt mit A',
@@ -260,9 +281,14 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'last_name_initial_C': 'Nachname beginnt mit C',
 		'last_name_initial_D': 'Nachname beginnt mit D',
 		'last_name_initial_E': 'Nachname beginnt mit E',
+		'last_name_initial_F': 'Nachname beginnt mit F',
+		'last_name_initial_G': 'Nachname beginnt mit G',
+		'last_name_initial_H': 'Nachname beginnt mit H',
+		'last_name_initial_T': 'Nachname beginnt mit T',
 		'last_name_initial_Z': 'Nachname beginnt mit Z',
 		'2_plus_championships': '2+ Meisterschaften',
 		'3_plus_championships': '3+ Meisterschaften',
+		'5_plus_championships': '5+ Meisterschaften',
 		'0_championships': 'Keine Meisterschaft',
 	},
 	en: {
@@ -272,7 +298,9 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'30_g_season': '30 Goals / Season',
 		'5_g_season_po': '5 Goals / Season (Playoffs)',
 		'5_a_season_po': '5 Assists / Season (Playoffs)',
+		'10_pts_season_po': '10 Points / Season (Playoffs)',
 		'30_a_season': '30 Assists / Season',
+		'40_a_season': '40 Assists / Season',
 		'50_a_season': '50 Assists / Season',
 		'20_pts_season': '20 Points / Season',
 		'40_pts_season': '40 Points / Season',
@@ -297,13 +325,16 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'150_g_career': '150 Goals / Career',
 		'200_g_career': '200 Goals / Career',
 		'10_g_career_po': '10 Playoff Goals / Career',
+		'20_g_career_po': '20 Playoff Goals / Career',
 		'100_a_career': '100 Assists / Career',
 		'200_a_career': '200 Assists / Career',
 		'250_a_career': '250 Assists / Career',
 		'250_pts_career': '250 Points / Career',
 		'400_pts_career': '400 Points / Career',
 		'500_pts_career': '500 Points / Career',
+		'10_pts_career_po': '10 Playoff Points / Career',
 		'30_pts_career_po': '30 Playoff Points / Career',
+		'50_pts_career_po': '50 Playoff Points / Career',
 		'500_pim_career': '500 PIMs / Career',
 		'100_pim_career_po': '100 PIMs in Playoffs / Career',
 		'50_pim_career_po': '50 PIMs in Playoffs / Career',
@@ -324,10 +355,12 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'dnl-champion': 'DNL Champion',
 		'italy-champion': 'Italian Champion',
 		'nl-champion': 'NL-Champion (Switzerland)',
+		'czech-extraliga-champion': 'Czech Extraliga Champion',
 		'liiga-champion': 'Liiga Champion',
 		'spengler-cup-winner': 'Spengler Cup Champion',
 		'hobey-baker-memorial-award-finalist': 'Hobey Baker Award Finalist',
 		'memorial-cup': 'Memorial Cup Participant',
+		'deutschland-cup': 'Deutschland Cup Participant',
 		'world-championship-medal': 'World Championship Medal',
 		'world-championship-gold-medal': 'World Championship Gold Medal',
 		'world-championship-silver-medal': 'World Championship Silver Medal',
@@ -336,7 +369,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'shl-sm-silver-medal': 'SHL Silver Medal',
 		'1994': '1994/95 Active Players',
 		'2025': '2025/26 Active Players',
-		'WJC-20': 'U20s Participant',
+		'wjc-20': 'U20s Participant',
 		'u20-wjc-gold-medal': 'U20s Gold Medal',
 		'u20-wjc-medals': 'U20s Medal',
 		'drafted': 'Selected in NHL Draft',
@@ -357,6 +390,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'10_w_season': '10+ Wins / Season',
 		'20_w_season': '20+ Wins / Season',
 		'30_w_season': '30+ Wins / Season',
+		'5_w_season_po': '5+ Wins in Playoffs / Season',
 		'10_w_season_po': '10+ Wins in Playoffs / Season',
 		'le_3.0_gaa_season_po': '≤ 3.0 GAA / Season in Playoffs',
 		'last_name_initial_A': 'Last name starts with A',
@@ -364,9 +398,14 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'last_name_initial_C': 'Last name starts with C',
 		'last_name_initial_D': 'Last name starts with D',
 		'last_name_initial_E': 'Last name starts with E',
+		'last_name_initial_F': 'Last name starts with F',
+		'last_name_initial_G': 'Last name starts with G',
+		'last_name_initial_H': 'Last name starts with H',
+		'last_name_initial_T': 'Last name starts with T',
 		'last_name_initial_Z': 'Last name starts with Z',
 		'2_plus_championships': '2+ Championships',
 		'3_plus_championships': '3+ Championships',
+		'5_plus_championships': '5+ Championships',
 		'0_championships': 'No Championships',
 	}
 };
