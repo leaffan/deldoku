@@ -2,7 +2,7 @@
 import { readFileSync, writeFileSync, statSync } from 'fs';
 
 // Lade die Original-Datei
-const players = JSON.parse(readFileSync('static/all_players.json', 'utf-8'));
+const players = JSON.parse(readFileSync('all_players_uncompressed.json', 'utf-8'));
 
 // Komprimiere die Felder
 const compressed = players.map(p => ({
