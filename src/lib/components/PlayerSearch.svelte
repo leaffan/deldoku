@@ -16,6 +16,7 @@
 	let inputElement: HTMLInputElement | null = $state(null);
 	let selectedIndex = $state(-1); // Index of the currently highlighted player
 	let feedbackStatus = $state<'correct' | 'incorrect' | null>(null); // Feedback status
+	let blurTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	// Auto-focus when component mounts
 	$effect(() => {
@@ -75,15 +76,18 @@
 	}
 
 	function handleFocus() {
-		searchQuery = '';
-		suggestions = [];
+		if (blurTimeout !== null) {
+			clearTimeout(blurTimeout);
+			blurTimeout = null;
+		}
 		if (searchQuery.length > 0) {
 			isOpen = true;
 		}
 	}
 
 	function handleBlur() {
-		setTimeout(() => {
+		blurTimeout = setTimeout(() => {
+			blurTimeout = null;
 			isOpen = false;
 			selectedIndex = -1;
 		}, 100);

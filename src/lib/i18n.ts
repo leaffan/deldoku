@@ -61,7 +61,9 @@ export type CategoryKey =
 	| '20_g_season'
 	| '30_g_season'
 	| '5_g_season_po'
+	| '5_a_season_po'
 	| '30_a_season'
+	| '50_a_season'
 	| '20_pts_season'
 	| '40_pts_season'
 	| '50_pts_season'
@@ -93,6 +95,7 @@ export type CategoryKey =
 	| '100_pim_career_po'
 	| '50_pim_career_po'
 	| '10_so_career'
+	| '20_so_career'
 	| '25_so_career'
 	| '1_teams'
 	| '2_teams'
@@ -105,16 +108,22 @@ export type CategoryKey =
 	| 'del2-champion'
 	| 'dnl-champion'
 	| 'liiga-champion'
+	| 'nl-champion'
 	| 'spengler-cup-winner'
 	| 'hobey-baker-memorial-award-finalist'
+	| 'memorial-cup'
 	| '100_pim_season'
+	| '50_pim_season_po'
 	| '1994'
 	| '2025'
 	| 'WJC-20'
-	| 'WJC-20_MEDAL'
 	| 'u20-wjc-gold-medal'
+	| 'u20-wjc-medals'
 	| 'world-championship-medal'
+	| 'world-championship-gold-medal'
+	| 'world-championship-silver-medal'
 	| 'world-championship-bronze-medal'
+	| 'shl-champion'
 	| 'shl-sm-silver-medal'
 	| 'drafted'
 	| 'not_drafted'
@@ -127,18 +136,24 @@ export type CategoryKey =
 	| 'defender'
 	| 'forward'
 	| 'le_2.5_gaa_season'
+	| 'le_3.0_gaa_season'
 	| 'le_100_gp_career'
 	| 'le_10_gp_career'
 	| 'goalscorer_over_40'
 	| 'relative_del'
 	| 'relative_nhl'
 	| '50_w_career'
+	| '150_w_career'
 	| '10_w_season'
+	| '20_w_season'
+	| '30_w_season'
 	| '10_w_season_po'
 	| 'le_3.0_gaa_season_po'
 	| 'last_name_initial_A'
 	| 'last_name_initial_B'
 	| 'last_name_initial_C'
+	| 'last_name_initial_D'
+	| 'last_name_initial_E'
 	| 'last_name_initial_Z'
 	| '2_plus_championships'
 	| '3_plus_championships'
@@ -152,17 +167,21 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'20_g_season': '20-Tore-Saison',
 		'30_g_season': '30-Tore-Saison',
 		'5_g_season_po': '5-Tore-Saison (Playoffs)',
+		'5_a_season_po': '5-Vorlagen-Saison (Playoffs)',
 		'30_a_season': '30-Vorlagen-Saison',
+		'50_a_season': '50-Vorlagen-Saison',
 		'20_pts_season': '20-Punkte-Saison',
 		'40_pts_season': '40-Punkte-Saison',
 		'50_pts_season': '50-Punkte-Saison',
 		'60_pts_season': '60-Punkte-Saison',
 		'70_pts_season': '70-Punkte-Saison',
 		'100_pim_season': '100 Strafminuten-Saison',
+		'50_pim_season_po': '50 Strafminuten in Playoffs / Saison',
 		'1_so_season': '1+ Shutout-Saison',
 		'1_so_season_po': '1+ Shutout-Saison (Playoffs)',
 		'5_so_season': '5+ Shutout-Saison',
 		'le_2.5_gaa_season': 'Saison mit ≤ 2,50 GTS',
+		'le_3.0_gaa_season': 'Saison mit ≤ 3,00 GTS',
 		'100_gp_career': '100 Spiele / Karriere',
 		'500_gp_career': '500 Spiele / Karriere',
 		'1000_gp_career': '1000 Spiele / Karriere',
@@ -186,6 +205,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'100_pim_career_po': '100 Strafminuten in Playoffs / Karriere',
 		'50_pim_career_po': '50 Strafminuten in Playoffs / Karriere',
 		'10_so_career': '10+ Shutouts / Karriere',
+		'20_so_career': '20+ Shutouts / Karriere',
 		'25_so_career': '25+ Shutouts / Karriere',
 		'le_100_gp_career': '≤ 100 Spiele / Karriere',
 		'le_10_gp_career': '≤ 10 Spiele / Karriere',
@@ -200,15 +220,20 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'dnl-champion': 'DNL-Meister',
 		'liiga-champion': 'Liiga-Meister',
 		'italy-champion': 'Italienischer Meister',
+		'nl-champion': 'NL-Meister (Schweiz)',
 		'spengler-cup-winner': 'Spengler-Cup-Sieger',
 		'hobey-baker-memorial-award-finalist': 'Finalist Hobey-Baker-Award',
+		'memorial-cup': 'Teilnehmer Memorial Cup',
 		'1994': '1994/95 aktive Spieler',
 		'2025': '2025/26 aktive Spieler',
 		'WJC-20': 'U20-WM-Teilnehmer',
-		'WJC-20_MEDAL': 'U20-WM-Medaille',
 		'u20-wjc-gold-medal': 'U20-WM-Titel',
+		'u20-wjc-medals': 'U20-WM-Medaille',
 		'world-championship-medal': 'WM-Medaille',
+		'world-championship-gold-medal': 'WM-Goldmedaille',
+		'world-championship-silver-medal': 'WM-Silbermedaille',
 		'world-championship-bronze-medal': 'WM-Bronzemedaille',
+		'shl-champion': 'SHL-Meister',
 		'shl-sm-silver-medal': 'SHL-Vizemeister',
 		'drafted': 'Ausgewählt im NHL-Draft',
 		'not_drafted': 'Nicht ausgewählt im NHL-Draft',
@@ -223,13 +248,18 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'goalscorer_over_40': 'Torschütze über 40 Jahre',
 		'relative_del': 'Verwandter mit DEL-Spiel(en)',
 		'relative_nhl': 'Verwandter mit NHL-Spiel(en)',
-		'50_w_career': '50 Siege / Karriere',
-		'10_w_season': '10 Siege / Saison',
-		'10_w_season_po': '10 Siege in Playoffs / Saison',
+		'50_w_career': '50+ Siege / Karriere',
+		'150_w_career': '150+ Siege / Karriere',
+		'10_w_season': '10+ Siege / Saison',
+		'20_w_season': '20+ Siege / Saison',
+		'30_w_season': '30+ Siege / Saison',
+		'10_w_season_po': '10+ Siege in Playoffs / Saison',
 		'le_3.0_gaa_season_po': 'Saison mit ≤ 3,0 GTS in Playoffs',
 		'last_name_initial_A': 'Nachname beginnt mit A',
 		'last_name_initial_B': 'Nachname beginnt mit B',
 		'last_name_initial_C': 'Nachname beginnt mit C',
+		'last_name_initial_D': 'Nachname beginnt mit D',
+		'last_name_initial_E': 'Nachname beginnt mit E',
 		'last_name_initial_Z': 'Nachname beginnt mit Z',
 		'2_plus_championships': '2+ Meisterschaften',
 		'3_plus_championships': '3+ Meisterschaften',
@@ -241,16 +271,20 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'20_g_season': '20 Goals / Season',
 		'30_g_season': '30 Goals / Season',
 		'5_g_season_po': '5 Goals / Season (Playoffs)',
+		'5_a_season_po': '5 Assists / Season (Playoffs)',
 		'30_a_season': '30 Assists / Season',
+		'50_a_season': '50 Assists / Season',
 		'20_pts_season': '20 Points / Season',
 		'40_pts_season': '40 Points / Season',
 		'50_pts_season': '50 Points / Season',
 		'60_pts_season': '60 Points / Season',
 		'70_pts_season': '70 Points / Season',
 		'100_pim_season': '100 PIMs / Season',
+		'50_pim_season_po': '50 PIMs in Playoffs / Season',
 		'1_so_season': '1+ Shutout Season',
 		'1_so_season_po': '1+ Shutout Season (Playoffs)',
 		'le_2.5_gaa_season': '≤ 2.50 GAA / Season',
+		'le_3.0_gaa_season': '≤ 3.00 GAA / Season',
 		'100_gp_career': '100 Games / Career',
 		'500_gp_career': '500 Games / Career',
 		'1000_gp_career': '1000 Games / Career',
@@ -274,6 +308,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'100_pim_career_po': '100 PIMs in Playoffs / Career',
 		'50_pim_career_po': '50 PIMs in Playoffs / Career',
 		'10_so_career': '10+ Shutouts / Career',
+		'20_so_career': '20+ Shutouts / Career',
 		'25_so_career': '25+ Shutouts / Career',
 		'5_so_season': '5+ Shutout Season',
 		'le_100_gp_career': '≤ 100 Games / Career',
@@ -288,17 +323,22 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'del2-champion': 'DEL2 Champion',
 		'dnl-champion': 'DNL Champion',
 		'italy-champion': 'Italian Champion',
+		'nl-champion': 'NL-Champion (Switzerland)',
 		'liiga-champion': 'Liiga Champion',
 		'spengler-cup-winner': 'Spengler Cup Champion',
 		'hobey-baker-memorial-award-finalist': 'Hobey Baker Award Finalist',
+		'memorial-cup': 'Memorial Cup Participant',
 		'world-championship-medal': 'World Championship Medal',
+		'world-championship-gold-medal': 'World Championship Gold Medal',
+		'world-championship-silver-medal': 'World Championship Silver Medal',
 		'world-championship-bronze-medal': 'World Championship Bronze Medal',
+		'shl-champion': 'SHL Champion',
 		'shl-sm-silver-medal': 'SHL Silver Medal',
 		'1994': '1994/95 Active Players',
 		'2025': '2025/26 Active Players',
 		'WJC-20': 'U20s Participant',
-		'WJC-20_MEDAL': 'U20s Medal',
 		'u20-wjc-gold-medal': 'U20s Gold Medal',
+		'u20-wjc-medals': 'U20s Medal',
 		'drafted': 'Selected in NHL Draft',
 		'not_drafted': 'Not selected in NHL Draft',
 		'draft_round_1': 'Drafted in Round 1',
@@ -313,12 +353,17 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'relative_del': 'Relative with DEL game(s) played',
 		'relative_nhl': 'Relative with NHL game(s) played',
 		'50_w_career': '50 Wins / Career',
-		'10_w_season': '10 Wins / Season',
-		'10_w_season_po': '10 Wins in Playoffs / Season',
+		'150_w_career': '150+ Wins / Career',
+		'10_w_season': '10+ Wins / Season',
+		'20_w_season': '20+ Wins / Season',
+		'30_w_season': '30+ Wins / Season',
+		'10_w_season_po': '10+ Wins in Playoffs / Season',
 		'le_3.0_gaa_season_po': '≤ 3.0 GAA / Season in Playoffs',
 		'last_name_initial_A': 'Last name starts with A',
 		'last_name_initial_B': 'Last name starts with B',
 		'last_name_initial_C': 'Last name starts with C',
+		'last_name_initial_D': 'Last name starts with D',
+		'last_name_initial_E': 'Last name starts with E',
 		'last_name_initial_Z': 'Last name starts with Z',
 		'2_plus_championships': '2+ Championships',
 		'3_plus_championships': '3+ Championships',
