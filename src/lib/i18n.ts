@@ -63,6 +63,7 @@ export type CategoryKey =
 	| '5_g_season_po'
 	| '5_a_season_po'
 	| '10_pts_season_po'
+	| '20_pts_season_po'
 	| '30_a_season'
 	| '40_a_season'
 	| '50_a_season'
@@ -182,6 +183,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'5_g_season_po': '5-Tore-Saison (Playoffs)',
 		'5_a_season_po': '5-Vorlagen-Saison (Playoffs)',
 		'10_pts_season_po': '10-Punkte-Saison (Playoffs)',
+		'20_pts_season_po': '20-Punkte-Saison (Playoffs)',
 		'30_a_season': '30-Vorlagen-Saison',
 		'40_a_season': '40-Vorlagen-Saison',
 		'50_a_season': '50-Vorlagen-Saison',
@@ -299,6 +301,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'5_g_season_po': '5 Goals / Season (Playoffs)',
 		'5_a_season_po': '5 Assists / Season (Playoffs)',
 		'10_pts_season_po': '10 Points / Season (Playoffs)',
+		'20_pts_season_po': '20 Points / Season (Playoffs)',
 		'30_a_season': '30 Assists / Season',
 		'40_a_season': '40 Assists / Season',
 		'50_a_season': '50 Assists / Season',
