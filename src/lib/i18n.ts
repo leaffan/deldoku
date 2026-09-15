@@ -143,6 +143,7 @@ export type CategoryKey =
 	| 'goalie'
 	| 'defender'
 	| 'forward'
+	| 'le_2.0_gaa_season'
 	| 'le_2.5_gaa_season'
 	| 'le_3.0_gaa_season'
 	| 'le_100_gp_career'
@@ -172,6 +173,7 @@ export type CategoryKey =
 	| '3_plus_championships'
 	| '5_plus_championships'
 	| '0_championships'
+	| '2_championships'
 	;
 
 export const categories: Record<Language, Record<CategoryKey, string>> = {
@@ -197,6 +199,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'1_so_season': '1+ Shutout-Saison',
 		'1_so_season_po': '1+ Shutout-Saison (Playoffs)',
 		'5_so_season': '5+ Shutout-Saison',
+		'le_2.0_gaa_season': 'Saison mit ≤ 2,00 GTS',
 		'le_2.5_gaa_season': 'Saison mit ≤ 2,50 GTS',
 		'le_3.0_gaa_season': 'Saison mit ≤ 3,00 GTS',
 		'100_gp_career': '100 Spiele / Karriere',
@@ -292,6 +295,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'3_plus_championships': '3+ Meisterschaften',
 		'5_plus_championships': '5+ Meisterschaften',
 		'0_championships': 'Keine Meisterschaft',
+		'2_championships': '2 Meisterschaften',
 	},
 	en: {
 		'20_goal': '20 Goals / Season',
@@ -314,6 +318,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'50_pim_season_po': '50 PIMs in Playoffs / Season',
 		'1_so_season': '1+ Shutout Season',
 		'1_so_season_po': '1+ Shutout Season (Playoffs)',
+		'le_2.0_gaa_season': '≤ 2.00 GAA / Season',
 		'le_2.5_gaa_season': '≤ 2.50 GAA / Season',
 		'le_3.0_gaa_season': '≤ 3.00 GAA / Season',
 		'100_gp_career': '100 Games / Career',
@@ -410,6 +415,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'3_plus_championships': '3+ Championships',
 		'5_plus_championships': '5+ Championships',
 		'0_championships': 'No Championships',
+		'2_championships': '2 Championships',
 	}
 };
 
