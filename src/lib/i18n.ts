@@ -152,12 +152,14 @@ export type CategoryKey =
 	| 'relative_del'
 	| 'relative_nhl'
 	| '50_w_career'
+	| '100_w_career'
 	| '150_w_career'
 	| '10_w_season'
 	| '20_w_season'
 	| '30_w_season'
 	| '5_w_season_po'
 	| '10_w_season_po'
+	| 'le_2.0_gaa_season_po'
 	| 'le_3.0_gaa_season_po'
 	| 'last_name_initial_A'
 	| 'last_name_initial_B'
@@ -274,12 +276,14 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'relative_del': 'Verwandter mit DEL-Spiel(en)',
 		'relative_nhl': 'Verwandter mit NHL-Spiel(en)',
 		'50_w_career': '50+ Siege / Karriere',
+		'100_w_career': '100+ Siege / Karriere',
 		'150_w_career': '150+ Siege / Karriere',
 		'10_w_season': '10+ Siege / Saison',
 		'20_w_season': '20+ Siege / Saison',
 		'30_w_season': '30+ Siege / Saison',
 		'5_w_season_po': '5+ Siege in Playoffs / Saison',
 		'10_w_season_po': '10+ Siege in Playoffs / Saison',
+		'le_2.0_gaa_season_po': 'Saison mit ≤ 2,0 GTS in Playoffs',
 		'le_3.0_gaa_season_po': 'Saison mit ≤ 3,0 GTS in Playoffs',
 		'last_name_initial_A': 'Nachname beginnt mit A',
 		'last_name_initial_B': 'Nachname beginnt mit B',
@@ -394,12 +398,14 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'relative_del': 'Relative with DEL game(s) played',
 		'relative_nhl': 'Relative with NHL game(s) played',
 		'50_w_career': '50 Wins / Career',
+		'100_w_career': '100+ Wins / Career',
 		'150_w_career': '150+ Wins / Career',
 		'10_w_season': '10+ Wins / Season',
 		'20_w_season': '20+ Wins / Season',
 		'30_w_season': '30+ Wins / Season',
 		'5_w_season_po': '5+ Wins in Playoffs / Season',
 		'10_w_season_po': '10+ Wins in Playoffs / Season',
+		'le_2.0_gaa_season_po': '≤ 2.0 GAA / Season in Playoffs',
 		'le_3.0_gaa_season_po': '≤ 3.0 GAA / Season in Playoffs',
 		'last_name_initial_A': 'Last name starts with A',
 		'last_name_initial_B': 'Last name starts with B',
