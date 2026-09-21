@@ -45,7 +45,7 @@
 			</div>
 			<div class="text-xs opacity-80">
 				{player.first_season} – 
-				{#if player.last_season !== 2025}
+				{#if player.last_season !== 2026}
 					{player.last_season + 1}
 				{/if}
 			</div>
