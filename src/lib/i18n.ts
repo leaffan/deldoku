@@ -140,6 +140,8 @@ export type CategoryKey =
 	| 'draft_2010s'
 	| 'draft_round_1'
 	| 'draft_round_2'
+	| 'draft_position_top_100'
+	| 'draft_team_canadian'
 	| 'goalie'
 	| 'defender'
 	| 'forward'
@@ -269,6 +271,8 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'draft_2010s': 'Ausgewählt im NHL-Draft der 2010er',
 		'draft_round_1': 'In Runde 1 gedraftet',
 		'draft_round_2': 'In Runde 2 gedraftet',
+		'draft_position_top_100': 'In den Top 100 gedraftet',
+		'draft_team_canadian': 'Gedraftet von kanadischen NHL-Team',
 		'goalie': 'Torwart',
 		'defender': 'Verteidiger',
 		'forward': 'Stürmer',
@@ -388,6 +392,8 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'not_drafted': 'Not selected in NHL Draft',
 		'draft_round_1': 'Drafted in Round 1',
 		'draft_round_2': 'Drafted in Round 2',
+		'draft_position_top_100': 'Drafted in Top 100',
+		'draft_team_canadian': 'Drafted by a Canadian NHL-Team',
 		'dual_nationalities': 'Dual Nationalities',
 		'draft_2000s': 'Selected in NHL Draft of 2000s',
 		'draft_2010s': 'Selected in NHL Draft of 2010s',
