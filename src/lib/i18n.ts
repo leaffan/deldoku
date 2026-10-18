@@ -171,6 +171,7 @@ export type CategoryKey =
 	| 'last_name_initial_F'
 	| 'last_name_initial_G'
 	| 'last_name_initial_H'
+	| 'last_name_initial_N'
 	| 'last_name_initial_T'
 	| 'last_name_initial_Z'
 	| '2_plus_championships'
@@ -297,6 +298,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'last_name_initial_F': 'Nachname beginnt mit F',
 		'last_name_initial_G': 'Nachname beginnt mit G',
 		'last_name_initial_H': 'Nachname beginnt mit H',
+		'last_name_initial_N': 'Nachname beginnt mit N',
 		'last_name_initial_T': 'Nachname beginnt mit T',
 		'last_name_initial_Z': 'Nachname beginnt mit Z',
 		'2_plus_championships': '2+ Meisterschaften',
@@ -421,6 +423,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'last_name_initial_F': 'Last name starts with F',
 		'last_name_initial_G': 'Last name starts with G',
 		'last_name_initial_H': 'Last name starts with H',
+		'last_name_initial_N': 'Last name starts with N',
 		'last_name_initial_T': 'Last name starts with T',
 		'last_name_initial_Z': 'Last name starts with Z',
 		'2_plus_championships': '2+ Championships',
