@@ -178,6 +178,7 @@ export type CategoryKey =
 	| '3_plus_championships'
 	| '5_plus_championships'
 	| '0_championships'
+	| '1_championships'
 	| '2_championships'
 	;
 
@@ -305,6 +306,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'3_plus_championships': '3+ Meisterschaften',
 		'5_plus_championships': '5+ Meisterschaften',
 		'0_championships': 'Keine Meisterschaft',
+		'1_championships': 'DEL-Meisterschaft',
 		'2_championships': '2 Meisterschaften',
 	},
 	en: {
@@ -430,6 +432,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'3_plus_championships': '3+ Championships',
 		'5_plus_championships': '5+ Championships',
 		'0_championships': 'No Championships',
+		'1_championships': '1 Championship',
 		'2_championships': '2 Championships',
 	}
 };
