@@ -1,0 +1,185 @@
+"""D02 API test: python3 -I test_api.py <base_url> <srv_dir>
+Runs end-to-end flows against stats.php and checks scores against a reference model."""
+import json, os, sys, threading, urllib.request, urllib.error
+from datetime import datetime, timedelta, timezone
+
+BASE, SRV = sys.argv[1], sys.argv[2]
+URL = BASE + "/deldoku/api/stats.php"
+TODAY = datetime.now(timezone.utc).date()
+D0, D1 = TODAY.isoformat(), (TODAY - timedelta(days=1)).isoformat()
+KEYS = [f"{r}-{c}" for r in range(3) for c in range(3)]
+fails = 0
+
+def req(method, query="", body=None, token=None, raw=None):
+    data = raw if raw is not None else (json.dumps(body).encode() if body is not None else None)
+    r = urllib.request.Request(URL + query, data=data, method=method)
+    r.add_header("Content-Type", "application/json")
+    if token:
+        r.add_header("X-DelDoku-Token", token)
+    try:
+        with urllib.request.urlopen(r) as resp:
+            return resp.status, json.loads(resp.read() or b"null")
+    except urllib.error.HTTPError as e:
+        txt = e.read()
+        try:
+            return e.code, json.loads(txt)
+        except Exception:
+            return e.code, txt.decode(errors="replace")[:200]
+
+def check(name, cond, info=""):
+    global fails
+    print(("PASS " if cond else "FAIL ") + name + ("" if cond else f"   -> {info}"))
+    if not cond:
+        fails += 1
+
+answers = {d: json.load(open(f"{SRV}/deldoku/challenges/{d}.json"))["answers"] for d in (D0, D1)}
+def sel(date, idx=0):
+    """Selection using the idx-th answer of each cell (falls back to first), skipping duplicates."""
+    out, used = {}, set()
+    for k in KEYS:
+        r, c = map(int, k.split("-"))
+        opts = [p for p in answers[date][r][c] if p not in used]
+        p = opts[min(idx, len(opts) - 1)]
+        used.add(p); out[k] = p
+    return out
+
+# Reference model of the scoring rules
+model = {D0: {k: {} for k in KEYS}, D1: {k: {} for k in KEYS}}
+seen = {}
+def expect(user, date, selections):
+    score, correct, cells = 0, 0, {}
+    for k in KEYS:
+        p = selections.get(k, "")
+        r, c = map(int, k.split("-"))
+        if p and p in answers[date][r][c]:
+            cnt = model[date][k]; tot = sum(cnt.values())
+            s = 100 if tot == 0 else max(10, round(100 * (1 - cnt.get(p, 0) / tot)))
+            cells[k] = s; score += s; correct += 1
+        else:
+            cells[k] = 0
+    if correct == 9:
+        score += 100
+    for k in KEYS:
+        p = selections.get(k, "")
+        if cells[k] and p not in seen.setdefault((user, date, k), set()):
+            seen[(user, date, k)].add(p)
+            model[date][k][p] = model[date][k].get(p, 0) + 1
+    return score, cells
+
+# --- public GET ---
+st, b = req("GET")
+check("GET public empty -> 200, games 0", st == 200 and b["games"] == 0 and b["cells"] == {}, (st, b))
+for q in ["?date=abc", "?date=..%2Fx", "?challengeDate=2026-13-45", "?date%5B%5D=x"]:
+    st, _ = req("GET", q); check(f"GET public {q} -> 400", st == 400, st)
+
+# --- registration ---
+A = sel(D0, 0)
+st, b = req("POST", body={"date": D0, "selections": A})
+check("POST new user -> 200 with userId+token", st == 200 and b.get("token") and b["userId"].startswith("u_"), (st, b))
+u1, t1 = b["userId"], b["token"]
+exp, _ = expect(u1, D0, A)
+check(f"first game score {exp}", b["game"]["score"] == exp and b["game"]["won"], b["game"])
+
+# --- auth ---
+st, _ = req("POST", body={"date": D0, "selections": A, "userId": u1})
+check("POST known user without token -> 401", st == 401, st)
+st, _ = req("POST", body={"date": D0, "selections": A, "userId": u1}, token="wrong")
+check("POST known user wrong token -> 401", st == 401, st)
+st, _ = req("POST", body={"date": D0, "selections": A, "userId": "../../x"}, token=t1)
+check("POST userId traversal -> 400", st == 400, st)
+st, _ = req("GET", f"?userId={u1}")
+check("GET own stats without token -> 401", st == 401, st)
+st, _ = req("GET", "?userId=..%2F..%2Fx", token=t1)
+check("GET userId traversal -> 400", st == 400, st)
+
+# --- replay same players: counts unchanged ---
+st, b = req("POST", body={"date": D0, "selections": A, "userId": u1}, token=t1)
+exp, _ = expect(u1, D0, A)
+check(f"replay same players score {exp}", st == 200 and b["game"]["score"] == exp, (st, b))
+st, pub = req("GET")
+check("replay same players: counts unchanged", all(sum(pub["cells"][k].values()) == 1 for k in KEYS), pub["cells"])
+
+# --- replay new players: counts increase ---
+B = sel(D0, 1)
+st, b = req("POST", body={"date": D0, "selections": B, "userId": u1}, token=t1)
+exp, _ = expect(u1, D0, B)
+check(f"replay new players score {exp}", st == 200 and b["game"]["score"] == exp, (st, b))
+
+# --- second user ---
+st, b = req("POST", body={"date": D0, "selections": A})
+u2, t2 = b["userId"], b["token"]
+exp, _ = expect(u2, D0, A)
+check(f"second user score {exp}", st == 200 and b["game"]["score"] == exp, (st, b))
+
+# --- wrong + empty answers ---
+W = dict(A); W["0-0"] = "1/not-a-real-player"; W["2-2"] = ""
+st, b = req("POST", body={"date": D0, "selections": W, "userId": u2}, token=t2)
+exp, cells = expect(u2, D0, W)
+check(f"wrong+empty cells: score {exp}, correct 7, not won",
+      st == 200 and b["game"]["score"] == exp and b["game"]["correct"] == 7 and not b["game"]["won"], (st, b))
+
+# --- validation ---
+D = dict(A); D["0-1"] = A["0-0"]
+cases = [
+    ("duplicate player", {"date": D0, "selections": D}, 400),
+    ("bad player id", {"date": D0, "selections": {"0-0": "../x"}}, 400),
+    ("unknown cell key", {"date": D0, "selections": {"3-3": A["0-0"]}}, 400),
+    ("selections not object", {"date": D0, "selections": "x"}, 400),
+    ("invalid date", {"date": "x/../../probe", "selections": A}, 400),
+    ("date 2 days ago", {"date": (TODAY - timedelta(days=2)).isoformat(), "selections": A}, 400),
+    ("date tomorrow", {"date": (TODAY + timedelta(days=1)).isoformat(), "selections": A}, 400),
+]
+for name, body, code in cases:
+    st, _ = req("POST", body=body); check(f"POST {name} -> {code}", st == code, st)
+st, _ = req("POST", raw=b"{not json"); check("POST invalid JSON -> 400", st == 400, st)
+st, _ = req("POST", raw=b'{"x":"' + b"a" * 9000 + b'"}'); check("POST > 8 KB -> 413", st == 413, st)
+
+# --- yesterday + streak ---
+Y = sel(D1, 0)
+st, b = req("POST", body={"date": D1, "selections": Y, "userId": u1}, token=t1)
+expect(u1, D1, Y)
+check("POST yesterday -> 200", st == 200, (st, b))
+st, b = req("GET", f"?userId={u1}", token=t1)
+s = b["stats"]
+best_today = max(g["score"] for g in s["gameHistory"] if g["date"] == D0)
+best_yday = max(g["score"] for g in s["gameHistory"] if g["date"] == D1)
+check("own stats: 4 games, 2 days, streak 2, totalPoints = best per day",
+      st == 200 and s["totalGames"] == 4 and s["daysPlayed"] == 2 and s["currentStreak"] == 2
+      and s["longestStreak"] == 2 and s["totalPoints"] == best_today + best_yday, s)
+
+# --- daily limit ---
+codes = [req("POST", body={"date": D0, "selections": A, "userId": u2}, token=t2)[0] for _ in range(19)]
+check("u2: games 3..20 accepted, 21st -> 429", codes[:18] == [200] * 18 and codes[18] == 429, codes)
+
+# --- concurrency: 20 new users in parallel ---
+res = []
+def worker():
+    res.append(req("POST", body={"date": D1, "selections": Y})[0])
+ts = [threading.Thread(target=worker) for _ in range(20)]
+[t.start() for t in ts]; [t.join() for t in ts]
+st, pub = req("GET", f"?date={D1}")
+check("20 parallel POSTs: all 200, day games = 21", res.count(200) == 20 and pub["games"] == 21, (res, pub["games"]))
+
+# --- public aggregate matches model, no user data ---
+st, pub = req("GET")
+counts_ok = all(pub["cells"][k] == model[D0][k] for k in KEYS)
+check("public counts match reference model", counts_ok, (pub["cells"], model[D0]))
+check("public output has no userIds/tokens", u1 not in json.dumps(pub) and "token" not in json.dumps(pub))
+
+# --- files on disk ---
+data = f"{SRV}/data"
+lines = open(f"{data}/games.jsonl").read().splitlines()
+check("games.jsonl has one line per accepted game", len(lines) == 6 + 18 + 20, len(lines))
+ufile = open(f"{data}/users/{u1}.json").read()
+check("user file stores no plaintext token", t1 not in ufile)
+check("data/.htaccess denies access", open(f"{data}/.htaccess").read().strip() == "Require all denied")
+outside = [p for p in os.listdir(SRV) if p not in ("data", "deldoku")]
+check("nothing written outside data/", outside == [], outside)
+
+# --- corrupt day file is kept, not overwritten ---
+open(f"{data}/day_{D0}.json", "w").write("{broken")
+st, _ = req("POST", body={"date": D0, "selections": A})
+check("corrupt day file -> 500 and file untouched", st == 500 and open(f"{data}/day_{D0}.json").read() == "{broken", st)
+
+print(f"\n{'ALL PASSED' if fails == 0 else f'{fails} FAILED'}")
+sys.exit(1 if fails else 0)
