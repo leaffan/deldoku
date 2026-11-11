@@ -445,7 +445,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'1_championships': '1 Championship',
 		'2_championships': '2 Championships',
 		'staff-del': 'Worked as DEL Staff',
-		'first_name_starts_with_max': 'Vorname beginnt mit Max'
+		'first_name_starts_with_max': 'First name starts with Max'
 	}
 };
 
