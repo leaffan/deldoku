@@ -13,10 +13,26 @@ function getChallengeDate($stats) {
     return date('Y-m-d'); // Fallback: heutiges Datum
 }
 
+// Nur echte Kalenderdaten im Format YYYY-MM-DD zulassen, da der Wert in den Dateipfad eingeht
+function isValidChallengeDate($challengeDate) {
+    if (!is_string($challengeDate)) {
+        return false;
+    }
+    if (!preg_match('/\A(\d{4})-(\d{2})-(\d{2})\z/', $challengeDate, $m)) {
+        return false;
+    }
+    return checkdate((int)$m[2], (int)$m[3], (int)$m[1]);
+}
+
 // Funktion um Stats-Datei für ein Challenge-Datum zu bekommen
 function getStatsFile($challengeDate = null) {
     if (!$challengeDate) {
         $challengeDate = date('Y-m-d');
+    }
+    if (!isValidChallengeDate($challengeDate)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'invalid challengeDate']);
+        exit;
     }
     return __DIR__ . "/../../data/stats_$challengeDate.json";
 }

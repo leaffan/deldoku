@@ -6,6 +6,7 @@ import cgi
 import cgitb
 import json
 import os
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -24,10 +25,25 @@ def get_challenge_date(stats):
     return date.today().isoformat()
 
 
+def is_valid_challenge_date(challenge_date):
+    """Nur echte Kalenderdaten im Format YYYY-MM-DD zulassen, da der Wert in den Dateipfad eingeht"""
+    if not isinstance(challenge_date, str):
+        return False
+    if not re.fullmatch(r'[0-9]{4}-[0-9]{2}-[0-9]{2}', challenge_date):
+        return False
+    try:
+        date.fromisoformat(challenge_date)
+    except ValueError:
+        return False
+    return True
+
+
 def get_stats_file(challenge_date=None):
     """Pfad zur Stats-Datei für ein Challenge-Datum"""
     if not challenge_date:
         challenge_date = date.today().isoformat()
+    if not is_valid_challenge_date(challenge_date):
+        send_response({'error': 'invalid challengeDate'}, 400)
     return DATA_DIR / f'stats_{challenge_date}.json'
 
 
@@ -88,7 +104,7 @@ def handle_post():
     """POST Request: Speichere Stats"""
     try:
         # Lese Request Body
-        content_length = int(os.environ.get('CONTENT_LENGTH', 0))
+        content_length = int(os.environ.get("CONTENT_LENGTH", "0"))
         post_data = sys.stdin.read(content_length)
         data = json.loads(post_data)
 
@@ -118,7 +134,7 @@ def handle_post():
         })
     except json.JSONDecodeError:
         send_response({'error': 'Invalid JSON'}, 400)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         send_response({'error': str(e)}, 500)
 
 
