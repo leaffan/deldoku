@@ -60,6 +60,7 @@ export type CategoryKey =
 	| '50_point'
 	| '20_g_season'
 	| '30_g_season'
+	| '40_g_season'
 	| '5_g_season_po'
 	| '5_a_season_po'
 	| '10_pts_season_po'
@@ -181,6 +182,8 @@ export type CategoryKey =
 	| '0_championships'
 	| '1_championships'
 	| '2_championships'
+	| 'staff-del'
+	| 'first_name_starts_with_max'
 	;
 
 export const categories: Record<Language, Record<CategoryKey, string>> = {
@@ -189,6 +192,7 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'50_point': '50-Punkte-Saison',
 		'20_g_season': '20-Tore-Saison',
 		'30_g_season': '30-Tore-Saison',
+		'40_g_season': '40-Tore-Saison',
 		'5_g_season_po': '5-Tore-Saison (Playoffs)',
 		'5_a_season_po': '5-Vorlagen-Saison (Playoffs)',
 		'10_pts_season_po': '10-Punkte-Saison (Playoffs)',
@@ -310,12 +314,15 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'0_championships': 'Keine Meisterschaft',
 		'1_championships': 'DEL-Meisterschaft',
 		'2_championships': '2 Meisterschaften',
+		'staff-del': 'Für ein DEL-Team gearbeitet',
+		'first_name_starts_with_max': 'Vorname beginnt mit Max'
 	},
 	en: {
 		'20_goal': '20 Goals / Season',
 		'50_point': '50 Points / Season',
 		'20_g_season': '20 Goals / Season',
 		'30_g_season': '30 Goals / Season',
+		'40_g_season': '40 Goals / Season',
 		'5_g_season_po': '5 Goals / Season (Playoffs)',
 		'5_a_season_po': '5 Assists / Season (Playoffs)',
 		'10_pts_season_po': '10 Points / Season (Playoffs)',
@@ -437,6 +444,8 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'0_championships': 'No Championships',
 		'1_championships': '1 Championship',
 		'2_championships': '2 Championships',
+		'staff-del': 'Worked as DEL Staff',
+		'first_name_starts_with_max': 'Vorname beginnt mit Max'
 	}
 };
 
