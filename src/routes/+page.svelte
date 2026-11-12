@@ -1,7 +1,7 @@
 <script lang="ts">
 	import GameBoard from '$lib/components/GameBoard.svelte';
 	import Stats from '$lib/components/Stats.svelte';
-	import { generateDailyChallenge, type DELDokuChallenge } from '$lib/data';
+	import { generateDailyChallenge, NoChallengeError, type DELDokuChallenge } from '$lib/data';
 	import { playersStore, languageStore, statsStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
 	import { getDebugChallenge, isDebugEnabled } from '$lib/debug';
@@ -11,6 +11,7 @@
 	let challenge = $state<DELDokuChallenge | null>(null);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
+	let noChallenge = $state(false);
 
 	// Lade Players, Stats und Challenge beim Komponenten-Mount
 	Promise.all([
@@ -56,8 +57,12 @@
 			});
 		})
 		.catch((err) => {
-			console.error('Error loading game:', err);
-			error = `${t('error', $languageStore)}${err.message}`;
+			if (err instanceof NoChallengeError) {
+				noChallenge = true;
+			} else {
+				console.error('Error loading game:', err);
+				error = `${t('error', $languageStore)}${err.message}`;
+			}
 			loading = false;
 		});
 </script>
@@ -105,7 +110,11 @@
 
 <main class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-4 sm:py-8 px-2 sm:px-4">
 	<div class="max-w-4xl mx-auto w-full">
-		{#if error}
+		{#if noChallenge}
+			<div class="text-center py-12">
+				<p class="text-sm sm:text-base text-gray-600">{t('noChallenge', $languageStore)}</p>
+			</div>
+		{:else if error}
 			<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-sm">
 				<p>{error}</p>
 				<p class="text-xs mt-2">{t('errorConsole', $languageStore)}</p>

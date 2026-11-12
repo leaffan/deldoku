@@ -6,6 +6,7 @@ export type Translations = {
 	loading: string;
 	error: string;
 	errorConsole: string;
+	noChallenge: string;
 	showStats: string;
 	hideStats: string;
 	correctAnswer: string;
@@ -460,6 +461,7 @@ export const translations: Record<Language, Translations> = {
 		loading: 'Laden...',
 		error: 'Fehler beim Laden: ',
 		errorConsole: 'Bitte öffne die Browser-Konsole (F12) für mehr Details.',
+		noChallenge: 'Heute ist keine Challenge verfügbar. Schau später noch einmal vorbei.',
 		showStats: 'Statistiken anzeigen',
 		hideStats: 'Statistiken ausblenden',
 		correctAnswer: '🎉 Glückwunsch! Rätsel gelöst!',
@@ -516,6 +518,7 @@ export const translations: Record<Language, Translations> = {
 		loading: 'Loading...',
 		error: 'Error loading: ',
 		errorConsole: 'Please open the browser console (F12) for more details.',
+		noChallenge: 'No challenge is available today. Please check back later.',
 		showStats: 'Show Statistics',
 		hideStats: 'Hide Statistics',
 		correctAnswer: '🎉 Congratulations! Puzzle solved!',

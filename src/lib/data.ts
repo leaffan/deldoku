@@ -15,6 +15,15 @@ export interface DELDokuChallenge {
 	colCategories: string[];
 	grid: (DELPlayer | null)[][];
 	answers: string[][][];
+	isFallback?: boolean; // Ersatz-Challenge, weil für das Datum keine Datei existiert
+}
+
+// Weder Tages- noch Ersatz-Challenge verfügbar
+export class NoChallengeError extends Error {
+	constructor() {
+		super('No challenge available');
+		this.name = 'NoChallengeError';
+	}
 }
 
 export let samplePlayers: DELPlayer[] = [];
@@ -66,65 +75,51 @@ export function getDailyChallengeDate(): string {
 	return `${year}-${month}-${day}`;
 }
 
+async function fetchChallengeFile(name: string): Promise<any | null> {
+	try {
+		const response = await fetch(`${getBasePath()}challenges/${name}.json`);
+		return response.ok ? await response.json() : null;
+	} catch (error) {
+		console.warn(`Challenge-Datei ${name}.json konnte nicht geladen werden:`, error instanceof Error ? error.message : String(error));
+		return null;
+	}
+}
+
 export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELDokuChallenge> {
 	const date = getDailyChallengeDate();
-	
+
 	// Lade Spieler wenn nicht vorhanden
-	const allPlayers = players.length > 0 ? players : await loadPlayers();
-	
-	// Lade die Challenge-Datei für den heutigen Tag (nur auf dem Client)
-	try {
-		// Nur im Browser laden - nicht während Server-Side Rendering
-		if (typeof window === 'undefined') {
-			throw new Error('Challenge kann nur im Browser geladen werden');
-		}
-		
-		const basePath = getBasePath();
-		const response = await fetch(`${basePath}challenges/${date}.json`);
-		
-		if (!response.ok) {
-			throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-		}
-		
-		const challengeData = await response.json();
-		
-		// Erstelle ein leeres Grid für den Spieler (am Anfang leer)
-		const grid: (DELPlayer | null)[][] = Array(3)
-			.fill(null)
-			.map(() => Array(3).fill(null));
-
-		return {
-			date,
-			title: challengeData.title,
-			rowCategories: challengeData.rowCategories,
-			colCategories: challengeData.colCategories,
-			grid,
-			answers: challengeData.answers
-		};
-	} catch (error) {
-		console.warn(`Challenge-Datei für ${date} konnte nicht geladen werden:`, error instanceof Error ? error.message : String(error));
-		
-		// Fallback auf Standard-Kategorien
-		const rowCategories = ['München', 'Berlin', 'Cologne'];
-		const colCategories = ['Center (C)', 'Stürmer (LW/RW)', 'Verteidigung (D)'];
-		const answers: string[][][] = [
-			[['p1'], ['p7'], ['p3']],
-			[['p6'], ['p2'], ['p4']],
-			[['p8'], ['p5'], ['p9', 'p10']]
-		];
-
-		const grid: (DELPlayer | null)[][] = Array(3)
-			.fill(null)
-			.map(() => Array(3).fill(null));
-
-		return {
-			date,
-			rowCategories,
-			colCategories,
-			grid,
-			answers
-		};
+	if (players.length === 0) {
+		await loadPlayers();
 	}
+
+	// Nur im Browser laden - nicht während Server-Side Rendering
+	if (typeof window === 'undefined') {
+		throw new Error('Challenge kann nur im Browser geladen werden');
+	}
+
+	let challengeData = await fetchChallengeFile(date);
+	let isFallback = false;
+	if (!challengeData) {
+		// Dauerhaft gültige Ersatz-Challenge; der Server wertet mit derselben Datei
+		challengeData = await fetchChallengeFile('fallback');
+		isFallback = true;
+	}
+	if (!challengeData) {
+		throw new NoChallengeError();
+	}
+
+	return {
+		date,
+		title: challengeData.title,
+		rowCategories: challengeData.rowCategories,
+		colCategories: challengeData.colCategories,
+		grid: Array(3)
+			.fill(null)
+			.map(() => Array(3).fill(null)),
+		answers: challengeData.answers,
+		isFallback
+	};
 }
 
 export function validatePlayerMatch(
