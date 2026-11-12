@@ -146,6 +146,8 @@ best_yday = max(g["score"] for g in s["gameHistory"] if g["date"] == D1)
 check("own stats: 4 games, 2 days, streak 2, totalPoints = best per day",
       st == 200 and s["totalGames"] == 4 and s["daysPlayed"] == 2 and s["currentStreak"] == 2
       and s["longestStreak"] == 2 and s["totalPoints"] == best_today + best_yday, s)
+check("pointsPercent = best per day / (days played * 1000)",
+      abs(s["pointsPercent"] - (best_today + best_yday) / 2000 * 100) < 0.051, s.get("pointsPercent"))
 
 # --- daily limit ---
 codes = [req("POST", body={"date": D0, "selections": A, "userId": u2}, token=t2)[0] for _ in range(19)]

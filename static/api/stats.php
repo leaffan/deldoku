@@ -11,6 +11,7 @@ const MAX_BODY_BYTES = 8192;
 const MAX_GAMES_PER_DAY = 20;
 const HISTORY_LIMIT = 100;
 const WIN_BONUS = 100;
+const MAX_SCORE_PER_DAY = 1000; // 9 Zellen à 100 Punkte plus Siegbonus
 const CELL_KEYS = ['0-0', '0-1', '0-2', '1-0', '1-1', '1-2', '2-0', '2-1', '2-2'];
 
 function respond($status, $data) {
@@ -204,6 +205,8 @@ function computeSummary($user) {
         'daysPlayed' => count($byDate),
         'daysWon' => $daysWon,
         'totalPoints' => $totalPoints,
+        // Anteil an den möglichen Punkten, bezogen auf die gespielten Tage
+        'pointsPercent' => count($byDate) > 0 ? round($totalPoints / (count($byDate) * MAX_SCORE_PER_DAY) * 100, 1) : null,
         'currentStreak' => $current,
         'longestStreak' => $longest,
         'gameHistory' => array_map(function ($g) {
