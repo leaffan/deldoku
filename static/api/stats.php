@@ -123,7 +123,8 @@ function authenticate($userId) {
     }
     $token = requestToken();
     $user = readJsonFile(userFile($userId), null);
-    if ($user === null || $token === '' || !hash_equals($user['tokenHash'], hash('sha256', $token))) {
+    if ($user === null || $token === '' || !isset($user['tokenHash']) || !is_string($user['tokenHash'])
+        || !hash_equals($user['tokenHash'], hash('sha256', $token))) {
         respond(401, ['error' => 'invalid credentials']);
     }
     return $user;
