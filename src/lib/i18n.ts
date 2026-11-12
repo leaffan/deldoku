@@ -20,6 +20,7 @@ export type Translations = {
 	currentStreak: string;
 	longestStreak: string;
 	pointsPercent: string;
+	saveFailed: string;
 	gameHistory: string;
 	won: string;
 	lost: string;
@@ -473,6 +474,7 @@ export const translations: Record<Language, Translations> = {
 		currentStreak: 'Aktuelle Serie (Tage)',
 		longestStreak: 'Längste Serie (Tage)',
 		pointsPercent: 'Punktequote (bestes Spiel pro Tag)',
+		saveFailed: 'Ergebnis konnte nicht gespeichert werden',
 		gameHistory: 'Spielhistorie',
 		won: '✓ Gewonnen',
 		lost: '✗ Verloren',
@@ -528,6 +530,7 @@ export const translations: Record<Language, Translations> = {
 		currentStreak: 'Current streak (days)',
 		longestStreak: 'Longest streak (days)',
 		pointsPercent: 'Points ratio (best game per day)',
+		saveFailed: 'Result could not be saved',
 		gameHistory: 'Game History',
 		won: '✓ Won',
 		lost: '✗ Lost',

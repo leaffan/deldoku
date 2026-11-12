@@ -13,6 +13,13 @@ const HISTORY_LIMIT = 100;
 const WIN_BONUS = 100;
 const MAX_SCORE_PER_DAY = 1000; // 9 Zellen à 100 Punkte plus Siegbonus
 const CELL_KEYS = ['0-0', '0-1', '0-2', '1-0', '1-1', '1-2', '2-0', '2-1', '2-2'];
+const DEFAULT_REGISTRATION_LIMIT = 20; // neue Nutzer pro IP und UTC-Tag
+
+function registrationLimit() {
+    // Überschreibbar nur für die API-Tests, die viele Nutzer von einer IP anlegen
+    $env = getenv('DELDOKU_REGISTRATION_LIMIT');
+    return ($env !== false && ctype_digit($env)) ? (int)$env : DEFAULT_REGISTRATION_LIMIT;
+}
 
 function respond($status, $data) {
     http_response_code($status);
@@ -112,6 +119,33 @@ function dayFile($date) {
 
 function emptyDay($date) {
     return ['date' => $date, 'games' => 0, 'sumCorrect' => 0, 'sumScore' => 0, 'cells' => []];
+}
+
+function rateLimitFile($date) {
+    return dataDir() . "/ratelimit_$date.json";
+}
+
+// IPs nur als HMAC mit täglich neuem Schlüssel speichern, damit sie nicht über Tage verfolgbar sind
+function loadRateLimit() {
+    $today = utcToday();
+    $path = rateLimitFile($today);
+    if (!file_exists($path)) {
+        // Nur heute und gestern behalten
+        $yesterday = previousDate($today);
+        foreach (glob(dataDir() . '/ratelimit_*.json') as $old) {
+            $date = substr(basename($old, '.json'), strlen('ratelimit_'));
+            if ($date !== $today && $date !== $yesterday) {
+                @unlink($old);
+            }
+        }
+        return ['path' => $path, 'data' => ['secret' => bin2hex(random_bytes(32)), 'counts' => []]];
+    }
+    return ['path' => $path, 'data' => readJsonFile($path, null)];
+}
+
+function clientKey($rateLimit) {
+    $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+    return hash_hmac('sha256', $ip, $rateLimit['data']['secret']);
 }
 
 function requestToken() {
@@ -302,9 +336,16 @@ function handlePost() {
 
     $result = withLock(function () use ($body, $date, $selections, $answers) {
         $newToken = null;
+        $rateLimit = null;
         if (isset($body['userId'])) {
             $user = authenticate($body['userId']);
         } else {
+            $rateLimit = loadRateLimit();
+            $ipKey = clientKey($rateLimit);
+            $registered = isset($rateLimit['data']['counts'][$ipKey]) ? $rateLimit['data']['counts'][$ipKey] : 0;
+            if ($registered >= registrationLimit()) {
+                respond(429, ['error' => 'registration limit reached']);
+            }
             $newToken = bin2hex(random_bytes(32));
             $user = [
                 'userId' => 'u_' . bin2hex(random_bytes(8)),
@@ -382,6 +423,11 @@ function handlePost() {
         }
         writeJsonFileAtomic(dayFile($date), $day);
         writeJsonFileAtomic(userFile($user['userId']), $user);
+        if ($rateLimit !== null) {
+            // Erst nach erfolgreichem Speichern zählen
+            $rateLimit['data']['counts'][$ipKey] = $registered + 1;
+            writeJsonFileAtomic($rateLimit['path'], $rateLimit['data']);
+        }
 
         $response = [
             'userId' => $user['userId'],

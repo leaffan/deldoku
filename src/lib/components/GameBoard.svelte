@@ -41,6 +41,7 @@
 	let cellScores = $state<Record<string, number>>({}); // Points per cell
 	let dayCounts: Record<string, Record<string, number>> | null = null; // Antwortzählung des Tages pro Zelle
 	let gameFinished = $state(false); // Whether the game is finished
+	let saveFailed = $state(false); // Ergebnis konnte nicht auf dem Server gespeichert werden
 
 	function formatDate(dateStr: string, lang: string): string {
 		if (!dateStr) return '';
@@ -349,6 +350,7 @@ https://www.leaffan.net/deldoku
 		} catch (error) {
 			// Ohne Server bleibt die vorläufige Punktzahl stehen
 			console.error('Error submitting game:', error);
+			saveFailed = true;
 		}
 		dayCounts = null; // Nächstes Spiel mit aktueller Zählung
 	}
@@ -393,6 +395,7 @@ https://www.leaffan.net/deldoku
 				cellScores = {}; // Reset cell scores
 				dayCounts = null;
 				gameFinished = false; // Reset game state
+				saveFailed = false;
 				await loadDayCounts();
 			}}
 			class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-2 rounded-lg transition-colors text-sm whitespace-nowrap"
@@ -476,6 +479,10 @@ https://www.leaffan.net/deldoku
 			</div>
 		</div>
 	</div>
+
+	{#if saveFailed}
+		<p class="mt-2 text-xs sm:text-sm text-red-600 text-center" role="status">{t('saveFailed', $languageStore)}</p>
+	{/if}
 
 	{#if gameFinished}
 		   <div class="mt-4 flex items-stretch gap-2 w-80 sm:w-96 md:w-112 mx-auto">
