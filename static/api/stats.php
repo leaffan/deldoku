@@ -113,8 +113,20 @@ function userFile($userId) {
     return dataDir() . "/users/$userId.json";
 }
 
-function dayFile($date) {
-    return dataDir() . "/day_$date.json";
+// Ersatz-Challenge getrennt zählen: gleiche Zellnamen, aber andere Kategorien als die Tages-Challenge
+function dayFile($date, $fallback = false) {
+    return dataDir() . "/day_$date" . ($fallback ? '_fallback' : '') . '.json';
+}
+
+// Erlaubt sind nur "fallback" oder keine Angabe
+function parseChallengeParam($value) {
+    if ($value === null) {
+        return false;
+    }
+    if ($value !== 'fallback') {
+        respond(400, ['error' => 'invalid challenge']);
+    }
+    return true;
 }
 
 function emptyDay($date) {
@@ -179,8 +191,14 @@ function authenticate($userId) {
     return $user;
 }
 
-function loadChallengeAnswers($date) {
+// Liefert [answers, isFallback]. Ohne Tagesdatei gilt wie im Client die Ersatz-Challenge.
+// Der Client gibt "fallback" an, damit ein später hochgeladener Tagesstand nicht falsch gewertet wird.
+function loadChallengeAnswers($date, $wantFallback) {
     $path = __DIR__ . "/../challenges/$date.json";
+    $isFallback = $wantFallback || !file_exists($path);
+    if ($isFallback) {
+        $path = __DIR__ . '/../challenges/fallback.json';
+    }
     if (!file_exists($path)) {
         respond(404, ['error' => 'challenge not found']);
     }
@@ -188,7 +206,7 @@ function loadChallengeAnswers($date) {
     if (!is_array($challenge) || !isset($challenge['answers']) || !is_array($challenge['answers'])) {
         respond(500, ['error' => 'invalid challenge file']);
     }
-    return $challenge['answers'];
+    return [$challenge['answers'], $isFallback];
 }
 
 // Seltenheitspunkte: 100 * (1 - Anteil dieses Spielers an allen Antworten der Zelle), mindestens 10
@@ -323,7 +341,8 @@ function handleGet() {
     if (!isValidChallengeDate($date)) {
         respond(400, ['error' => 'invalid date']);
     }
-    respond(200, publicDayStats(readJsonFile(dayFile($date), emptyDay($date))));
+    $fallback = parseChallengeParam(isset($_GET['challenge']) ? $_GET['challenge'] : null);
+    respond(200, publicDayStats(readJsonFile(dayFile($date, $fallback), emptyDay($date))));
 }
 
 function handlePost() {
@@ -346,9 +365,12 @@ function handlePost() {
         respond(400, ['error' => 'date not playable']);
     }
     $selections = parseSelections(isset($body['selections']) ? $body['selections'] : null);
-    $answers = loadChallengeAnswers($date);
+    $wantFallback = parseChallengeParam(isset($body['challenge']) ? $body['challenge'] : null);
+    list($answers, $fallback) = loadChallengeAnswers($date, $wantFallback);
+    // Merker "Spieler schon genannt" ebenfalls getrennt für die Ersatz-Challenge
+    $seenKey = $fallback ? "$date:fallback" : $date;
 
-    $result = withLock(function () use ($body, $date, $selections, $answers) {
+    $result = withLock(function () use ($body, $date, $selections, $answers, $fallback, $seenKey) {
         $newToken = null;
         $rateLimit = null;
         if (isset($body['userId'])) {
@@ -380,7 +402,7 @@ function handlePost() {
             respond(429, ['error' => 'daily game limit reached']);
         }
 
-        $day = readJsonFile(dayFile($date), emptyDay($date));
+        $day = readJsonFile(dayFile($date, $fallback), emptyDay($date));
         $cellScores = [];
         $correct = 0;
         $score = 0;
@@ -409,9 +431,9 @@ function handlePost() {
             if ($cellScores[$key] === 0) {
                 continue;
             }
-            $seen = isset($user['seen'][$date][$key]) ? $user['seen'][$date][$key] : [];
+            $seen = isset($user['seen'][$seenKey][$key]) ? $user['seen'][$seenKey][$key] : [];
             if (!in_array($playerId, $seen, true)) {
-                $user['seen'][$date][$key] = array_merge($seen, [$playerId]);
+                $user['seen'][$seenKey][$key] = array_merge($seen, [$playerId]);
                 $day['cells'][$key][$playerId] = (isset($day['cells'][$key][$playerId]) ? $day['cells'][$key][$playerId] : 0) + 1;
             }
         }
@@ -428,6 +450,9 @@ function handlePost() {
             'score' => $score,
             'cellScores' => $cellScores,
         ];
+        if ($fallback) {
+            $entry['challenge'] = 'fallback';
+        }
         $user['games'][] = $entry;
 
         // Vollständiges Protokoll, aus dem sich Nutzer- und Tagesdateien neu erzeugen lassen.
@@ -440,7 +465,7 @@ function handlePost() {
         if (file_put_contents(dataDir() . '/games.jsonl', $logLines, FILE_APPEND) === false) {
             respond(500, ['error' => 'could not write data']);
         }
-        writeJsonFileAtomic(dayFile($date), $day);
+        writeJsonFileAtomic(dayFile($date, $fallback), $day);
         writeJsonFileAtomic(userFile($user['userId']), $user);
         if ($rateLimit !== null) {
             // Erst nach erfolgreichem Speichern zählen
@@ -456,7 +481,7 @@ function handlePost() {
                 'correct' => $correct,
                 'score' => $score,
                 'cellScores' => (object)$cellScores,
-            ],
+            ] + ($fallback ? ['challenge' => 'fallback'] : []),
             'stats' => computeSummary($user),
         ];
         if ($newToken !== null) {

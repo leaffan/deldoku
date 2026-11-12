@@ -232,5 +232,34 @@ open(f"{data}/day_{D0}.json", "w").write("{broken")
 st, _ = req("POST", body={"date": D0, "selections": A, "userId": u1}, token=t1)
 check("corrupt day file -> 500 and file untouched", st == 500 and open(f"{data}/day_{D0}.json").read() == "{broken", st)
 
+# --- fallback challenge (the regular day file for D0 is still corrupt, so it must not be touched) ---
+challenges_dir = f"{SRV}/deldoku/challenges"
+fb = json.load(open(f"{challenges_dir}/fallback.json"))["answers"]
+F = {k: fb[int(k[0])][int(k[2])][0] for k in KEYS}
+st, b = req("POST", body={"date": D0, "selections": F, "userId": u1, "challenge": "fallback"}, token=t1)
+check("declared fallback: scored against fallback answers (1000)",
+      st == 200 and b["game"]["score"] == 1000 and b["game"].get("challenge") == "fallback", (st, b))
+check("fallback counted separately, regular day file untouched",
+      os.path.exists(f"{data}/day_{D0}_fallback.json") and open(f"{data}/day_{D0}.json").read() == "{broken")
+st, pub = req("GET", f"?date={D0}&challenge=fallback")
+check("GET fallback day stats", st == 200 and pub["games"] == 1 and all(pub["cells"][k] == {F[k]: 1} for k in KEYS), pub)
+user_file = json.load(open(f"{data}/users/{u1}.json"))
+check("seen-marker for fallback kept apart from the regular challenge",
+      f"{D0}:fallback" in user_file["seen"] and user_file["games"][-1].get("challenge") == "fallback", list(user_file["seen"]))
+last = json.loads(open(f"{data}/games.jsonl").read().splitlines()[-1])
+check("log line marks fallback game", last["type"] == "game" and last.get("challenge") == "fallback", last)
+
+os.rename(f"{challenges_dir}/{D0}.json", f"{challenges_dir}/{D0}.json.hidden")
+st, b = req("POST", body={"date": D0, "selections": F, "userId": u1}, token=t1)
+check("day file missing, nothing declared: server falls back on its own (replay -> 190)",
+      st == 200 and b["game"].get("challenge") == "fallback" and b["game"]["score"] == 190, (st, b))
+for name, body in [("POST invalid challenge value", {"date": D0, "selections": F, "userId": u1, "challenge": "x"}),
+                   ("POST challenge not a string", {"date": D0, "selections": F, "userId": u1, "challenge": 1})]:
+    st, _ = req("POST", body=body, token=t1); check(f"{name} -> 400", st == 400, st)
+st, _ = req("GET", f"?date={D0}&challenge=x"); check("GET invalid challenge value -> 400", st == 400, st)
+os.rename(f"{challenges_dir}/fallback.json", f"{challenges_dir}/fallback.json.hidden")
+st, _ = req("POST", body={"date": D0, "selections": F, "userId": u1}, token=t1)
+check("neither day file nor fallback -> 404", st == 404, st)
+
 print(f"\n{'ALL PASSED' if fails == 0 else f'{fails} FAILED'}")
 sys.exit(1 if fails else 0)
