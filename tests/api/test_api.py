@@ -8,6 +8,7 @@ URL = BASE + "/deldoku/api/stats.php"
 TODAY = datetime.now(timezone.utc).date()
 D0, D1 = TODAY.isoformat(), (TODAY - timedelta(days=1)).isoformat()
 KEYS = [f"{r}-{c}" for r in range(3) for c in range(3)]
+REQUEST_TIMEOUT = 10  # seconds; keeps a hung server from blocking the run
 fails = 0
 
 def req(method, query="", body=None, token=None, raw=None):
@@ -17,7 +18,7 @@ def req(method, query="", body=None, token=None, raw=None):
     if token:
         r.add_header("X-DelDoku-Token", token)
     try:
-        with urllib.request.urlopen(r) as resp:
+        with urllib.request.urlopen(r, timeout=REQUEST_TIMEOUT) as resp:
             return resp.status, json.loads(resp.read() or b"null")
     except urllib.error.HTTPError as e:
         txt = e.read()
@@ -25,6 +26,9 @@ def req(method, query="", body=None, token=None, raw=None):
             return e.code, json.loads(txt)
         except Exception:
             return e.code, txt.decode(errors="replace")[:200]
+    except (urllib.error.URLError, TimeoutError) as e:
+        # Status 0 = no HTTP response; the calling check fails and shows the reason
+        return 0, f"no response: {e}"
 
 def check(name, cond, info=""):
     global fails
