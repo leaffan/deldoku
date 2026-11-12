@@ -206,7 +206,18 @@ check("public output has no userIds/tokens", u1 not in json.dumps(pub) and "toke
 # --- files on disk ---
 data = f"{SRV}/data"
 log_raw = open(f"{data}/games.jsonl").read()
-log = [json.loads(l) for l in log_raw.splitlines()]
+
+def parse_log_line(line):
+    # Malformed lines must fail a check below instead of crashing the test run
+    try:
+        entry = json.loads(line)
+    except ValueError:
+        return None
+    return entry if isinstance(entry, dict) and isinstance(entry.get("userId"), str) else None
+
+lines = log_raw.splitlines()
+log = [e for e in map(parse_log_line, lines) if e is not None]
+check("games.jsonl: every line is a JSON object with userId", len(log) == len(lines), len(lines) - len(log))
 games = [e for e in log if e.get("type") == "game"]
 regs = [e for e in log if e.get("type") == "register"]
 check("games.jsonl: every line typed as game or register", len(games) + len(regs) == len(log), len(log))
@@ -214,9 +225,9 @@ check("games.jsonl has one game line per accepted game", len(games) == 6 + 18 + 
 check("games.jsonl has exactly one register line per user", len(regs) == REG_LIMIT and len({r["userId"] for r in regs}) == REG_LIMIT, len(regs))
 first_game = {}
 for i, e in enumerate(log):
-    first_game.setdefault(e["userId"], (i, e["type"]))
+    first_game.setdefault(e["userId"], (i, e.get("type")))
 check("each user's first log line is its registration", all(t == "register" for _, t in first_game.values()))
-r1 = next(r for r in regs if r["userId"] == u1)
+r1 = next((r for r in regs if r["userId"] == u1), {})
 check("register line has tokenHash of user file, keys exactly as specified",
       set(r1) == {"type", "userId", "tokenHash", "created"}
       and r1["tokenHash"] == json.load(open(f"{data}/users/{u1}.json"))["tokenHash"], r1)
