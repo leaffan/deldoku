@@ -502,7 +502,7 @@ https://www.leaffan.net/deldoku
 			role="dialog"
 			aria-modal="true"
 			tabindex="-1"
-			class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+			class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
 			onclick={(e) => {
 				if (e.target === e.currentTarget) {
 					selectedCell = null;

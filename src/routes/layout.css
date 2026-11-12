@@ -1,5 +1,28 @@
+@import 'tailwindcss';
+@import 'flag-icons/css/flag-icons.min.css';
 @import '@fontsource/fira-mono';
 
+/* Tailwind v4 hat Standardwerte gegenüber v3 (bisher per CDN) geändert; diese Regeln stellen das alte Aussehen her */
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentColor);
+	}
+	button:not(:disabled),
+	[role='button']:not(:disabled) {
+		cursor: pointer;
+	}
+	input::placeholder,
+	textarea::placeholder {
+		color: var(--color-gray-400);
+	}
+}
+
+/* Eigene Grundstile in den base-Layer, damit Tailwind-Utilities sie wie bisher überschreiben */
+@layer base {
 :root {
 	--font-body:
 		Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
@@ -102,4 +125,5 @@ button:focus:not(:focus-visible) {
 	position: absolute;
 	width: 1px;
 	white-space: nowrap;
+}
 }

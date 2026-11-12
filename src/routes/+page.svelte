@@ -75,7 +75,7 @@
 	   <div class="flex items-center gap-3">
 			<button
 				onclick={() => showRules = true}
-				class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+				class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-lg transition-colors"
 				aria-label={typeof t('howToPlay', $languageStore) === 'string' ? t('howToPlay', $languageStore) : ''}
 			>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,14 +85,14 @@
 			</button>
 			<button
 				onclick={() => languageStore.toggle()}
-				class="relative inline-flex items-center h-8 w-16 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-500"
+				class="relative inline-flex items-center h-8 w-16 rounded-full transition-colors focus:outline-hidden focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-500"
 				class:bg-green-500={$languageStore === 'en'}
 				class:bg-blue-300={$languageStore === 'de'}
 				aria-label="Toggle language"
 			>
 				<!-- Toggle circle -->
 				<span
-					class="inline-block h-6 w-6 transform rounded-full bg-white transition-transform flex items-center justify-center text-xs font-bold text-blue-600"
+					class="flex h-6 w-6 transform rounded-full bg-white transition-transform items-center justify-center text-xs font-bold text-blue-600"
 					class:translate-x-8={$languageStore === 'en'}
 					class:translate-x-1={$languageStore === 'de'}
 				>
@@ -145,7 +145,7 @@
 	<div 
 		data-rules-overlay
 		role="presentation"
-		class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+		class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
 		tabindex="-1"
 		onclick={(e) => {
 			if (e.target === e.currentTarget) {
