@@ -5,6 +5,7 @@
 	import { playersStore, languageStore, statsStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
 	import { getDebugChallenge, isDebugEnabled } from '$lib/debug';
+	import { browser } from '$app/environment';
 
 	let showStats = $state(false);
 	let showRules = $state(false);
@@ -13,8 +14,8 @@
 	let error = $state<string | null>(null);
 	let noChallenge = $state(false);
 
-	// Lade Players, Stats und Challenge beim Komponenten-Mount
-	Promise.all([
+	// Lade Players, Stats und Challenge beim Komponenten-Mount; nicht beim Prerendern im Build
+	if (browser) Promise.all([
 		playersStore.init(),
 		statsStore.init()
 	])
