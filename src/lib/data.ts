@@ -34,6 +34,11 @@ export function getApiBasePath(): string {
 	return '/deldoku/';
 }
 
+// Direkt auf stats.php zeigen, damit kein MultiViews/Rewrite auf dem Server nötig ist
+export function getStatsApiUrl(): string {
+	return `${getApiBasePath()}api/stats.php`;
+}
+
 export async function loadPlayers(): Promise<DELPlayer[]> {
 	if (samplePlayers.length === 0 && typeof window !== 'undefined') {
 		const basePath = getBasePath();

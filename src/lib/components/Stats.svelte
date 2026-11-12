@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { statsStore, languageStore, winRate, playersStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
+	import { getStatsApiUrl, getDailyChallengeDate } from '$lib/data';
 
 
 	// Gesamtstatistiken für den aktuellen Tag (Svelte 5 $state)
@@ -15,21 +16,12 @@
 		loadingGlobalStats = true;
 		errorGlobalStats = null;
 		try {
-			const apiPath = typeof window !== 'undefined' ? new URL('.', window.location.href).pathname + 'api/stats' : '/api/stats';
-			const res = await fetch(apiPath);
+			const res = await fetch(`${getStatsApiUrl()}?date=${getDailyChallengeDate()}`);
 			if (!res.ok) throw new Error('HTTP ' + res.status);
-			const allStats = await res.json();
-			const allGames = Object.values(allStats)
-				.map((user: any) => Array.isArray(user.gameHistory) ? user.gameHistory : [])
-				.flat();
-			totalGamesToday = allGames.length;
-			if (allGames.length === 0) {
-				avgCorrectAnswers = null;
-				avgScore = null;
-			} else {
-				avgCorrectAnswers = allGames.reduce((sum, g) => sum + Object.values(g.cellScores||{}).filter((v) => typeof v === 'number' && v > 0).length, 0) / allGames.length;
-				avgScore = allGames.reduce((sum, g) => sum + (g.score || 0), 0) / allGames.length;
-			}
+			const day = await res.json();
+			totalGamesToday = day.games;
+			avgCorrectAnswers = day.avgCorrect;
+			avgScore = day.avgScore;
 		} catch (e) {
 			errorGlobalStats = e instanceof Error ? e.message : String(e);
 		} finally {
@@ -92,6 +84,31 @@
 		<div class="bg-purple-50 p-2 sm:p-4 rounded-lg">
 			<div class="text-xl sm:text-3xl font-bold text-purple-600">{$statsStore.gamesWon}</div>
 			<div class="text-xs sm:text-sm text-gray-600">{t('gamesWon', $languageStore)}</div>
+		</div>
+	</div>
+
+	<div class="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
+		<div class="bg-orange-50 p-2 sm:p-4 rounded-lg">
+			<div class="text-xl sm:text-3xl font-bold text-orange-600">{$statsStore.currentStreak ?? 0}</div>
+			<div class="text-xs sm:text-sm text-gray-600">{t('currentStreak', $languageStore)}</div>
+		</div>
+
+		<div class="bg-orange-50 p-2 sm:p-4 rounded-lg">
+			<div class="text-xl sm:text-3xl font-bold text-orange-600">{$statsStore.longestStreak ?? 0}</div>
+			<div class="text-xs sm:text-sm text-gray-600">{t('longestStreak', $languageStore)}</div>
+		</div>
+
+		<div class="bg-blue-50 p-2 sm:p-4 rounded-lg">
+			<div class="text-xl sm:text-3xl font-bold text-blue-600">
+				{$statsStore.pointsPercent != null
+					? ($statsStore.pointsPercent / 100).toLocaleString($languageStore === 'en' ? 'en-US' : 'de-DE', {
+							style: 'percent',
+							minimumFractionDigits: 1,
+							maximumFractionDigits: 1
+						})
+					: '-'}
+			</div>
+			<div class="text-xs sm:text-sm text-gray-600">{t('pointsPercent', $languageStore)}</div>
 		</div>
 	</div>
 

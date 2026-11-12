@@ -24,3 +24,6 @@ vite.config.ts.timestamp-*
 
 data/*
 static/challenges/*
+
+# Lokale Daten des PHP-Dev-Containers
+/.dev-data
