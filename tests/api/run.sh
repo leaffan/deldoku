@@ -14,7 +14,9 @@ trap cleanup EXIT
 
 mkdir -p "$SRV/deldoku/api" "$SRV/deldoku/challenges" "$SRV/data"
 cp "$REPO/static/api/stats.php" "$SRV/deldoku/api/"
-for d in "$(date -u +%F)" "$(date -u -d yesterday +%F)"; do
+# Today and yesterday in UTC via Python (already required below), since `date -d` is GNU-only
+DATES=$(python3 -I -c 'from datetime import datetime, timedelta, timezone as tz; d = datetime.now(tz.utc).date(); print(d, d - timedelta(days=1))')
+for d in $DATES; do
   cp "$REPO/static/challenges/$d.json" "$SRV/deldoku/challenges/" || { echo "missing challenge $d" >&2; exit 1; }
 done
 docker run --rm -v "$SRV:/srv" "php:$TAG-cli" php -l /srv/deldoku/api/stats.php
