@@ -4,13 +4,14 @@
 	"version": "1.3.0",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "node scripts/dev-php.mjs up && vite dev",
 		"build": "vite build",
-		"preview": "vite preview",
+		"preview": "node scripts/dev-php.mjs up && vite preview",
 		"start": "node build",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"dev:down": "node scripts/dev-php.mjs down"
 	},
 	"devDependencies": {
 		"@fontsource/fira-mono": "^5.2.7",

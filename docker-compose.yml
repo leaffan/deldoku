@@ -1,0 +1,12 @@
+# Lokales PHP-Backend für `pnpm run dev` (gleiche Verzeichnisstruktur wie auf dem Server)
+services:
+  php:
+    image: php:8.2-cli
+    command: php -S 0.0.0.0:8000 -t /srv
+    environment:
+      PHP_CLI_SERVER_WORKERS: "4"
+    ports:
+      - "8090:8000"
+    volumes:
+      - ./static:/srv/deldoku
+      - ./.dev-data:/srv/data
