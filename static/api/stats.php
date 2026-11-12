@@ -28,12 +28,13 @@ function dataDir() {
 
 function ensureDataDirs() {
     $dir = dataDir();
-    if (!is_dir($dir . '/users')) {
-        mkdir($dir . '/users', 0755, true);
+    // is_dir() nach mkdir(), falls ein paralleler Request das Verzeichnis gerade angelegt hat
+    if (!is_dir($dir . '/users') && !@mkdir($dir . '/users', 0755, true) && !is_dir($dir . '/users')) {
+        respond(500, ['error' => 'could not create data directory']);
     }
     // data/ kann im Document Root liegen; enthält Token-Hashes und Rohdaten
-    if (!file_exists($dir . '/.htaccess')) {
-        file_put_contents($dir . '/.htaccess', "Require all denied\n");
+    if (!file_exists($dir . '/.htaccess') && @file_put_contents($dir . '/.htaccess', "Require all denied\n") === false) {
+        respond(500, ['error' => 'could not protect data directory']);
     }
 }
 
