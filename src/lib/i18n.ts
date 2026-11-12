@@ -17,6 +17,9 @@ export type Translations = {
 	totalGames: string;
 	winRate: string;
 	gamesWon: string;
+	currentStreak: string;
+	longestStreak: string;
+	pointsPercent: string;
 	gameHistory: string;
 	won: string;
 	lost: string;
@@ -467,6 +470,9 @@ export const translations: Record<Language, Translations> = {
 		totalGames: 'Spiele gesamt',
 		winRate: 'Gewinnquote',
 		gamesWon: 'Spiele gewonnen',
+		currentStreak: 'Aktuelle Serie (Tage)',
+		longestStreak: 'Längste Serie (Tage)',
+		pointsPercent: 'Punktequote (bestes Spiel pro Tag)',
 		gameHistory: 'Spielhistorie',
 		won: '✓ Gewonnen',
 		lost: '✗ Verloren',
@@ -519,6 +525,9 @@ export const translations: Record<Language, Translations> = {
 		totalGames: 'Total Games',
 		winRate: 'Win Rate',
 		gamesWon: 'Games Won',
+		currentStreak: 'Current streak (days)',
+		longestStreak: 'Longest streak (days)',
+		pointsPercent: 'Points ratio (best game per day)',
 		gameHistory: 'Game History',
 		won: '✓ Won',
 		lost: '✗ Lost',

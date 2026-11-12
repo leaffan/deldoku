@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { DELPlayer, DELDokuChallenge } from '$lib/data';
-	import { validatePlayerMatch, getApiBasePath } from '$lib/data';
+	import { validatePlayerMatch, getStatsApiUrl } from '$lib/data';
 	import { playersStore, languageStore } from '$lib/stores';
 	import { t, translations, c, categories } from '$lib/i18n';
 	import { pngLogoCategories } from '$lib/pngLogoCategories';
@@ -39,7 +39,7 @@
 	let flashAnswers = $state(false); // For flash animation on answers
 	let flashScore = $state(false); // For flash animation on score
 	let cellScores = $state<Record<string, number>>({}); // Points per cell
-	let cachedStats: Record<string, any> | null = null; // Cache for stats
+	let dayCounts: Record<string, Record<string, number>> | null = null; // Antwortzählung des Tages pro Zelle
 	let gameFinished = $state(false); // Whether the game is finished
 
 	function formatDate(dateStr: string, lang: string): string {
@@ -164,23 +164,23 @@ https://www.leaffan.net/deldoku
 		return gameGrid.flat().filter(p => p !== null).length;
 	});
 
-	// Load stats when component mounts
-	async function preloadStats() {
-		if (!cachedStats) {
-			try {
-				const apiPath = getApiBasePath();
-				const response = await fetch(`${apiPath}api/stats`);
-				cachedStats = await response.json();
-				debug('📥 Stats preloaded and cached');
-			} catch (error) {
-				console.error('Error preloading stats:', error);
-			}
+	// Tageszählung für die vorläufige Punkteanzeige laden; verbindlich sind die Punkte vom Server
+	async function loadDayCounts() {
+		if (dayCounts) return;
+		try {
+			const response = await fetch(`${getStatsApiUrl()}?date=${challenge.date}`);
+			if (!response.ok) throw new Error(`HTTP ${response.status}`);
+			const data = await response.json();
+			dayCounts = data.cells ?? {};
+			debug('📥 Day counts loaded');
+		} catch (error) {
+			console.error('Error loading day counts:', error);
+			dayCounts = {};
 		}
 	}
 
-	// Preload stats when page loads
 	$effect(() => {
-		preloadStats();
+		loadDayCounts();
 	});
 
 	// Focus the input field when a cell is selected
@@ -282,29 +282,8 @@ https://www.leaffan.net/deldoku
 	}
 
 	async function updateScoreForCell(cellKey: string, playerId: string) {
-		// Lade Stats nur beim ersten Mal, danach aus Cache
-		if (!cachedStats) {
-			const apiPath = getApiBasePath();
-			const response = await fetch(`${apiPath}api/stats`);
-			cachedStats = await response.json();
-			debug('📥 Stats loaded and cached');
-		}
-		const allStats = cachedStats;
-
-		// Count how often this player was used in this position
-		const usageCounts: Record<string, number> = {};
-		
-		// Iterate all player statistics
-		if (allStats) {
-			Object.values(allStats).forEach((stats: any) => {
-			stats.gameHistory?.forEach((game: any) => {
-				const playerInCell = game.playerSelections?.[cellKey];
-				if (playerInCell && playerInCell !== '') {
-					usageCounts[playerInCell] = (usageCounts[playerInCell] || 0) + 1;
-				}
-			});
-		});
-		}
+		await loadDayCounts();
+		const usageCounts: Record<string, number> = dayCounts?.[cellKey] ?? {};
 
 		// Calculate total number of answers for this cell
 		const totalAnswers = Object.values(usageCounts).reduce((sum, count) => sum + count, 0) || 1;
@@ -363,8 +342,15 @@ https://www.leaffan.net/deldoku
 			debug(`🎉 Game won! Bonus +100 points → Total: ${currentScore}/1000`);
 		}
 		
-		// Store the game in stats (score is already calculated)
-		await statsStore.addGame(won, playerSelections, currentScore, cellScores);
+		try {
+			const result = await statsStore.submitGame(challenge.date, playerSelections);
+			currentScore = result.score;
+			cellScores = result.cellScores;
+		} catch (error) {
+			// Ohne Server bleibt die vorläufige Punktzahl stehen
+			console.error('Error submitting game:', error);
+		}
+		dayCounts = null; // Nächstes Spiel mit aktueller Zählung
 	}
 </script>
 
@@ -405,9 +391,9 @@ https://www.leaffan.net/deldoku
 				answersGiven = 0; // Reset counter
 				currentScore = 0; // Reset score
 				cellScores = {}; // Reset cell scores
-				cachedStats = null; // Reset cache
+				dayCounts = null;
 				gameFinished = false; // Reset game state
-				await preloadStats(); // Stats neu laden
+				await loadDayCounts();
 			}}
 			class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-2 rounded-lg transition-colors text-sm whitespace-nowrap"
 		>

@@ -1,7 +1,7 @@
 import { writable, derived } from 'svelte/store';
 import type { DELPlayer } from './data';
 import type { Language } from './i18n';
-import { loadPlayers, getApiBasePath } from './data';
+import { loadPlayers, getStatsApiUrl } from './data';
 
 export interface GameState {
 	grid: (string | null)[][];
@@ -14,8 +14,9 @@ export interface GameState {
 
 export interface GameEntry {
 	timestamp: string; // ISO 8601 full timestamp
+	date?: string; // Challenge-Datum (YYYY-MM-DD)
 	won: boolean;
-	playerSelections: Record<string, string>; // "0-0": "p1", "0-1": "p2", etc.
+	playerSelections: Record<string, string>; // "0-0": "<player id>", "0-1": "", etc.
 	score?: number; // Punktzahl (0-1000, inkl. 100 Bonus für Gewinn)
 	cellScores?: Record<string, number>; // Punkte pro Zelle
 }
@@ -24,8 +25,21 @@ export interface PlayerStats {
 	totalGames: number;
 	gamesWon: number;
 	lastPlayedDate: string; // ISO 8601 full timestamp
-	gameHistory: GameEntry[];
-	currentChallenge?: string; // Challenge-Datum (YYYY-MM-DD)
+	gameHistory: GameEntry[]; // die letzten 100 Spiele
+	daysPlayed?: number;
+	daysWon?: number;
+	totalPoints?: number; // Summe des besten Ergebnisses pro Tag
+	pointsPercent?: number | null; // Anteil an den möglichen Punkten der gespielten Tage (0-100)
+	currentStreak?: number;
+	longestStreak?: number;
+}
+
+export interface GameResult {
+	date: string;
+	won: boolean;
+	correct: number;
+	score: number;
+	cellScores: Record<string, number>;
 }
 
 const defaultGameState: GameState = {
@@ -74,97 +88,106 @@ function createGameStore() {
 	};
 }
 
-function createStatsStore() {
-	let initial = defaultStats;
-	let userId: string | null = null;
-	
-	// Generiere oder lade eine eindeutige User-ID
-	if (typeof window !== 'undefined') {
-		userId = localStorage.getItem('del_doku_user_id');
-		if (!userId) {
-			userId = 'user_' + Math.random().toString(36).substr(2, 9);
-			localStorage.setItem('del_doku_user_id', userId);
-		}
-	}
+interface Auth {
+	userId: string;
+	token: string;
+}
 
-	const { subscribe, set, update } = writable<PlayerStats>(initial);
+const AUTH_KEY = 'del_doku_auth';
+
+function loadAuth(): Auth | null {
+	try {
+		const parsed = JSON.parse(localStorage.getItem(AUTH_KEY) ?? 'null');
+		return typeof parsed?.userId === 'string' && typeof parsed?.token === 'string' ? parsed : null;
+	} catch {
+		return null;
+	}
+}
+
+function saveAuth(auth: Auth | null) {
+	try {
+		if (auth) {
+			localStorage.setItem(AUTH_KEY, JSON.stringify(auth));
+		} else {
+			localStorage.removeItem(AUTH_KEY);
+		}
+	} catch {
+		// localStorage nicht verfügbar (z. B. privates Fenster): Stats gelten dann nur für diese Sitzung
+	}
+}
+
+function createStatsStore() {
+	// Server vergibt userId und Token beim ersten abgesendeten Spiel
+	let auth: Auth | null = null;
+	const { subscribe, set } = writable<PlayerStats>(defaultStats);
+
+	async function submitGame(date: string, selections: Record<string, string>): Promise<GameResult> {
+		const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+		const body: Record<string, unknown> = { date, selections };
+		if (auth) {
+			body.userId = auth.userId;
+			headers['X-DelDoku-Token'] = auth.token;
+		}
+		const response = await fetch(getStatsApiUrl(), {
+			method: 'POST',
+			headers,
+			body: JSON.stringify(body)
+		});
+		if (response.status === 401 && auth) {
+			// Zugangsdaten auf dem Server unbekannt: als neuer Nutzer erneut absenden
+			auth = null;
+			saveAuth(null);
+			return submitGame(date, selections);
+		}
+		if (!response.ok) {
+			throw new Error(`HTTP ${response.status}`);
+		}
+		const data = await response.json();
+		if (data.token) {
+			auth = { userId: data.userId, token: data.token };
+			saveAuth(auth);
+		}
+		set(data.stats);
+		return data.game;
+	}
 
 	return {
 		subscribe,
-		
-		// Lade Stats vom Server
+
+		// Lade eigene Stats vom Server
 		init: async () => {
-			if (typeof window === 'undefined' || !userId) return;
-			
+			if (typeof window === 'undefined') return;
 			try {
-				const apiPath = getApiBasePath();
-				const response = await fetch(`${apiPath}api/stats?userId=${userId}`);
+				// Schlüssel des alten Stats-Formats aufräumen
+				localStorage.removeItem('del_doku_user_id');
+				localStorage.removeItem('del_doku_stats');
+			} catch {
+				// ignorieren
+			}
+			auth = loadAuth();
+			if (!auth) return;
+
+			try {
+				const response = await fetch(
+					`${getStatsApiUrl()}?userId=${encodeURIComponent(auth.userId)}`,
+					{ headers: { 'X-DelDoku-Token': auth.token } }
+				);
+				if (response.status === 401) {
+					auth = null;
+					saveAuth(null);
+					return;
+				}
 				if (!response.ok) {
 					throw new Error(`HTTP ${response.status}`);
 				}
 				const data = await response.json();
-				
-				if (data.stats) {
-					set(data.stats);
-				}
+				set(data.stats);
 			} catch (error) {
 				console.error('Error loading stats from server:', error);
-				// Fallback auf localStorage
-				const stored = localStorage.getItem('del_doku_stats');
-				if (stored) {
-					try {
-						const parsed = JSON.parse(stored);
-						set(parsed);
-					} catch (e) {
-						console.error('Error parsing stats from localStorage:', e);
-					}
-				}
 			}
 		},
-		
-		addGame: async (won: boolean, playerSelections: Record<string, string>, totalScore: number, cellScores: Record<string, number>) => {
-			// Score und cellScores werden jetzt von außen übergeben (bereits während des Spiels berechnet)
-			update((state) => {
-				const timestamp = new Date().toISOString();
-				const newEntry: GameEntry = {
-					timestamp,
-					won,
-					playerSelections,
-					score: totalScore,
-					cellScores
-				};
 
-				const newStats = {
-					...state,
-					totalGames: state.totalGames + 1,
-					gamesWon: won ? state.gamesWon + 1 : state.gamesWon,				lastPlayedDate: timestamp,
-				gameHistory: [...(state.gameHistory || []), newEntry]
-			};
-				// Speichere auf Server
-				if (typeof window !== 'undefined' && userId) {
-					const apiPath = getApiBasePath();
-					fetch(`${apiPath}api/stats`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ userId, stats: newStats })
-					}).catch(err => console.error('Error saving stats:', err));
-				}
-
-				return newStats;
-			});
-		},
-		
-		resetStats: () => {
-			set(defaultStats);
-			if (typeof window !== 'undefined' && userId) {
-				const apiPath = getApiBasePath();
-				fetch(`${apiPath}api/stats`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ userId, stats: defaultStats })
-				}).catch(err => console.error('Error resetting stats:', err));
-			}
-		}
+		submitGame
 	};
 }
 
