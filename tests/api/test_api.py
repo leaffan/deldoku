@@ -133,6 +133,11 @@ for name, body, code in cases:
     st, _ = req("POST", body=body); check(f"POST {name} -> {code}", st == code, st)
 st, _ = req("POST", raw=b"{not json"); check("POST invalid JSON -> 400", st == 400, st)
 st, _ = req("POST", raw=b'{"x":"' + b"a" * 9000 + b'"}'); check("POST > 8 KB -> 413", st == 413, st)
+# Real IDs contain dots, %-encoding and non-ASCII. An invalid userId makes the request stop right
+# after selection parsing, so "invalid userId" proves the selections were accepted without storing a game.
+S = {"0-0": "12390/t.j.-mulock", "0-1": "15224/daniel-wei%C3%9F", "0-2": "22333/bastian-steingroÃŸ"}
+st, b = req("POST", body={"date": D0, "selections": S, "userId": "x"})
+check("POST real-world player IDs pass validation", st == 400 and b.get("error") == "invalid userId", (st, b))
 
 # --- yesterday + streak ---
 Y = sel(D1, 0)

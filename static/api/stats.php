@@ -54,9 +54,10 @@ function isValidUserId($userId) {
     return is_string($userId) && preg_match('/\Au_[0-9a-f]{16}\z/', $userId) === 1;
 }
 
+// Spieler-IDs enthalten Punkte, %-Kodierung und Nicht-ASCII-Zeichen; sie landen nur in JSON, nie in Pfaden
 function isValidPlayerId($playerId) {
     return is_string($playerId) && strlen($playerId) <= 80
-        && preg_match('/\A\d+\/[a-z0-9-]+\z/', $playerId) === 1;
+        && preg_match('/\A\d+\/[^\s\x00-\x1F\x7F]+\z/u', $playerId) === 1;
 }
 
 function utcToday() {
