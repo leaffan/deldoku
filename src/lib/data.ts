@@ -75,14 +75,17 @@ export function getDailyChallengeDate(): string {
 	return `${year}-${month}-${day}`;
 }
 
+// null nur bei 404 (Datei fehlt); Netzwerk-, Server- und Parse-Fehler werden weitergereicht,
+// damit sie als Fehler angezeigt werden statt als "keine Challenge" oder Ersatz-Challenge
 async function fetchChallengeFile(name: string): Promise<any | null> {
-	try {
-		const response = await fetch(`${getBasePath()}challenges/${name}.json`);
-		return response.ok ? await response.json() : null;
-	} catch (error) {
-		console.warn(`Challenge-Datei ${name}.json konnte nicht geladen werden:`, error instanceof Error ? error.message : String(error));
+	const response = await fetch(`${getBasePath()}challenges/${name}.json`);
+	if (response.status === 404) {
 		return null;
 	}
+	if (!response.ok) {
+		throw new Error(`HTTP ${response.status} (${name}.json)`);
+	}
+	return response.json();
 }
 
 export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELDokuChallenge> {
