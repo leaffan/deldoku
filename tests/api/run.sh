@@ -20,7 +20,7 @@ for d in $DATES; do
   cp "$REPO/static/challenges/$d.json" "$SRV/deldoku/challenges/" || { echo "missing challenge $d" >&2; exit 1; }
 done
 docker run --rm -v "$SRV:/srv" "php:$TAG-cli" php -l /srv/deldoku/api/stats.php
-CID=$(docker run -d --rm --user "$(id -u):$(id -g)" -e PHP_CLI_SERVER_WORKERS=8 -p "$PORT:8000" \
+CID=$(docker run -d --rm --user "$(id -u):$(id -g)" -e PHP_CLI_SERVER_WORKERS=8 -e DELDOKU_REGISTRATION_LIMIT=30 -p "$PORT:8000" \
       -v "$SRV:/srv" "php:$TAG-cli" php -S 0.0.0.0:8000 -t /srv)
 
 ready=""

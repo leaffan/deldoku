@@ -76,6 +76,12 @@ check("GET public empty -> 200, games 0", st == 200 and b["games"] == 0 and b["c
 for q in ["?date=abc", "?date=..%2Fx", "?challengeDate=2026-13-45", "?date%5B%5D=x"]:
     st, _ = req("GET", q); check(f"GET public {q} -> 400", st == 400, st)
 
+# Rate-limit files from earlier days: only today and yesterday may survive
+REG_LIMIT = 30  # set via DELDOKU_REGISTRATION_LIMIT in run.sh
+D3 = (TODAY - timedelta(days=3)).isoformat()
+for d in (D3, D1):
+    open(f"{SRV}/data/ratelimit_{d}.json", "w").write('{"secret":"x","counts":{}}')
+
 # --- registration ---
 A = sel(D0, 0)
 st, b = req("POST", body={"date": D0, "selections": A})
@@ -171,6 +177,26 @@ ts = [threading.Thread(target=worker) for _ in range(20)]
 st, pub = req("GET", f"?date={D1}")
 check("20 parallel POSTs: all 200, day games = 21", res.count(200) == 20 and pub["games"] == 21, (res, pub["games"]))
 
+# --- registration limit per IP (22 users registered so far) ---
+extra = 0
+while True:
+    st, _ = req("POST", body={"date": D1, "selections": Y})
+    if st != 200:
+        break
+    extra += 1
+    if extra > REG_LIMIT:
+        break
+check(f"registration limit: {REG_LIMIT} new users per IP, then 429", 22 + extra == REG_LIMIT and st == 429, (extra, st))
+st, _ = req("POST", body={"date": D0, "selections": A, "userId": u1}, token=t1)
+check("existing user can still play after registration limit", st == 200, st)
+expect(u1, D0, A)
+rl = open(f"{SRV}/data/ratelimit_{D0}.json").read()
+rl_data = json.loads(rl)
+check("rate-limit file stores only hashes, no IPs",
+      not __import__("re").search(r"\d+\.\d+\.\d+\.\d+", rl) and all(len(k) == 64 for k in rl_data["counts"]), rl)
+check("old rate-limit files removed, yesterday kept",
+      not os.path.exists(f"{SRV}/data/ratelimit_{D3}.json") and os.path.exists(f"{SRV}/data/ratelimit_{D1}.json"))
+
 # --- public aggregate matches model, no user data ---
 st, pub = req("GET")
 counts_ok = all(pub["cells"][k] == model[D0][k] for k in KEYS)
@@ -180,7 +206,7 @@ check("public output has no userIds/tokens", u1 not in json.dumps(pub) and "toke
 # --- files on disk ---
 data = f"{SRV}/data"
 lines = open(f"{data}/games.jsonl").read().splitlines()
-check("games.jsonl has one line per accepted game", len(lines) == 6 + 18 + 20, len(lines))
+check("games.jsonl has one line per accepted game", len(lines) == 6 + 18 + 20 + (REG_LIMIT - 22) + 1, len(lines))
 ufile = open(f"{data}/users/{u1}.json").read()
 check("user file stores no plaintext token", t1 not in ufile)
 check("data/.htaccess denies access", open(f"{data}/.htaccess").read().strip() == "Require all denied")
@@ -189,7 +215,7 @@ check("nothing written outside data/", outside == [], outside)
 
 # --- corrupt day file is kept, not overwritten ---
 open(f"{data}/day_{D0}.json", "w").write("{broken")
-st, _ = req("POST", body={"date": D0, "selections": A})
+st, _ = req("POST", body={"date": D0, "selections": A, "userId": u1}, token=t1)
 check("corrupt day file -> 500 and file untouched", st == 500 and open(f"{data}/day_{D0}.json").read() == "{broken", st)
 
 print(f"\n{'ALL PASSED' if fails == 0 else f'{fails} FAILED'}")
