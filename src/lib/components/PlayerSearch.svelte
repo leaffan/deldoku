@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getCurrentSeason, type DELPlayer } from '$lib/data';
-	import { playersStore } from '$lib/stores';
+	import { playersStore, languageStore } from '$lib/stores';
+	import { t } from '$lib/i18n';
 	import { debug } from '$lib/debug';
 
 	interface Props {
@@ -129,7 +130,7 @@
 	<input
 		bind:this={inputElement}
 		type="text"
-		placeholder="Spieler suchen..."
+		placeholder={t('searchPlaceholder', $languageStore)}
 		value={searchQuery}
 		oninput={handleInput}
 		onfocus={handleFocus}
@@ -167,7 +168,7 @@
 							class={`ml-2 px-3 py-1 rounded text-sm font-semibold transition-colors
 								${isDisabled ? 'opacity-30 cursor-not-allowed bg-gray-200 text-gray-400' : isSelected ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white hover:bg-blue-600 cursor-pointer'}`}
 						>
-							{isSelected ? '→ Enter' : 'Auswählen'}
+							{isSelected ? '→ Enter' : t('selectButton', $languageStore)}
 						</button>
 					</div>
 				</li>

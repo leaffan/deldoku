@@ -4,6 +4,11 @@
 	import { t } from '$lib/i18n';
 
 	let { children } = $props();
+
+	// Seitensprache für Screenreader und Silbentrennung an die gewählte Sprache anpassen
+	$effect(() => {
+		document.documentElement.lang = $languageStore;
+	});
 </script>
 
 <div class="app">
