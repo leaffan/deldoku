@@ -10,6 +10,7 @@
 	import { statsStore } from '$lib/stores';
 	import { onMount, tick } from 'svelte';
 	import { asset } from '$app/paths';
+	import { modalDialog, countryName } from '$lib/a11y';
 
 	interface Props {
 		rowCategories: string[];
@@ -18,7 +19,6 @@
 		challenge: DELDokuChallenge;
 	}
 
-	let showRules = $state(false); // For rules modal visibility
 	let { rowCategories, colCategories, grid: initialGrid, challenge }: Props = $props();
 
 	// Create local reactive grid instead of using prop
@@ -202,14 +202,14 @@ https://www.leaffan.net/deldoku
 		}
 	});
 
-	// Focus the overlay when opened (for ESC key)
-	$effect(() => {
-		if (showRules) {
-			setTimeout(() => {
-				(document.querySelector('[data-rules-overlay]') as HTMLElement | null)?.focus();
-			}, 100);
-		}
-	});
+	// Zugänglicher Name einer Zelle: Zeile, Spalte und Zustand (nicht nur über die Farbe erkennbar)
+	function getCellLabel(rowIdx: number, colIdx: number): string {
+		const key = getCellKey(rowIdx, colIdx);
+		const state = correctCells.includes(key)
+			? `${t('cellCorrect', $languageStore)}: ${gameGrid[rowIdx][colIdx]?.name ?? ''}`
+			: incorrectCells.includes(key) ? t('cellIncorrect', $languageStore) : t('cellOpen', $languageStore);
+		return `${t('row', $languageStore)} ${getCategoryName(rowCategories[rowIdx])}, ${t('column', $languageStore)} ${getCategoryName(colCategories[colIdx])}: ${state}`;
+	}
 
 	function getCellKey(row: number, col: number): string {
 		return `${row}-${col}`;
@@ -428,9 +428,9 @@ https://www.leaffan.net/deldoku
 				<!-- {@const slug = slugify(colCat)} -->
 				<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-2">
 					{#if logoMap[colCat]}
-						<img src={logoMap[colCat]} alt={colCat} class="h-14 w-auto" title={getCategoryName(colCat)} />
+						<img src={logoMap[colCat]} alt={getCategoryName(colCat)} class="h-14 w-auto" title={getCategoryName(colCat)} />
 					{:else if /^([a-zA-Z]{2})$/.test(colCat) }
-						<span class={"fi fi-" + colCat.toLowerCase()} title={getCategoryName(colCat)} style="font-size:2.5rem;"></span>
+						<span class={"fi fi-" + colCat.toLowerCase()} role="img" aria-label={countryName(colCat, $languageStore)} title={countryName(colCat, $languageStore)} style="font-size:2.5rem;"></span>
 					{:else}
 						{getCategoryName(colCat)}
 					{/if}
@@ -444,9 +444,9 @@ https://www.leaffan.net/deldoku
 			<div class="flex">
 				<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-2">
 					{#if logoMap[rowCat]}
-						<img src="{logoMap[rowCat]}" alt="{rowCat}" class="h-14 w-auto" title={getCategoryName(rowCat)} />
+						<img src={logoMap[rowCat]} alt={getCategoryName(rowCat)} class="h-14 w-auto" title={getCategoryName(rowCat)} />
 					{:else if /^([a-zA-Z]{2})$/.test(rowCat) }
-						<span class={"fi fi-" + rowCat.toLowerCase()} title={getCategoryName(rowCat)} style="font-size:2.5rem;"></span>
+						<span class={"fi fi-" + rowCat.toLowerCase()} role="img" aria-label={countryName(rowCat, $languageStore)} title={countryName(rowCat, $languageStore)} style="font-size:2.5rem;"></span>
 					{:else}
 						{getCategoryName(rowCat)}
 					{/if}
@@ -472,6 +472,7 @@ https://www.leaffan.net/deldoku
 							isSelected={selectedCell?.[0] === rowIdx && selectedCell?.[1] === colIdx}
 							isCorrect={correctCells.includes(getCellKey(rowIdx, colIdx))}
 							isIncorrect={incorrectCells.includes(getCellKey(rowIdx, colIdx))}
+							label={getCellLabel(rowIdx, colIdx)}
 						/>
 					</div>
 				{/each}
@@ -516,25 +517,24 @@ https://www.leaffan.net/deldoku
 
 	<!-- Overlay for player input -->
 	{#if selectedCell !== null}
+		<!-- Klick auf den Hintergrund schließt; per Tastatur übernimmt das Escape in modalDialog -->
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div 
 			role="dialog"
 			aria-modal="true"
+			aria-labelledby="player-dialog-title"
 			tabindex="-1"
 			class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+			use:modalDialog={() => (selectedCell = null)}
 			onclick={(e) => {
 				if (e.target === e.currentTarget) {
-					selectedCell = null;
-				}
-			}}
-			onkeydown={(e) => {
-				if (e.key === 'Escape') {
 					selectedCell = null;
 				}
 			}}
 		>
 			<div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl">
 				<div class="mb-4">
-					<h2 class="text-lg font-bold text-gray-800 mb-2 text-center">{t('selectPlayer', $languageStore)}</h2>
+					<h2 id="player-dialog-title" class="text-lg font-bold text-gray-800 mb-2 text-center">{t('selectPlayer', $languageStore)}</h2>
 					<div class="text-sm text-gray-600 text-center">
 					<span class="font-semibold">{t('row', $languageStore)}:</span> {getCategoryName(rowCategories[selectedCell[0]])} · 
 					<span class="font-semibold">{t('column', $languageStore)}:</span> {getCategoryName(colCategories[selectedCell[1]])}

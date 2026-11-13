@@ -11,6 +11,7 @@
 	}
 
 	let { onPlayerSelect, usedPlayerIds = [], incorrectPlayerIds = [] }: Props = $props();
+	const uid = $props.id(); // Eindeutige IDs für die ARIA-Verknüpfung von Eingabe und Liste
 	let searchQuery = $state('');
 	let suggestions = $state<DELPlayer[]>([]);
 	let isOpen = $state(false);
@@ -47,6 +48,14 @@
 			}
 		}, 800);
 	}
+
+	// ID der per Pfeiltaste markierten Option (für aria-activedescendant)
+	let activeOptionId = $derived.by(() => {
+		if (!isOpen || selectedIndex < 0) return undefined;
+		const available = suggestions.filter(p => !usedPlayerIds.includes(p.id) && !incorrectPlayerIds.includes(p.id));
+		const player = available[selectedIndex];
+		return player ? `${uid}-opt-${suggestions.indexOf(player)}` : undefined;
+	});
 
 	function handleInput(e: Event) {
 		const input = (e.target as HTMLInputElement).value;
@@ -95,6 +104,13 @@
 	}
 
 	function handleKeyDown(e: KeyboardEvent) {
+		// Escape schließt nur die Liste; ist sie zu, schließt der Dialog (siehe modalDialog)
+		if (e.key === 'Escape' && isOpen) {
+			e.preventDefault();
+			isOpen = false;
+			selectedIndex = -1;
+			return;
+		}
 		if (!isOpen || suggestions.length === 0) return;
 
 		// Filter only available (not used and not already incorrect) players
@@ -117,11 +133,6 @@
 					selectPlayer(availableSuggestions[selectedIndex]);
 				}
 				break;
-			case 'Escape':
-				e.preventDefault();
-				isOpen = false;
-				selectedIndex = -1;
-				break;
 		}
 	}
 </script>
@@ -130,6 +141,13 @@
 	<input
 		bind:this={inputElement}
 		type="text"
+		role="combobox"
+		aria-label={t('searchPlaceholder', $languageStore)}
+		aria-autocomplete="list"
+		aria-controls="{uid}-list"
+		aria-expanded={isOpen && suggestions.length > 0}
+		aria-activedescendant={activeOptionId}
+		autocomplete="off"
 		placeholder={t('searchPlaceholder', $languageStore)}
 		value={searchQuery}
 		oninput={handleInput}
@@ -144,14 +162,19 @@
 
 	{#if isOpen && suggestions.length > 0}
 		{@const availablePlayers = suggestions.filter(p => !usedPlayerIds.includes(p.id) && !incorrectPlayerIds.includes(p.id))}
-		<ul class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-10 max-h-96 overflow-y-auto">
+		<ul id="{uid}-list" role="listbox" class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-10 max-h-96 overflow-y-auto">
 			{#each suggestions as player, index (player.id)}
 				{@const isUsed = usedPlayerIds.includes(player.id)}
 				{@const isIncorrect = incorrectPlayerIds.includes(player.id)}
 				{@const isDisabled = isUsed || isIncorrect}
 				{@const availableIndex = availablePlayers.indexOf(player)}
 				{@const isSelected = !isDisabled && selectedIndex === availableIndex}
-				<li>
+				<li
+					id="{uid}-opt-{index}"
+					role="option"
+					aria-selected={isSelected}
+					aria-disabled={isDisabled}
+				>
 					<div class={`w-full px-3 py-2 flex justify-between items-center transition-colors
 						${isSelected ? 'bg-blue-100 border-l-4 border-blue-500' : 'hover:bg-gray-50'}
 						${isIncorrect ? 'bg-red-50' : ''}`}>
@@ -162,7 +185,10 @@
 							</div>
 							<div class="text-sm text-gray-600">{player.first_season} –  {player.last_season !== getCurrentSeason() ? player.last_season + 1 : ''}</div>
 						</div>
+						<!-- Tastatur läuft über die Pfeiltasten im Suchfeld; der Button ist nur für Maus und Touch -->
 						<button
+							tabindex="-1"
+							aria-hidden="true"
 							onclick={() => !isDisabled && selectPlayer(player)}
 							disabled={isDisabled}
 							class={`ml-2 px-3 py-1 rounded text-sm font-semibold transition-colors
@@ -175,4 +201,9 @@
 			{/each}
 		</ul>
 	{/if}
+
+	<!-- Ansage für Screenreader, ob die Antwort richtig war -->
+	<p class="sr-only" aria-live="assertive">
+		{feedbackStatus === 'correct' ? t('answerCorrect', $languageStore) : feedbackStatus === 'incorrect' ? t('answerIncorrect', $languageStore) : ''}
+	</p>
 </div>
