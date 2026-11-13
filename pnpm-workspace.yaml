@@ -18,6 +18,7 @@ verifyDepsBeforeRun: false
 # (oder in package.json), nicht mehr aus .npmrc. Direkte Abhängigkeiten werden in package.json angehoben.
 overrides:
   cookie@<0.7.0: ^0.7.2
-  devalue@<5.8.1: ^5.8.1
+  devalue@<5.9.3: ^5.9.3
   nanoid@<3.3.18: ^3.3.18
   postcss@<8.5.23: ^8.5.23
+  source-map-js@<1.2.2: ^1.2.2
