@@ -1,4 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, type Connect, type Plugin } from 'vite';
 import http from 'node:http';
 
@@ -35,5 +36,9 @@ function phpApiProxy(): Plugin {
 }
 
 export default defineConfig({
-	plugins: [phpApiProxy(), sveltekit()]
+	plugins: [phpApiProxy(), tailwindcss(), sveltekit()],
+	build: {
+		// Flaggen einzeln ausliefern statt alle ~400 SVGs ins CSS einzubetten; sie werden nur bei Bedarf geladen
+		assetsInlineLimit: (filePath) => (filePath.includes('/flag-icons/') ? false : undefined)
+	}
 });

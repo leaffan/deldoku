@@ -1,0 +1,15 @@
+# Native Binaries (rolldown, lightningcss, Tailwind oxide) für Windows und WSL installieren,
+# damit dasselbe node_modules auf beiden Seiten funktioniert.
+supportedArchitectures:
+  os:
+    - current
+    - win32
+    - linux
+  cpu:
+    - x64
+  libc:
+    - glibc
+
+# Windows und WSL nutzen unterschiedliche Store-Pfade; ohne diese Einstellung hält jede Seite die
+# Installation der anderen für veraltet und installiert bei jedem `pnpm run` komplett neu.
+verifyDepsBeforeRun: false
