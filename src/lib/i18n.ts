@@ -52,6 +52,10 @@ export type Translations = {
 	shareResult: string;
 	shareCopied: string;
 	shareFailed: string;
+	searchPlaceholder: string;
+	selectButton: string;
+	emptyCell: string;
+	pointsShort: string;
 
 	// Aggregated stats
 	globalStatsTitle: string;
@@ -113,6 +117,10 @@ export type CategoryKey =
 	| '25_so_career'
 	| '1_teams'
 	| '2_teams'
+	| '1990s'
+	| '2000s'
+	| '2010s'
+	| '2020s'
 	| '3_teams'
 	| '3_plus_teams'
 	| '5_plus_teams'
@@ -252,6 +260,10 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'le_10_gp_career': '≤ 10 Spiele / Karriere',
 		'1_teams': 'Nur ein Team',
 		'2_teams': 'Exakt 2 Teams',
+		'1990s': 'Aktiv in den 1990ern',
+		'2000s': 'Aktiv in den 2000ern',
+		'2010s': 'Aktiv in den 2010ern',
+		'2020s': 'Aktiv in den 2020ern',
 		'3_plus_teams': '3+ Teams',
 		'3_teams': 'Exakt 3 Teams',
 		'5_plus_teams': '5+ Teams',
@@ -382,6 +394,10 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 		'le_10_gp_career': '≤ 10 Games / Career',
 		'1_teams': 'Single Team',
 		'2_teams': 'Exactly 2 Teams',
+		'1990s': 'Active in the 1990s',
+		'2000s': 'Active in the 2000s',
+		'2010s': 'Active in the 2010s',
+		'2020s': 'Active in the 2020s',
 		'3_plus_teams': '3+ Teams',
 		'3_teams': 'Exactly 3 Teams',
 		'5_plus_teams': '5+ Teams',
@@ -486,6 +502,10 @@ export const translations: Record<Language, Translations> = {
 		shareResult: 'Ergebnis teilen',
 		shareCopied: 'In die Zwischenablage kopiert ✓',
 		shareFailed: 'Kopieren fehlgeschlagen',
+		searchPlaceholder: 'Spieler suchen …',
+		selectButton: 'Auswählen',
+		emptyCell: '(leer)',
+		pointsShort: 'Pkt.',
 		score: 'Punkte',
 		selectPlayer: 'Spieler auswählen',
 		row: 'Zeile',
@@ -545,6 +565,10 @@ export const translations: Record<Language, Translations> = {
 		shareResult: 'Share Result',
 		shareCopied: 'Copied to clipboard ✓',
 		shareFailed: 'Copying failed',
+		searchPlaceholder: 'Search player …',
+		selectButton: 'Select',
+		emptyCell: '(empty)',
+		pointsShort: 'pts',
 		score: 'Score',
 		selectPlayer: 'Select Player',
 		row: 'Row',

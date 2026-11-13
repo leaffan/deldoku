@@ -37,7 +37,7 @@
 
 	// Find player name based on ID
 	function getPlayerName(playerId: string): string {
-		if (!playerId) return '(leer)';
+		if (!playerId) return t('emptyCell', $languageStore);
 		const player = $playersStore.find(p => p.id === playerId);
 		return player ? player.name : playerId;
 	}
@@ -154,7 +154,7 @@
 											</span>
 										</div>
 										<span class="text-xs font-bold {score > 0 ? 'text-blue-600' : 'text-red-600'}">
-											{score} Pkt
+											{score} {t('pointsShort', $languageStore)}
 										</span>
 									</div>
 								{/each}
