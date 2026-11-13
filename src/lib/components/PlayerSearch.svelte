@@ -135,7 +135,6 @@
 		onfocus={handleFocus}
 		onblur={handleBlur}
 		onkeydown={handleKeyDown}
-		autofocus
 		class="w-full px-3 py-2 border-2 rounded-lg transition-colors
 			{feedbackStatus === 'correct' ? 'border-green-500 bg-green-50' : 
 			 feedbackStatus === 'incorrect' ? 'border-red-500 bg-red-50' : 
