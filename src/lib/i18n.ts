@@ -56,6 +56,12 @@ export type Translations = {
 	selectButton: string;
 	emptyCell: string;
 	pointsShort: string;
+	cellCorrect: string;
+	cellIncorrect: string;
+	cellOpen: string;
+	answerCorrect: string;
+	answerIncorrect: string;
+	languageToggle: string;
 
 	// Aggregated stats
 	globalStatsTitle: string;
@@ -506,6 +512,12 @@ export const translations: Record<Language, Translations> = {
 		selectButton: 'Auswählen',
 		emptyCell: '(leer)',
 		pointsShort: 'Pkt.',
+		cellCorrect: 'richtig',
+		cellIncorrect: 'falsch',
+		cellOpen: 'offen',
+		answerCorrect: 'Richtig!',
+		answerIncorrect: 'Falsch, versuch es noch einmal.',
+		languageToggle: 'Sprache: Deutsch. Auf Englisch umschalten',
 		score: 'Punkte',
 		selectPlayer: 'Spieler auswählen',
 		row: 'Zeile',
@@ -569,6 +581,12 @@ export const translations: Record<Language, Translations> = {
 		selectButton: 'Select',
 		emptyCell: '(empty)',
 		pointsShort: 'pts',
+		cellCorrect: 'correct',
+		cellIncorrect: 'incorrect',
+		cellOpen: 'open',
+		answerCorrect: 'Correct!',
+		answerIncorrect: 'Incorrect, try again.',
+		languageToggle: 'Language: English. Switch to German',
 		score: 'Score',
 		selectPlayer: 'Select Player',
 		row: 'Row',

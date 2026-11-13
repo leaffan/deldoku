@@ -4,6 +4,7 @@
 	import { generateDailyChallenge, NoChallengeError, type DELDokuChallenge } from '$lib/data';
 	import { playersStore, languageStore, statsStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
+	import { modalDialog } from '$lib/a11y';
 	import { getDebugChallenge, isDebugEnabled } from '$lib/debug';
 	import { browser } from '$app/environment';
 
@@ -82,7 +83,7 @@
 			<button
 				onclick={() => showRules = true}
 				class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-lg transition-colors"
-				aria-label={typeof t('howToPlay', $languageStore) === 'string' ? t('howToPlay', $languageStore) : ''}
+				aria-label={t('howToPlay', $languageStore)}
 			>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -94,7 +95,7 @@
 				class="relative inline-flex items-center h-8 w-16 rounded-full transition-colors focus:outline-hidden focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-500"
 				class:bg-green-500={$languageStore === 'en'}
 				class:bg-blue-300={$languageStore === 'de'}
-				aria-label="Toggle language"
+				aria-label={t('languageToggle', $languageStore)}
 			>
 				<!-- Toggle circle -->
 				<span
@@ -152,24 +153,23 @@
 
 <!-- Rules Modal -->
 {#if showRules}
+	<!-- Klick auf den Hintergrund schließt; per Tastatur übernimmt das Escape in modalDialog -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div 
-		data-rules-overlay
-		role="presentation"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="rules-dialog-title"
 		class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
 		tabindex="-1"
+		use:modalDialog={() => (showRules = false)}
 		onclick={(e) => {
 			if (e.target === e.currentTarget) {
 				showRules = false;
 			}
 		}}
-		onkeydown={(e) => {
-			if (e.key === 'Escape') {
-				showRules = false;
-			}
-		}}
 	>
 		<div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-			<h2 class="text-2xl font-bold text-gray-800 mb-4">{t('howToPlay', $languageStore)}</h2>
+			<h2 id="rules-dialog-title" class="text-2xl font-bold text-gray-800 mb-4">{t('howToPlay', $languageStore)}</h2>
 			
 			<div class="space-y-4 text-gray-700">
 				<div>

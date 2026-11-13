@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { getCurrentSeason, type DELPlayer } from '$lib/data';
+	import { countryName } from '$lib/a11y';
+	import { languageStore } from '$lib/stores';
 
 	interface Props {
 		rowCategory: string;
@@ -9,9 +11,10 @@
 		isSelected?: boolean;
 		isCorrect?: boolean;
 		isIncorrect?: boolean;
+		label?: string; // Zugänglicher Name inkl. Zustand (richtig/falsch/offen)
 	}
 
-	let { rowCategory, colCategory, player, onCellClick, isSelected, isCorrect, isIncorrect }: Props = $props();
+	let { rowCategory, colCategory, player, onCellClick, isSelected, isCorrect, isIncorrect, label }: Props = $props();
 
 	// Abbreviates first names to initials (for mobile view)
 	function abbreviateName(fullName: string): string {
@@ -27,6 +30,7 @@
 
 <button
 	onclick={onCellClick}
+	aria-label={label}
 	class={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex flex-col items-center justify-center text-center transition-all cursor-pointer
 		${isCorrect ? 'bg-green-400 text-white shadow-lg' : isIncorrect ? 'bg-red-400 text-white shadow-lg' : isSelected ? 'bg-blue-300 text-gray-900 shadow-md' : 'bg-white text-gray-900 hover:bg-gray-50'}
 		${player ? 'font-bold text-xs' : 'font-semibold text-2xl'}`}
@@ -35,7 +39,7 @@
 		<div class="flex flex-col items-center justify-center gap-1">
 			<div class="flex flex-row gap-1">
 				{#each player.nationality.split(',').map(n => n.trim()).sort() as nat}
-					<span class="fi fi-{nat}" style="font-size: 1rem;"></span>
+					<span class="fi fi-{nat}" role="img" aria-label={countryName(nat, $languageStore)} title={countryName(nat, $languageStore)} style="font-size: 1rem;"></span>
 				{/each}
 			</div>
 			<!-- Full name on larger screens, abbreviated name on mobile devices -->
