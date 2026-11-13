@@ -221,6 +221,8 @@ https://www.leaffan.net/deldoku
 	}
 
 	async function handlePlayerSelect(player: DELPlayer) {
+		// Nach der 9. Antwort bzw. Abgabe keine weiteren Antworten annehmen
+		if (gameFinished || answersGiven >= 9) return;
 		if (selectedCell) {
 			const [row, col] = selectedCell;
 			const isCorrect = validatePlayerMatch(
@@ -302,6 +304,8 @@ https://www.leaffan.net/deldoku
 	}
 
 	async function submitSolution() {
+		if (gameFinished) return; // Doppelte Abgabe (Button + automatische Abgabe) verhindern
+		selectedCell = null; // Offenes Suchfenster schließen
 		let correctCount = 0;
 		const playerSelections: Record<string, string> = {};
 
