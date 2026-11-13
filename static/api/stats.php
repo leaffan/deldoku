@@ -121,6 +121,20 @@ function emptyDay($date) {
     return ['date' => $date, 'games' => 0, 'sumCorrect' => 0, 'sumScore' => 0, 'cells' => []];
 }
 
+function logLine($data) {
+    return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
+}
+
+// Nur der Hash, nie das Token selbst
+function registrationLogEntry($user) {
+    return [
+        'type' => 'register',
+        'userId' => $user['userId'],
+        'tokenHash' => $user['tokenHash'],
+        'created' => $user['created'],
+    ];
+}
+
 function rateLimitFile($date) {
     return dataDir() . "/ratelimit_$date.json";
 }
@@ -416,9 +430,14 @@ function handlePost() {
         ];
         $user['games'][] = $entry;
 
-        // Vollständiges Protokoll, aus dem sich Nutzer- und Tagesdateien neu erzeugen lassen
-        $logLine = json_encode(['userId' => $user['userId']] + $entry, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
-        if (file_put_contents(dataDir() . '/games.jsonl', $logLine, FILE_APPEND) === false) {
+        // Vollständiges Protokoll, aus dem sich Nutzer- und Tagesdateien neu erzeugen lassen.
+        // Registrierung vor dem ersten Spiel, damit ein Rebuild die Anmeldung (tokenHash) erhalten kann.
+        $logLines = '';
+        if ($newToken !== null) {
+            $logLines .= logLine(registrationLogEntry($user));
+        }
+        $logLines .= logLine(['type' => 'game', 'userId' => $user['userId']] + $entry);
+        if (file_put_contents(dataDir() . '/games.jsonl', $logLines, FILE_APPEND) === false) {
             respond(500, ['error' => 'could not write data']);
         }
         writeJsonFileAtomic(dayFile($date), $day);
