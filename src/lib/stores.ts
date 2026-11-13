@@ -3,15 +3,6 @@ import type { DELPlayer } from './data';
 import type { Language } from './i18n';
 import { loadPlayers, getStatsApiUrl } from './data';
 
-export interface GameState {
-	grid: (string | null)[][];
-	categories: string[];
-	dailyChallenge: string;
-	startTime: number;
-	endTime: number | null;
-	solved: boolean;
-}
-
 export interface GameEntry {
 	timestamp: string; // ISO 8601 full timestamp
 	date?: string; // Challenge-Datum (YYYY-MM-DD)
@@ -42,51 +33,12 @@ export interface GameResult {
 	cellScores: Record<string, number>;
 }
 
-const defaultGameState: GameState = {
-	grid: Array(9)
-		.fill(null)
-		.map(() => Array(3).fill(null)),
-	categories: [],
-	dailyChallenge: new Date().toISOString().split('T')[0],
-	startTime: Date.now(),
-	endTime: null,
-	solved: false
-};
-
 const defaultStats: PlayerStats = {
 	totalGames: 0,
 	gamesWon: 0,
 	lastPlayedDate: '',
 	gameHistory: []
 };
-
-function createGameStore() {
-	const { subscribe, set, update } = writable<GameState>(defaultGameState);
-
-	return {
-		subscribe,
-		resetGame: () => set(defaultGameState),
-		setCell: (row: number, col: number, value: string | null) => {
-			update((state) => {
-				state.grid[row][col] = value;
-				return state;
-			});
-		},
-		setCategories: (categories: string[]) => {
-			update((state) => ({
-				...state,
-				categories
-			}));
-		},
-		markSolved: () => {
-			update((state) => ({
-				...state,
-				solved: true,
-				endTime: Date.now()
-			}));
-		}
-	};
-}
 
 interface Auth {
 	userId: string;

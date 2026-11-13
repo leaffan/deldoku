@@ -50,6 +50,8 @@ export type Translations = {
 	delStats: string;
 	todaysTopic: string;
 	shareResult: string;
+	shareCopied: string;
+	shareFailed: string;
 
 	// Aggregated stats
 	globalStatsTitle: string;
@@ -482,6 +484,8 @@ export const translations: Record<Language, Translations> = {
 		lost: '✗ Verloren',
 		todaysTopic: 'Heutiges Thema',
 		shareResult: 'Ergebnis teilen',
+		shareCopied: 'In die Zwischenablage kopiert ✓',
+		shareFailed: 'Kopieren fehlgeschlagen',
 		score: 'Punkte',
 		selectPlayer: 'Spieler auswählen',
 		row: 'Zeile',
@@ -539,6 +543,8 @@ export const translations: Record<Language, Translations> = {
 		lost: '✗ Lost',
 		todaysTopic: "Today's Topic",
 		shareResult: 'Share Result',
+		shareCopied: 'Copied to clipboard ✓',
+		shareFailed: 'Copying failed',
 		score: 'Score',
 		selectPlayer: 'Select Player',
 		row: 'Row',

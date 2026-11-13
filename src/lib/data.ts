@@ -62,8 +62,16 @@ export async function loadPlayers(): Promise<DELPlayer[]> {
 			first_season: p.f,
 			last_season: p.l
 		}));
+		currentSeason = samplePlayers.reduce((max, p) => Math.max(max, p.last_season), 0);
 	}
 	return samplePlayers;
+}
+
+// Aktuelle Saison = jüngste Saison in den Spielerdaten; Spieler mit dieser last_season sind noch aktiv.
+// Wird einmal in loadPlayers berechnet, weil die Funktion pro Zelle und Suchtreffer aufgerufen wird.
+let currentSeason = 0;
+export function getCurrentSeason(): number {
+	return currentSeason;
 }
 
 export function getDailyChallengeDate(): string {

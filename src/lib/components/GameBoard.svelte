@@ -79,9 +79,10 @@ https://www.leaffan.net/deldoku
 		for (let row = 0; row < 3; row++) {
 			for (let col = 0; col < 3; col++) {
 				const cellKey = getCellKey(row, col);
+				// Grün = richtig, Rot = nur falsche Versuche, Weiß = nicht beantwortet
 				grid += correctCells.includes(cellKey)
 					? GREEN
-					: (gameGrid[row][col] ? RED : '⬜'); // Leere Zellen als weißes Quadrat
+					: (incorrectPlayersByCell[cellKey]?.length ? RED : '⬜');
 			}
 			if (row < 2) grid += '\n';
 		}
@@ -89,9 +90,19 @@ https://www.leaffan.net/deldoku
 		return resultTemplate({ grid, score: currentScore, $languageStore, date });
 	}
 
-	function copyResultToClipboard() {
-		const text = generateResultText();
-		navigator.clipboard.writeText(text);
+	let shareStatus = $state<'copied' | 'failed' | null>(null);
+	let shareStatusTimeout: ReturnType<typeof setTimeout> | null = null;
+
+	async function copyResultToClipboard() {
+		try {
+			await navigator.clipboard.writeText(generateResultText());
+			shareStatus = 'copied';
+		} catch (error) {
+			console.error('Error copying result:', error);
+			shareStatus = 'failed';
+		}
+		if (shareStatusTimeout) clearTimeout(shareStatusTimeout);
+		shareStatusTimeout = setTimeout(() => (shareStatus = null), 2000);
 	}
 
 
@@ -231,6 +242,7 @@ https://www.leaffan.net/deldoku
 			);
 
 			debug('Validating:', player.name, 'at', row, col, '- Correct:', isCorrect);
+			playerSearchComponent?.showFeedback(isCorrect);
 
 			// Increment answer counter (for all answers, correct or incorrect)
 			answersGiven++;
@@ -361,7 +373,6 @@ https://www.leaffan.net/deldoku
 
 <div class="w-full flex flex-col items-center">
 	<div class="mb-3 text-center">
-		<!-- svelte-ignore a11y_missing_attribute -->
 		<img src={asset('/img/deldoku.png')} alt="DELDoku Logo" class="h-20 sm:h-28 md:h-32 w-auto mx-auto mb-2" />
 		<!-- <h1 class="text-2xl sm:text-3xl font-bold mb-2">{t('title', $languageStore)}</h1> -->
 		{#if challenge?.title}
@@ -494,7 +505,11 @@ https://www.leaffan.net/deldoku
 				   style="width:100%"
 				   onclick={copyResultToClipboard}
 			   >
-				{t('shareResult', $languageStore)}
+				<span aria-live="polite">
+					{shareStatus === 'copied' ? t('shareCopied', $languageStore)
+						: shareStatus === 'failed' ? t('shareFailed', $languageStore)
+						: t('shareResult', $languageStore)}
+				</span>
 			   </button>
 		   </div>
 	{/if}

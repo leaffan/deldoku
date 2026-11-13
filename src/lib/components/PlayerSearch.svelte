@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { DELPlayer } from '$lib/data';
+	import { getCurrentSeason, type DELPlayer } from '$lib/data';
 	import { playersStore } from '$lib/stores';
 	import { debug } from '$lib/debug';
 
@@ -159,7 +159,7 @@
 								{player.name}
 
 							</div>
-							<div class="text-sm text-gray-600">{player.first_season} –  {player.last_season !== 2026 ? player.last_season + 1 : ''}</div>
+							<div class="text-sm text-gray-600">{player.first_season} –  {player.last_season !== getCurrentSeason() ? player.last_season + 1 : ''}</div>
 						</div>
 						<button
 							onclick={() => !isDisabled && selectPlayer(player)}
