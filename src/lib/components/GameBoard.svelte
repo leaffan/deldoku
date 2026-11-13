@@ -169,7 +169,8 @@ https://www.leaffan.net/deldoku
 	async function loadDayCounts() {
 		if (dayCounts) return;
 		try {
-			const response = await fetch(`${getStatsApiUrl()}?date=${challenge.date}`);
+			const fallback = challenge.isFallback ? '&challenge=fallback' : '';
+			const response = await fetch(`${getStatsApiUrl()}?date=${challenge.date}${fallback}`);
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
 			const data = await response.json();
 			dayCounts = data.cells ?? {};
@@ -344,7 +345,7 @@ https://www.leaffan.net/deldoku
 		}
 		
 		try {
-			const result = await statsStore.submitGame(challenge.date, playerSelections);
+			const result = await statsStore.submitGame(challenge.date, playerSelections, challenge.isFallback);
 			currentScore = result.score;
 			cellScores = result.cellScores;
 		} catch (error) {

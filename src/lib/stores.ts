@@ -121,9 +121,17 @@ function createStatsStore() {
 	let auth: Auth | null = null;
 	const { subscribe, set } = writable<PlayerStats>(defaultStats);
 
-	async function submitGame(date: string, selections: Record<string, string>): Promise<GameResult> {
+	async function submitGame(
+		date: string,
+		selections: Record<string, string>,
+		isFallback = false
+	): Promise<GameResult> {
 		const headers: Record<string, string> = { 'Content-Type': 'application/json' };
 		const body: Record<string, unknown> = { date, selections };
+		if (isFallback) {
+			// Sonst würde nach einem späteren Upload der Tagesdatei gegen die falsche Challenge gewertet
+			body.challenge = 'fallback';
+		}
 		if (auth) {
 			body.userId = auth.userId;
 			headers['X-DelDoku-Token'] = auth.token;
@@ -137,7 +145,7 @@ function createStatsStore() {
 			// Zugangsdaten auf dem Server unbekannt: als neuer Nutzer erneut absenden
 			auth = null;
 			saveAuth(null);
-			return submitGame(date, selections);
+			return submitGame(date, selections, isFallback);
 		}
 		if (!response.ok) {
 			throw new Error(`HTTP ${response.status}`);

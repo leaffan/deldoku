@@ -21,6 +21,7 @@ DATES=$(python3 -I -c 'from datetime import datetime, timedelta, timezone as tz;
 for d in $DATES; do
   cp "$REPO/tests/api/fixtures/challenge.json" "$SRV/deldoku/challenges/$d.json"
 done
+cp "$REPO/tests/api/fixtures/fallback.json" "$SRV/deldoku/challenges/fallback.json"
 docker run --rm -v "$SRV:/srv" "php:$TAG-cli" php -l /srv/deldoku/api/stats.php
 CID=$(docker run -d --rm --user "$(id -u):$(id -g)" -e PHP_CLI_SERVER_WORKERS=8 -e DELDOKU_REGISTRATION_LIMIT=30 -p "$PORT:8000" \
       -v "$SRV:/srv" "php:$TAG-cli" php -S 0.0.0.0:8000 -t /srv)

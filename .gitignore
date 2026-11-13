@@ -24,6 +24,7 @@ vite.config.ts.timestamp-*
 
 data/*
 static/challenges/*
+!static/challenges/fallback.json
 
 # Lokale Daten des PHP-Dev-Containers
 /.dev-data
