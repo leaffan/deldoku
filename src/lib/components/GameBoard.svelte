@@ -2,14 +2,14 @@
 	import type { DELPlayer, DELDokuChallenge } from '$lib/data';
 	import { validatePlayerMatch, getStatsApiUrl } from '$lib/data';
 	import { playersStore, languageStore } from '$lib/stores';
-	import { t, translations, c, categories } from '$lib/i18n';
+	import { t, translations, c, categories, type Language } from '$lib/i18n';
 	import { pngLogoCategories } from '$lib/pngLogoCategories';
 	import { debug } from '$lib/debug';
 	import GameCell from './GameCell.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
 	import { statsStore } from '$lib/stores';
 	import { onMount, tick } from 'svelte';
-	import { resolve } from '$app/paths';
+	import { asset } from '$app/paths';
 
 	interface Props {
 		rowCategories: string[];
@@ -58,14 +58,12 @@
 	const resultTemplate = ({
 		grid,
 		score,
-		t,
 		$languageStore,
 		date
 	}: {
 		grid: string;
 		score: number;
-		t: (key: string, lang: string) => string;
-		$languageStore: string;
+		$languageStore: Language;
 		date: string;
 	}) =>
 `DELDoku ${formatDate(date, $languageStore)}\n 
@@ -88,7 +86,7 @@ https://www.leaffan.net/deldoku
 			if (row < 2) grid += '\n';
 		}
 		const date = challenge?.date || '';
-		return resultTemplate({ grid, score: currentScore, t, $languageStore, date });
+		return resultTemplate({ grid, score: currentScore, $languageStore, date });
 	}
 
 	function copyResultToClipboard() {
@@ -360,7 +358,7 @@ https://www.leaffan.net/deldoku
 <div class="w-full flex flex-col items-center">
 	<div class="mb-3 text-center">
 		<!-- svelte-ignore a11y_missing_attribute -->
-		<img src="{resolve('/img/deldoku.png')}" alt="DELDoku Logo" class="h-20 sm:h-28 md:h-32 w-auto mx-auto mb-2" />
+		<img src={asset('/img/deldoku.png')} alt="DELDoku Logo" class="h-20 sm:h-28 md:h-32 w-auto mx-auto mb-2" />
 		<!-- <h1 class="text-2xl sm:text-3xl font-bold mb-2">{t('title', $languageStore)}</h1> -->
 		{#if challenge?.title}
 			<p class="text-sm text-gray-600 mb-1 flex flex-wrap justify-center items-center gap-2">
