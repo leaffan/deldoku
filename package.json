@@ -7,7 +7,6 @@
 		"dev": "node scripts/dev-php.mjs up && vite dev",
 		"build": "vite build",
 		"preview": "node scripts/dev-php.mjs up && vite preview",
-		"start": "node build",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -15,8 +14,6 @@
 	},
 	"devDependencies": {
 		"@fontsource/fira-mono": "^5.2.7",
-		"@neoconfetti/svelte": "^2.2.2",
-		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.70.4",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
