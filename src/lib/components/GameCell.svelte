@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { DELPlayer } from '$lib/data';
+	import { getCurrentSeason, type DELPlayer } from '$lib/data';
 
 	interface Props {
 		rowCategory: string;
@@ -45,7 +45,7 @@
 			</div>
 			<div class="text-xs opacity-80">
 				{player.first_season} – 
-				{#if player.last_season !== 2026}
+				{#if player.last_season !== getCurrentSeason()}
 					{player.last_season + 1}
 				{/if}
 			</div>
