@@ -1,0 +1,22 @@
+# Wöchentliche Updates gebündelt; Sicherheits-Updates kommen unabhängig davon sofort
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      # Minor- und Patch-Updates in einem PR; Major-Updates einzeln, weil sie eher etwas brechen
+      npm-minor-patch:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      github-actions:
+        patterns: ['*']
