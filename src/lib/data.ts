@@ -133,6 +133,17 @@ export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELD
 	};
 }
 
+// Spieler werden nur über die Zahl vor dem "/" verglichen; der Namensteil dient nur der Lesbarkeit
+// und ist zwischen Spielerliste und Challenges nicht immer gleich kodiert (z. B. "krauß" vs. "krauÃŸ")
+export function playerNumber(playerId: string): string {
+	const pos = playerId.indexOf('/');
+	return pos === -1 ? playerId : playerId.slice(0, pos);
+}
+
+export function samePlayer(a: string, b: string): boolean {
+	return playerNumber(a) === playerNumber(b);
+}
+
 export function validatePlayerMatch(
 	player: DELPlayer,
 	answers: string[][][],
@@ -143,7 +154,7 @@ export function validatePlayerMatch(
 	const expectedPlayerIds = answers[rowIdx][colIdx];
 	
 	// Überprüfe ob der ausgewählte Spieler in den gültigen IDs enthalten ist
-	if (!expectedPlayerIds.includes(player.id)) {
+	if (!expectedPlayerIds.some((id) => samePlayer(id, player.id))) {
 		return false;
 	}
 

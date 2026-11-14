@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { statsStore, languageStore, winRate, playersStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
-	import { getStatsApiUrl, getDailyChallengeDate } from '$lib/data';
+	import { getStatsApiUrl, getDailyChallengeDate, samePlayer } from '$lib/data';
 
 
 	// Gesamtstatistiken für den aktuellen Tag (Svelte 5 $state)
@@ -38,7 +38,7 @@
 	// Find player name based on ID
 	function getPlayerName(playerId: string): string {
 		if (!playerId) return t('emptyCell', $languageStore);
-		const player = $playersStore.find(p => p.id === playerId);
+		const player = $playersStore.find(p => samePlayer(p.id, playerId));
 		return player ? player.name : playerId;
 	}
 </script>

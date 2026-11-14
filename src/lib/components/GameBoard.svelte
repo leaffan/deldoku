@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { DELPlayer, DELDokuChallenge } from '$lib/data';
-	import { validatePlayerMatch, getStatsApiUrl } from '$lib/data';
+	import { validatePlayerMatch, getStatsApiUrl, samePlayer } from '$lib/data';
 	import { playersStore, languageStore } from '$lib/stores';
 	import { t, translations, c, categories, type Language } from '$lib/i18n';
 	import { pngLogoCategories } from '$lib/pngLogoCategories';
@@ -301,7 +301,8 @@ https://www.leaffan.net/deldoku
 
 		// Calculate total number of answers for this cell
 		const totalAnswers = Object.values(usageCounts).reduce((sum, count) => sum + count, 0) || 1;
-		const usageCount = usageCounts[playerId] || 0;
+		// Der Server zählt unter der Schreibweise der Challenge, daher über die Spielernummer suchen
+		const usageCount = Object.entries(usageCounts).reduce((sum, [id, count]) => (samePlayer(id, playerId) ? sum + count : sum), 0);
 		
 		// Dynamic formula: 100 * (1 - usageCount / totalAnswers), minimum 10 points
 		const score = Math.max(10, Math.round(100 * (1 - usageCount / totalAnswers)));
