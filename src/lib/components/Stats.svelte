@@ -34,6 +34,18 @@
 		const player = $playersStore.find((p) => samePlayer(p.id, playerId));
 		return player ? player.name : playerId;
 	}
+
+	// Historie, neuestes Spiel zuerst, mit stabilem Schlüssel pro Spiel: Der Zeitstempel ist nur
+	// sekundengenau, daher bei gleichen Zeitstempeln ein Zähler, damit der Schlüssel eindeutig bleibt
+	let history = $derived.by(() => {
+		const seen: Record<string, number> = {};
+		return $statsStore.gameHistory
+			.map((game) => {
+				const n = (seen[game.timestamp] = (seen[game.timestamp] ?? 0) + 1);
+				return { game, key: `${game.timestamp}#${n}` };
+			})
+			.reverse();
+	});
 </script>
 
 <div class="bg-white rounded-lg shadow-lg p-6">
@@ -126,7 +138,7 @@
 		<div class="border-t pt-6">
 			<h3 class="text-base sm:text-lg font-bold mb-4">{t('gameHistory', $languageStore)}</h3>
 			<div class="space-y-2 sm:space-y-4 max-h-96 overflow-y-auto">
-				{#each $statsStore.gameHistory.slice().reverse() as game, i (i)}
+				{#each history as { game, key } (key)}
 					<div
 						class="border rounded-lg p-2 sm:p-4 {game.won
 							? 'bg-green-50 border-green-300'
