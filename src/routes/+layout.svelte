@@ -29,7 +29,7 @@
 					{t('delStats', $languageStore)}
 				</a>
 				<span class="footer-separator">•</span>
-				<a href="mailto:deldoku@leaffan.net" class="footer-link"> deldoku@leaffan.net </a>
+				<a href="mailto:deldoku@leaffan.net" class="footer-link">deldoku@leaffan.net</a>
 				<span class="footer-separator">•</span>
 				<a
 					href="https://bsky.app/profile/leaffan.bsky.social"
