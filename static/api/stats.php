@@ -340,10 +340,11 @@ function parseSelections($raw) {
             respond(400, ['error' => 'invalid selections']);
         }
         if ($playerId !== '') {
-            if (isset($used[playerNumber($playerId)])) {
+            $number = playerNumber($playerId);
+            if (isset($used[$number])) {
                 respond(400, ['error' => 'player used more than once']);
             }
-            $used[playerNumber($playerId)] = true;
+            $used[$number] = true;
         }
         $selections[$key] = $playerId;
     }
