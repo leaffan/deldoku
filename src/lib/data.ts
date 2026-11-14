@@ -1,8 +1,6 @@
 export interface DELPlayer {
 	id: string;
 	name: string;
-	number?: number;
-	position?: 'C' | 'LW' | 'RW' | 'D' | 'G';
 	nationality: string;
 	first_season: number;
 	last_season: number;
@@ -133,15 +131,15 @@ export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELD
 	};
 }
 
-// Spieler werden nur über die Zahl vor dem "/" verglichen; der Namensteil dient nur der Lesbarkeit
+// Spieler werden nur über ihre numerische Eliteprospects-ID (die Zahl vor dem "/") verglichen; der Namensteil dient nur der Lesbarkeit
 // und ist zwischen Spielerliste und Challenges nicht immer gleich kodiert (z. B. "krauß" vs. "krauÃŸ")
-export function playerNumber(playerId: string): string {
+export function epId(playerId: string): string {
 	const pos = playerId.indexOf('/');
 	return pos === -1 ? playerId : playerId.slice(0, pos);
 }
 
 export function samePlayer(a: string, b: string): boolean {
-	return playerNumber(a) === playerNumber(b);
+	return epId(a) === epId(b);
 }
 
 export function validatePlayerMatch(

@@ -301,7 +301,7 @@ https://www.leaffan.net/deldoku
 
 		// Calculate total number of answers for this cell
 		const totalAnswers = Object.values(usageCounts).reduce((sum, count) => sum + count, 0) || 1;
-		// Der Server zählt unter der Schreibweise der Challenge, daher über die Spielernummer suchen
+		// Der Server zählt unter der Schreibweise der Challenge, daher über die numerische Eliteprospects-ID suchen
 		const usageCount = Object.entries(usageCounts).reduce((sum, [id, count]) => (samePlayer(id, playerId) ? sum + count : sum), 0);
 		
 		// Dynamic formula: 100 * (1 - usageCount / totalAnswers), minimum 10 points

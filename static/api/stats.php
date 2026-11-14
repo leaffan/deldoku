@@ -67,18 +67,18 @@ function isValidPlayerId($playerId) {
         && preg_match('/\A\d+\/[^\s\x00-\x1F\x7F]+\z/u', $playerId) === 1;
 }
 
-// Spieler werden nur über die Zahl vor dem "/" verglichen; der Namensteil dient nur der Lesbarkeit
+// Spieler werden nur über ihre numerischeEliteprospects-ID (die Zahl vor dem "/") verglichen; der Namensteil dient nur der Lesbarkeit
 // und ist zwischen Spielerliste und Challenges nicht immer gleich kodiert (z. B. "krauß" vs. "krauÃŸ")
-function playerNumber($playerId) {
+function epId($playerId) {
     $pos = strpos($playerId, '/');
     return $pos === false ? $playerId : substr($playerId, 0, $pos);
 }
 
 // Schreibweise der Challenge für den Spieler, oder null, wenn er in der Zelle nicht gültig ist
 function matchAnswer($playerId, $valid) {
-    $number = playerNumber($playerId);
+    $epId = epId($playerId);
     foreach ($valid as $answer) {
-        if (is_string($answer) && playerNumber($answer) === $number) {
+        if (is_string($answer) && epId($answer) === $epId) {
             return $answer;
         }
     }
@@ -340,11 +340,11 @@ function parseSelections($raw) {
             respond(400, ['error' => 'invalid selections']);
         }
         if ($playerId !== '') {
-            $number = playerNumber($playerId);
-            if (isset($used[$number])) {
+            $epId = epId($playerId);
+            if (isset($used[$epId])) {
                 respond(400, ['error' => 'player used more than once']);
             }
-            $used[$number] = true;
+            $used[$epId] = true;
         }
         $selections[$key] = $playerId;
     }

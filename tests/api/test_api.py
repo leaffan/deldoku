@@ -238,14 +238,14 @@ check("data/.htaccess denies access", open(f"{data}/.htaccess").read().strip() =
 outside = [p for p in os.listdir(SRV) if p not in ("data", "deldoku")]
 check("nothing written outside data/", outside == [], outside)
 
-# --- D45: players are matched by the number before "/", the name part may differ ---
+# --- D45: players are matched by their numerical Eliteprospects ID (the number before "/"), the name part may differ ---
 V = sel(D1, 1)
 canon = V["0-0"]
 V["0-0"] = canon.split("/")[0] + "/anders-geschrieben"
 st, b = req("POST", body={"date": D1, "selections": V, "userId": u1}, token=t1)
 V_canon = dict(V); V_canon["0-0"] = canon
 exp, _ = expect(u1, D1, V_canon)
-check(f"different name part, same number -> correct, score {exp}",
+check(f"different name part, same EP ID -> correct, score {exp}",
       st == 200 and b["game"]["cellScores"]["0-0"] > 0 and b["game"]["score"] == exp, (st, b))
 st, pub = req("GET", f"?date={D1}")
 check("counts use the challenge spelling, not the submitted one",
@@ -253,10 +253,10 @@ check("counts use the challenge spelling, not the submitted one",
 W2 = sel(D1, 0); W2["0-0"] = "999999/" + W2["0-0"].split("/", 1)[1]
 st, b = req("POST", body={"date": D1, "selections": W2, "userId": u1}, token=t1)
 expect(u1, D1, W2)
-check("same name part, wrong number -> incorrect", st == 200 and b["game"]["cellScores"]["0-0"] == 0, (st, b))
+check("same name part, wrong EP ID -> incorrect", st == 200 and b["game"]["cellScores"]["0-0"] == 0, (st, b))
 Dup = sel(D1, 0); Dup["0-1"] = Dup["0-0"].split("/")[0] + "/zweite-schreibweise"
 st, _ = req("POST", body={"date": D1, "selections": Dup, "userId": u1}, token=t1)
-check("same number in two cells -> 400", st == 400, st)
+check("same EP ID in two cells -> 400", st == 400, st)
 
 # --- corrupt day file is kept, not overwritten ---
 open(f"{data}/day_{D0}.json", "w").write("{broken")
