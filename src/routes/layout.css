@@ -127,3 +127,15 @@ button:focus:not(:focus-visible) {
 	white-space: nowrap;
 }
 }
+
+/* Spielfeld auf schmalen Displays: 4 Spalten passen in die Breite abzüglich 3rem Seitenabstand
+   (1rem Layout + 0.5rem Seite, je beidseitig); ab sm gelten die festen Größen */
+@utility cell-size {
+	width: min(5rem, calc((100vw - 3rem) / 4));
+	height: min(5rem, calc((100vw - 3rem) / 4));
+	flex-shrink: 0; /* alle Zeilen gleich breit halten */
+}
+
+@utility board-width {
+	width: min(20rem, calc(100vw - 3rem));
+}

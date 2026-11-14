@@ -384,7 +384,7 @@ https://www.leaffan.net/deldoku
 	</div>
 
 	<!-- Action Buttons (above game board) -->
-	<div class="mb-2 flex items-stretch gap-2 w-80 sm:w-96 md:w-112 mx-auto">
+	<div class="mb-2 flex items-stretch gap-2 board-width sm:w-96 md:w-112 mx-auto">
 		<button
 			onclick={submitSolution}
 			disabled={gameFinished || answersGiven === 0}
@@ -422,13 +422,13 @@ https://www.leaffan.net/deldoku
 	<div class="inline-block bg-white shadow-lg rounded-lg overflow-hidden max-w-full">
 		<!-- Header with column categories -->
 		<div class="flex">
-			<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gray-200 flex items-center justify-center font-bold text-center text-xs p-2">
+			<div class="cell-size sm:size-24 md:size-28 bg-gray-200 flex items-center justify-center font-bold text-center text-xs p-2">
 			</div>
 			{#each colCategories as colCat}
 				<!-- {@const slug = slugify(colCat)} -->
-				<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-2">
+				<div class="cell-size sm:size-24 md:size-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-1 sm:p-2 hyphens-auto max-sm:overflow-hidden max-sm:wrap-anywhere">
 					{#if logoMap[colCat]}
-						<img src={logoMap[colCat]} alt={getCategoryName(colCat)} class="h-14 w-auto" title={getCategoryName(colCat)} />
+						<img src={logoMap[colCat]} alt={getCategoryName(colCat)} class="max-h-full max-w-full sm:h-14 w-auto object-contain" title={getCategoryName(colCat)} />
 					{:else if /^([a-zA-Z]{2})$/.test(colCat) }
 						<span class={"fi fi-" + colCat.toLowerCase()} role="img" aria-label={countryName(colCat, $languageStore)} title={countryName(colCat, $languageStore)} style="font-size:2.5rem;"></span>
 					{:else}
@@ -442,9 +442,9 @@ https://www.leaffan.net/deldoku
 		{#each rowCategories as rowCat, rowIdx}
 			<!-- {@const rslug = slugify(rowCat)} -->
 			<div class="flex">
-				<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-2">
+				<div class="cell-size sm:size-24 md:size-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-1 sm:p-2 hyphens-auto max-sm:overflow-hidden max-sm:wrap-anywhere">
 					{#if logoMap[rowCat]}
-						<img src={logoMap[rowCat]} alt={getCategoryName(rowCat)} class="h-14 w-auto" title={getCategoryName(rowCat)} />
+						<img src={logoMap[rowCat]} alt={getCategoryName(rowCat)} class="max-h-full max-w-full sm:h-14 w-auto object-contain" title={getCategoryName(rowCat)} />
 					{:else if /^([a-zA-Z]{2})$/.test(rowCat) }
 						<span class={"fi fi-" + rowCat.toLowerCase()} role="img" aria-label={countryName(rowCat, $languageStore)} title={countryName(rowCat, $languageStore)} style="font-size:2.5rem;"></span>
 					{:else}
@@ -481,7 +481,7 @@ https://www.leaffan.net/deldoku
 	</div>
 
 	<!-- Counter and Score Display (below game board) -->
-	<div class="mt-4 flex items-stretch gap-2 w-80 sm:w-96 md:w-112 mx-auto">
+	<div class="mt-4 flex items-stretch gap-2 board-width sm:w-96 md:w-112 mx-auto">
 		<div class={`flex-1 p-2 rounded-lg transition-all ${flashAnswers ? 'scale-105 ring-2 ring-blue-500' : ''} ${gameFinished ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50 border-2 border-gray-300'}`}>
 			<div class={`text-xs sm:text-sm ${gameFinished ? 'font-bold text-blue-800' : 'font-semibold text-gray-700'} text-center whitespace-nowrap`}>
 				{t('answersGiven', $languageStore)}: {answersGiven} / 9
@@ -500,7 +500,7 @@ https://www.leaffan.net/deldoku
 	{/if}
 
 	{#if gameFinished}
-		   <div class="mt-4 flex items-stretch gap-2 w-80 sm:w-96 md:w-112 mx-auto">
+		   <div class="mt-4 flex items-stretch gap-2 board-width sm:w-96 md:w-112 mx-auto">
 			   <button
 				   class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 text-sm sm:text-base rounded-lg transition-colors"
 				   style="width:100%"

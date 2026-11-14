@@ -31,7 +31,7 @@
 <button
 	onclick={onCellClick}
 	aria-label={label}
-	class={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex flex-col items-center justify-center text-center transition-all cursor-pointer
+	class={`cell-size sm:size-24 md:size-28 flex flex-col items-center justify-center text-center transition-all cursor-pointer
 		${isCorrect ? 'bg-green-400 text-white shadow-lg' : isIncorrect ? 'bg-red-400 text-white shadow-lg' : isSelected ? 'bg-blue-300 text-gray-900 shadow-md' : 'bg-white text-gray-900 hover:bg-gray-50'}
 		${player ? 'font-bold text-xs' : 'font-semibold text-2xl'}`}
 >
