@@ -15,10 +15,17 @@ const MAX_SCORE_PER_DAY = 1000; // 9 Zellen à 100 Punkte plus Siegbonus
 const CELL_KEYS = ['0-0', '0-1', '0-2', '1-0', '1-1', '1-2', '2-0', '2-1', '2-2'];
 const DEFAULT_REGISTRATION_LIMIT = 20; // neue Nutzer pro IP und UTC-Tag
 
+// --- Nur für die API-Tests (tests/api): auf dem Server nie gesetzt ---
+// DELDOKU_TEST_TODAY               festes "heute" (YYYY-MM-DD), damit Tests nicht über Mitternacht kippen
+// DELDOKU_TEST_REGISTRATION_LIMIT  eigenes Limit für neue Nutzer, da alle Tests von einer IP kommen
+function testSetting($name) {
+    $value = getenv($name);
+    return $value === false || $value === '' ? null : $value;
+}
+
 function registrationLimit() {
-    // Überschreibbar nur für die API-Tests, die viele Nutzer von einer IP anlegen
-    $env = getenv('DELDOKU_REGISTRATION_LIMIT');
-    return ($env !== false && ctype_digit($env)) ? (int)$env : DEFAULT_REGISTRATION_LIMIT;
+    $env = testSetting('DELDOKU_TEST_REGISTRATION_LIMIT');
+    return ($env !== null && ctype_digit($env)) ? (int)$env : DEFAULT_REGISTRATION_LIMIT;
 }
 
 function respond($status, $data) {
@@ -86,7 +93,8 @@ function matchAnswer($playerId, $valid) {
 }
 
 function utcToday() {
-    return gmdate('Y-m-d');
+    $fixed = testSetting('DELDOKU_TEST_TODAY');
+    return ($fixed !== null && isValidChallengeDate($fixed)) ? $fixed : gmdate('Y-m-d');
 }
 
 function previousDate($date) {
