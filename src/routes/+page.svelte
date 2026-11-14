@@ -138,7 +138,6 @@
 				<GameBoard
 					rowCategories={challenge.rowCategories}
 					colCategories={challenge.colCategories}
-					grid={challenge.grid}
 					{challenge}
 				/>
 

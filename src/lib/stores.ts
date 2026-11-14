@@ -176,7 +176,7 @@ function createLanguageStore() {
 	const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
 	const initialLanguage: Language = savedLanguage === 'en' ? 'en' : 'de';
 
-	const { subscribe, set, update } = writable<Language>(initialLanguage);
+	const { subscribe, update } = writable<Language>(initialLanguage);
 
 	return {
 		subscribe,

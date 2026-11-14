@@ -4,8 +4,6 @@
 	import { languageStore } from '$lib/stores';
 
 	interface Props {
-		rowCategory: string;
-		colCategory: string;
 		player?: DELPlayer | null;
 		onCellClick: () => void;
 		isSelected?: boolean;
@@ -14,16 +12,7 @@
 		label?: string; // Zugänglicher Name inkl. Zustand (richtig/falsch/offen)
 	}
 
-	let {
-		rowCategory,
-		colCategory,
-		player,
-		onCellClick,
-		isSelected,
-		isCorrect,
-		isIncorrect,
-		label
-	}: Props = $props();
+	let { player, onCellClick, isSelected, isCorrect, isIncorrect, label }: Props = $props();
 
 	// Abbreviates first names to initials (for mobile view)
 	function abbreviateName(fullName: string): string {
@@ -50,7 +39,7 @@
 				{#each player.nationality
 					.split(',')
 					.map((n) => n.trim())
-					.sort() as nat}
+					.sort() as nat (nat)}
 					<span
 						class="fi fi-{nat}"
 						role="img"

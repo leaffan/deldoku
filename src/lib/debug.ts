@@ -18,7 +18,7 @@ if (typeof window !== 'undefined') {
 	}
 }
 
-export function debug(...args: any[]) {
+export function debug(...args: unknown[]) {
 	if (debugEnabled) {
 		console.log('[DEBUG]', ...args);
 	}

@@ -2,7 +2,6 @@
 	import { getCurrentSeason, type DELPlayer } from '$lib/data';
 	import { playersStore, languageStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
-	import { debug } from '$lib/debug';
 
 	interface Props {
 		onPlayerSelect: (player: DELPlayer) => void;

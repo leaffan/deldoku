@@ -28,12 +28,6 @@
 		}
 	});
 
-	interface Props {
-		showStats?: boolean;
-	}
-
-	let { showStats = false }: Props = $props();
-
 	// Find player name based on ID
 	function getPlayerName(playerId: string): string {
 		if (!playerId) return t('emptyCell', $languageStore);
@@ -132,7 +126,7 @@
 		<div class="border-t pt-6">
 			<h3 class="text-base sm:text-lg font-bold mb-4">{t('gameHistory', $languageStore)}</h3>
 			<div class="space-y-2 sm:space-y-4 max-h-96 overflow-y-auto">
-				{#each $statsStore.gameHistory.slice().reverse() as game}
+				{#each $statsStore.gameHistory.slice().reverse() as game, i (i)}
 					<div
 						class="border rounded-lg p-2 sm:p-4 {game.won
 							? 'bg-green-50 border-green-300'
@@ -177,7 +171,7 @@
 								>{t('showDetails', $languageStore)}</summary
 							>
 							<div class="mt-2 space-y-1">
-								{#each Object.entries(game.playerSelections) as [cellKey, playerId]}
+								{#each Object.entries(game.playerSelections) as [cellKey, playerId] (cellKey)}
 									{@const score = game.cellScores?.[cellKey] ?? 0}
 									<div class="ml-2 flex justify-between items-center">
 										<div>

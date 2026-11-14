@@ -1,25 +1,24 @@
 <script lang="ts">
 	import type { DELPlayer, DELDokuChallenge } from '$lib/data';
 	import { validatePlayerMatch, getStatsApiUrl, samePlayer } from '$lib/data';
-	import { playersStore, languageStore } from '$lib/stores';
-	import { t, translations, c, categories, type Language } from '$lib/i18n';
+	import { languageStore } from '$lib/stores';
+	import { t, categories, type Language } from '$lib/i18n';
 	import { pngLogoCategories } from '$lib/pngLogoCategories';
 	import { debug } from '$lib/debug';
 	import GameCell from './GameCell.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
 	import { statsStore } from '$lib/stores';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { asset } from '$app/paths';
 	import { modalDialog, countryName } from '$lib/a11y';
 
 	interface Props {
 		rowCategories: string[];
 		colCategories: string[];
-		grid: (DELPlayer | null)[][];
 		challenge: DELDokuChallenge;
 	}
 
-	let { rowCategories, colCategories, grid: initialGrid, challenge }: Props = $props();
+	let { rowCategories, colCategories, challenge }: Props = $props();
 
 	// Create local reactive grid instead of using prop
 	let gameGrid = $state<(DELPlayer | null)[][]>([
@@ -32,7 +31,7 @@
 	let correctCells = $state<string[]>([]);
 	let incorrectCells = $state<string[]>([]);
 	let incorrectPlayersByCell = $state<Record<string, string[]>>({}); // Incorrect players per cell
-	let playerSearchComponent: any = $state(null);
+	let playerSearchComponent: ReturnType<typeof PlayerSearch> | null = $state(null);
 	let isAutoSubmitting = $state(false);
 	let answersGiven = $state(0); // Counts all answers (correct or incorrect)
 	let currentScore = $state<number>(0); // Current score
@@ -134,12 +133,7 @@ https://www.leaffan.net/deldoku
 
 	async function findLogo(category: string) {
 		const appBase = import.meta.env.BASE_URL || '/';
-		let extension = '';
-		if (pngLogoCategories.includes(category)) {
-			extension = '.png';
-		} else {
-			extension = '.svg';
-		}
+		const extension = pngLogoCategories.includes(category) ? '.png' : '.svg';
 		const logo_template = `img/logos/logo_${category.toUpperCase()}${extension}`;
 
 		function join(prefix: string, path: string) {
@@ -154,7 +148,7 @@ https://www.leaffan.net/deldoku
 				logoMap = { ...logoMap, [category]: url };
 				return;
 			}
-		} catch (e) {
+		} catch {
 			debug('No logo found for', category);
 			logoMap = { ...logoMap, [category]: null };
 		}
@@ -170,11 +164,6 @@ https://www.leaffan.net/deldoku
 			if (c.toUpperCase() !== 'OG' && /^[a-zA-Z]{2}$/.test(c)) return; // keine Logo-Suche für ISO-Ländercode
 			findLogo(c);
 		});
-	});
-
-	// Derived state: number of filled cells (correct or incorrect)
-	let filledCells = $derived.by(() => {
-		return gameGrid.flat().filter((p) => p !== null).length;
 	});
 
 	// Tageszählung für die vorläufige Punkteanzeige laden; verbindlich sind die Punkte vom Server
@@ -434,7 +423,7 @@ https://www.leaffan.net/deldoku
 			<div
 				class="cell-size sm:size-24 md:size-28 bg-gray-200 flex items-center justify-center font-bold text-center text-xs p-2"
 			></div>
-			{#each colCategories as colCat}
+			{#each colCategories as colCat, colIdx (colIdx)}
 				<!-- {@const slug = slugify(colCat)} -->
 				<div
 					class="cell-size sm:size-24 md:size-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-1 sm:p-2 hyphens-auto max-sm:overflow-hidden max-sm:wrap-anywhere"
@@ -462,7 +451,7 @@ https://www.leaffan.net/deldoku
 		</div>
 
 		<!-- Grid rows -->
-		{#each rowCategories as rowCat, rowIdx}
+		{#each rowCategories as rowCat, rowIdx (rowIdx)}
 			<!-- {@const rslug = slugify(rowCat)} -->
 			<div class="flex">
 				<div
@@ -487,11 +476,9 @@ https://www.leaffan.net/deldoku
 						{getCategoryName(rowCat)}
 					{/if}
 				</div>
-				{#each colCategories as colCat, colIdx}
+				{#each colCategories, colIdx (colIdx)}
 					<div class="">
 						<GameCell
-							rowCategory={rowCat}
-							colCategory={colCat}
 							player={gameGrid[rowIdx][colIdx]}
 							onCellClick={() => {
 								// Prevent input if game is finished
