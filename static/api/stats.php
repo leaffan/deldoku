@@ -67,6 +67,24 @@ function isValidPlayerId($playerId) {
         && preg_match('/\A\d+\/[^\s\x00-\x1F\x7F]+\z/u', $playerId) === 1;
 }
 
+// Spieler werden nur über ihre numerischeEliteprospects-ID (die Zahl vor dem "/") verglichen; der Namensteil dient nur der Lesbarkeit
+// und ist zwischen Spielerliste und Challenges nicht immer gleich kodiert (z. B. "krauß" vs. "krauÃŸ")
+function epId($playerId) {
+    $pos = strpos($playerId, '/');
+    return $pos === false ? $playerId : substr($playerId, 0, $pos);
+}
+
+// Schreibweise der Challenge für den Spieler, oder null, wenn er in der Zelle nicht gültig ist
+function matchAnswer($playerId, $valid) {
+    $epId = epId($playerId);
+    foreach ($valid as $answer) {
+        if (is_string($answer) && epId($answer) === $epId) {
+            return $answer;
+        }
+    }
+    return null;
+}
+
 function utcToday() {
     return gmdate('Y-m-d');
 }
@@ -322,10 +340,11 @@ function parseSelections($raw) {
             respond(400, ['error' => 'invalid selections']);
         }
         if ($playerId !== '') {
-            if (isset($used[$playerId])) {
+            $epId = epId($playerId);
+            if (isset($used[$epId])) {
                 respond(400, ['error' => 'player used more than once']);
             }
-            $used[$playerId] = true;
+            $used[$epId] = true;
         }
         $selections[$key] = $playerId;
     }
@@ -410,10 +429,15 @@ function handlePost() {
             $playerId = $selections[$key];
             list($row, $col) = array_map('intval', explode('-', $key));
             $valid = isset($answers[$row][$col]) && is_array($answers[$row][$col]) ? $answers[$row][$col] : [];
-            if ($playerId === '' || !in_array($playerId, $valid, true)) {
+            $match = $playerId === '' ? null : matchAnswer($playerId, $valid);
+            if ($match === null) {
                 $cellScores[$key] = 0;
                 continue;
             }
+            // Ab hier gilt die Schreibweise der Challenge, damit ein anderer Namensteil keine
+            // eigene Zählung (und damit volle Seltenheitspunkte) bekommt
+            $playerId = $match;
+            $selections[$key] = $match;
             $counts = isset($day['cells'][$key]) ? $day['cells'][$key] : [];
             // Punkte gegen den Stand vor diesem Spiel berechnen
             $cellScores[$key] = cellScore($counts, $playerId);
