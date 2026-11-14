@@ -4,7 +4,6 @@
 	import { t } from '$lib/i18n';
 	import { getStatsApiUrl, getDailyChallengeDate, samePlayer } from '$lib/data';
 
-
 	// Gesamtstatistiken für den aktuellen Tag (Svelte 5 $state)
 	let avgCorrectAnswers = $state<number | null>(null);
 	let avgScore = $state<number | null>(null);
@@ -38,7 +37,7 @@
 	// Find player name based on ID
 	function getPlayerName(playerId: string): string {
 		if (!playerId) return t('emptyCell', $languageStore);
-		const player = $playersStore.find(p => samePlayer(p.id, playerId));
+		const player = $playersStore.find((p) => samePlayer(p.id, playerId));
 		return player ? player.name : playerId;
 	}
 </script>
@@ -56,15 +55,25 @@
 			<div class="grid grid-cols-3 gap-2 sm:gap-4">
 				<div class="bg-gray-50 p-2 sm:p-4 rounded-lg">
 					<div class="text-xl sm:text-2xl font-bold text-gray-700">{totalGamesToday ?? 0}</div>
-					<div class="text-xs sm:text-sm text-gray-600">{t('globalStatsGamesToday', $languageStore)}</div>
+					<div class="text-xs sm:text-sm text-gray-600">
+						{t('globalStatsGamesToday', $languageStore)}
+					</div>
 				</div>
 				<div class="bg-gray-50 p-2 sm:p-4 rounded-lg">
-					<div class="text-xl sm:text-2xl font-bold text-gray-700">{avgCorrectAnswers !== null ? avgCorrectAnswers.toFixed(2) : '-'}</div>
-					<div class="text-xs sm:text-sm text-gray-600">{t('globalStatsAvgCorrect', $languageStore)}</div>
+					<div class="text-xl sm:text-2xl font-bold text-gray-700">
+						{avgCorrectAnswers !== null ? avgCorrectAnswers.toFixed(2) : '-'}
+					</div>
+					<div class="text-xs sm:text-sm text-gray-600">
+						{t('globalStatsAvgCorrect', $languageStore)}
+					</div>
 				</div>
 				<div class="bg-gray-50 p-2 sm:p-4 rounded-lg">
-					<div class="text-xl sm:text-2xl font-bold text-gray-700">{avgScore !== null ? Math.round(avgScore) : '-'}</div>
-					<div class="text-xs sm:text-sm text-gray-600">{t('globalStatsAvgScore', $languageStore)}</div>
+					<div class="text-xl sm:text-2xl font-bold text-gray-700">
+						{avgScore !== null ? Math.round(avgScore) : '-'}
+					</div>
+					<div class="text-xs sm:text-sm text-gray-600">
+						{t('globalStatsAvgScore', $languageStore)}
+					</div>
 				</div>
 			</div>
 		{/if}
@@ -89,23 +98,30 @@
 
 	<div class="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
 		<div class="bg-orange-50 p-2 sm:p-4 rounded-lg">
-			<div class="text-xl sm:text-3xl font-bold text-orange-600">{$statsStore.currentStreak ?? 0}</div>
+			<div class="text-xl sm:text-3xl font-bold text-orange-600">
+				{$statsStore.currentStreak ?? 0}
+			</div>
 			<div class="text-xs sm:text-sm text-gray-600">{t('currentStreak', $languageStore)}</div>
 		</div>
 
 		<div class="bg-orange-50 p-2 sm:p-4 rounded-lg">
-			<div class="text-xl sm:text-3xl font-bold text-orange-600">{$statsStore.longestStreak ?? 0}</div>
+			<div class="text-xl sm:text-3xl font-bold text-orange-600">
+				{$statsStore.longestStreak ?? 0}
+			</div>
 			<div class="text-xs sm:text-sm text-gray-600">{t('longestStreak', $languageStore)}</div>
 		</div>
 
 		<div class="bg-blue-50 p-2 sm:p-4 rounded-lg">
 			<div class="text-xl sm:text-3xl font-bold text-blue-600">
 				{$statsStore.pointsPercent != null
-					? ($statsStore.pointsPercent / 100).toLocaleString($languageStore === 'en' ? 'en-US' : 'de-DE', {
-							style: 'percent',
-							minimumFractionDigits: 1,
-							maximumFractionDigits: 1
-						})
+					? ($statsStore.pointsPercent / 100).toLocaleString(
+							$languageStore === 'en' ? 'en-US' : 'de-DE',
+							{
+								style: 'percent',
+								minimumFractionDigits: 1,
+								maximumFractionDigits: 1
+							}
+						)
 					: '-'}
 			</div>
 			<div class="text-xs sm:text-sm text-gray-600">{t('pointsPercent', $languageStore)}</div>
@@ -117,44 +133,64 @@
 			<h3 class="text-base sm:text-lg font-bold mb-4">{t('gameHistory', $languageStore)}</h3>
 			<div class="space-y-2 sm:space-y-4 max-h-96 overflow-y-auto">
 				{#each $statsStore.gameHistory.slice().reverse() as game}
-					<div class="border rounded-lg p-2 sm:p-4 {game.won ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}">
-						<div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-0 mb-2">
-							<div class="font-semibold text-xs sm:text-sm">{new Date(game.timestamp).toLocaleString($languageStore === 'en' ? 'en-US' : 'de-DE', { 
-								year: 'numeric', 
-								month: '2-digit', 
-								day: '2-digit',
-								hour: '2-digit',
-								minute: '2-digit'
-							})}</div>
+					<div
+						class="border rounded-lg p-2 sm:p-4 {game.won
+							? 'bg-green-50 border-green-300'
+							: 'bg-red-50 border-red-300'}"
+					>
+						<div
+							class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-0 mb-2"
+						>
+							<div class="font-semibold text-xs sm:text-sm">
+								{new Date(game.timestamp).toLocaleString(
+									$languageStore === 'en' ? 'en-US' : 'de-DE',
+									{
+										year: 'numeric',
+										month: '2-digit',
+										day: '2-digit',
+										hour: '2-digit',
+										minute: '2-digit'
+									}
+								)}
+							</div>
 							<div class="flex gap-2 items-center">
 								{#if game.score !== undefined}
 									<span class="text-xs sm:text-sm font-bold text-blue-600">
-									{#if game.won}
-										{game.score - 100} + 100 = {game.score} / 1000
-									{:else}
-										{game.score} / 1000
-									{/if}
+										{#if game.won}
+											{game.score - 100} + 100 = {game.score} / 1000
+										{:else}
+											{game.score} / 1000
+										{/if}
 									</span>
 								{/if}
-								<div class="text-xs sm:text-sm font-bold {game.won ? 'text-green-600' : 'text-red-600'}">
+								<div
+									class="text-xs sm:text-sm font-bold {game.won
+										? 'text-green-600'
+										: 'text-red-600'}"
+								>
 									{game.won ? t('won', $languageStore) : t('lost', $languageStore)}
 								</div>
 							</div>
 						</div>
 						<details class="text-xs text-gray-600">
-						<summary class="cursor-pointer hover:text-gray-800">{t('showDetails', $languageStore)}</summary>
+							<summary class="cursor-pointer hover:text-gray-800"
+								>{t('showDetails', $languageStore)}</summary
+							>
 							<div class="mt-2 space-y-1">
 								{#each Object.entries(game.playerSelections) as [cellKey, playerId]}
 									{@const score = game.cellScores?.[cellKey] ?? 0}
 									<div class="ml-2 flex justify-between items-center">
 										<div>
-											<span class="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-xs">{cellKey}</span>: 
+											<span class="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-xs"
+												>{cellKey}</span
+											>:
 											<span class={playerId ? 'font-semibold' : 'text-gray-400 italic'}>
 												{getPlayerName(playerId)}
 											</span>
 										</div>
 										<span class="text-xs font-bold {score > 0 ? 'text-blue-600' : 'text-red-600'}">
-											{score} {t('pointsShort', $languageStore)}
+											{score}
+											{t('pointsShort', $languageStore)}
 										</span>
 									</div>
 								{/each}

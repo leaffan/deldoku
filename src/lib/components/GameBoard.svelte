@@ -66,7 +66,7 @@
 		$languageStore: Language;
 		date: string;
 	}) =>
-`DELDoku ${formatDate(date, $languageStore)}\n 
+		`DELDoku ${formatDate(date, $languageStore)}\n 
 ${grid}\n
 ${t('score', $languageStore)}: ${score} / 1000\n
 #DELDoku
@@ -82,7 +82,9 @@ https://www.leaffan.net/deldoku
 				// Grün = richtig, Rot = nur falsche Versuche, Weiß = nicht beantwortet
 				grid += correctCells.includes(cellKey)
 					? GREEN
-					: (incorrectPlayersByCell[cellKey]?.length ? RED : '⬜');
+					: incorrectPlayersByCell[cellKey]?.length
+						? RED
+						: '⬜';
 			}
 			if (row < 2) grid += '\n';
 		}
@@ -105,11 +107,12 @@ https://www.leaffan.net/deldoku
 		shareStatusTimeout = setTimeout(() => (shareStatus = null), 2000);
 	}
 
-
-
 	// Derived state: list of used player IDs
 	let usedPlayerIds = $derived.by(() => {
-		return gameGrid.flat().filter(p => p !== null).map(p => p!.id);
+		return gameGrid
+			.flat()
+			.filter((p) => p !== null)
+			.map((p) => p!.id);
 	});
 
 	// Logo loading state: map of slug -> boolean (true if logo exists)
@@ -131,7 +134,7 @@ https://www.leaffan.net/deldoku
 
 	async function findLogo(category: string) {
 		const appBase = import.meta.env.BASE_URL || '/';
-		let extension = "";
+		let extension = '';
 		if (pngLogoCategories.includes(category)) {
 			extension = '.png';
 		} else {
@@ -171,7 +174,7 @@ https://www.leaffan.net/deldoku
 
 	// Derived state: number of filled cells (correct or incorrect)
 	let filledCells = $derived.by(() => {
-		return gameGrid.flat().filter(p => p !== null).length;
+		return gameGrid.flat().filter((p) => p !== null).length;
 	});
 
 	// Tageszählung für die vorläufige Punkteanzeige laden; verbindlich sind die Punkte vom Server
@@ -207,7 +210,9 @@ https://www.leaffan.net/deldoku
 		const key = getCellKey(rowIdx, colIdx);
 		const state = correctCells.includes(key)
 			? `${t('cellCorrect', $languageStore)}: ${gameGrid[rowIdx][colIdx]?.name ?? ''}`
-			: incorrectCells.includes(key) ? t('cellIncorrect', $languageStore) : t('cellOpen', $languageStore);
+			: incorrectCells.includes(key)
+				? t('cellIncorrect', $languageStore)
+				: t('cellOpen', $languageStore);
 		return `${t('row', $languageStore)} ${getCategoryName(rowCategories[rowIdx])}, ${t('column', $languageStore)} ${getCategoryName(colCategories[colIdx])}: ${state}`;
 	}
 
@@ -234,12 +239,7 @@ https://www.leaffan.net/deldoku
 		if (gameFinished || answersGiven >= 9) return;
 		if (selectedCell) {
 			const [row, col] = selectedCell;
-			const isCorrect = validatePlayerMatch(
-				player,
-				challenge.answers,
-				row,
-				col
-			);
+			const isCorrect = validatePlayerMatch(player, challenge.answers, row, col);
 
 			debug('Validating:', player.name, 'at', row, col, '- Correct:', isCorrect);
 			playerSearchComponent?.showFeedback(isCorrect);
@@ -247,27 +247,27 @@ https://www.leaffan.net/deldoku
 			// Increment answer counter (for all answers, correct or incorrect)
 			answersGiven++;
 			debug('Answers given:', answersGiven);
-			
+
 			// Triggere Flash-Animation
 			flashAnswers = true;
-			setTimeout(() => flashAnswers = false, 400);
+			setTimeout(() => (flashAnswers = false), 400);
 
 			const cellKey = getCellKey(row, col);
-			
+
 			if (isCorrect) {
 				// Only enter correct answers into the cell
 				gameGrid[row][col] = player;
 				gameGrid = gameGrid; // Trigger reactivity
 
 				addCorrectCell(cellKey);
-				
+
 				// Calculate score only for this cell
 				await updateScoreForCell(cellKey, player.id);
-				
+
 				// Trigger flash animation for score
 				flashScore = true;
-				setTimeout(() => flashScore = false, 400);
-			
+				setTimeout(() => (flashScore = false), 400);
+
 				// Delay closing overlay on correct answer
 				setTimeout(() => {
 					selectedCell = null;
@@ -276,22 +276,22 @@ https://www.leaffan.net/deldoku
 				addIncorrectCell(cellKey);
 				if (!incorrectPlayersByCell[cellKey]) {
 					incorrectPlayersByCell[cellKey] = [];
-					}
+				}
 				if (!incorrectPlayersByCell[cellKey].includes(player.id)) {
 					incorrectPlayersByCell[cellKey] = [...incorrectPlayersByCell[cellKey], player.id];
 				}
 				// Keep overlay open on incorrect answer
 			}
 
-		// Check if 9 answers have been given
-		if (answersGiven === 9 && !isAutoSubmitting) {
-			debug('9 answers given - auto-submitting...');
-			isAutoSubmitting = true;
-			setTimeout(() => {
-				submitSolution();
-				isAutoSubmitting = false;
-			}, 800);
-		}
+			// Check if 9 answers have been given
+			if (answersGiven === 9 && !isAutoSubmitting) {
+				debug('9 answers given - auto-submitting...');
+				isAutoSubmitting = true;
+				setTimeout(() => {
+					submitSolution();
+					isAutoSubmitting = false;
+				}, 800);
+			}
 		}
 	}
 
@@ -302,16 +302,21 @@ https://www.leaffan.net/deldoku
 		// Calculate total number of answers for this cell
 		const totalAnswers = Object.values(usageCounts).reduce((sum, count) => sum + count, 0) || 1;
 		// Der Server zählt unter der Schreibweise der Challenge, daher über die numerische Eliteprospects-ID suchen
-		const usageCount = Object.entries(usageCounts).reduce((sum, [id, count]) => (samePlayer(id, playerId) ? sum + count : sum), 0);
-		
+		const usageCount = Object.entries(usageCounts).reduce(
+			(sum, [id, count]) => (samePlayer(id, playerId) ? sum + count : sum),
+			0
+		);
+
 		// Dynamic formula: 100 * (1 - usageCount / totalAnswers), minimum 10 points
 		const score = Math.max(10, Math.round(100 * (1 - usageCount / totalAnswers)));
-		
+
 		// Update score and cellScores
 		cellScores[cellKey] = score;
 		currentScore += score;
-		
-		debug(`Score for ${cellKey}: ${playerId} → ${usageCount}/${totalAnswers} usages = ${score} points (Total: ${currentScore})`);
+
+		debug(
+			`Score for ${cellKey}: ${playerId} → ${usageCount}/${totalAnswers} usages = ${score} points (Total: ${currentScore})`
+		);
 	}
 
 	async function submitSolution() {
@@ -331,12 +336,7 @@ https://www.leaffan.net/deldoku
 
 				if (player) {
 					// Cell is filled - check if correct
-					const isCorrect = validatePlayerMatch(
-						player,
-						challenge.answers,
-						row,
-						col
-					);
+					const isCorrect = validatePlayerMatch(player, challenge.answers, row, col);
 
 					if (isCorrect) {
 						correctCount++;
@@ -358,9 +358,13 @@ https://www.leaffan.net/deldoku
 			currentScore += 100;
 			debug(`🎉 Game won! Bonus +100 points → Total: ${currentScore}/1000`);
 		}
-		
+
 		try {
-			const result = await statsStore.submitGame(challenge.date, playerSelections, challenge.isFallback);
+			const result = await statsStore.submitGame(
+				challenge.date,
+				playerSelections,
+				challenge.isFallback
+			);
 			currentScore = result.score;
 			cellScores = result.cellScores;
 		} catch (error) {
@@ -374,7 +378,11 @@ https://www.leaffan.net/deldoku
 
 <div class="w-full flex flex-col items-center">
 	<div class="mb-3 text-center">
-		<img src={asset('/img/deldoku.png')} alt="DELDoku Logo" class="h-20 sm:h-28 md:h-32 w-auto mx-auto mb-2" />
+		<img
+			src={asset('/img/deldoku.png')}
+			alt="DELDoku Logo"
+			class="h-20 sm:h-28 md:h-32 w-auto mx-auto mb-2"
+		/>
 		<!-- <h1 class="text-2xl sm:text-3xl font-bold mb-2">{t('title', $languageStore)}</h1> -->
 		{#if challenge?.title}
 			<p class="text-sm text-gray-600 mb-1 flex flex-wrap justify-center items-center gap-2">
@@ -393,7 +401,7 @@ https://www.leaffan.net/deldoku
 		>
 			{t('submitSolution', $languageStore)}
 		</button>
-		
+
 		<button
 			onclick={async () => {
 				gameGrid = [
@@ -423,15 +431,29 @@ https://www.leaffan.net/deldoku
 	<div class="inline-block bg-white shadow-lg rounded-lg overflow-hidden max-w-full">
 		<!-- Header with column categories -->
 		<div class="flex">
-			<div class="cell-size sm:size-24 md:size-28 bg-gray-200 flex items-center justify-center font-bold text-center text-xs p-2">
-			</div>
+			<div
+				class="cell-size sm:size-24 md:size-28 bg-gray-200 flex items-center justify-center font-bold text-center text-xs p-2"
+			></div>
 			{#each colCategories as colCat}
 				<!-- {@const slug = slugify(colCat)} -->
-				<div class="cell-size sm:size-24 md:size-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-1 sm:p-2 hyphens-auto max-sm:overflow-hidden max-sm:wrap-anywhere">
+				<div
+					class="cell-size sm:size-24 md:size-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-1 sm:p-2 hyphens-auto max-sm:overflow-hidden max-sm:wrap-anywhere"
+				>
 					{#if logoMap[colCat]}
-						<img src={logoMap[colCat]} alt={getCategoryName(colCat)} class="max-h-full max-w-full sm:h-14 w-auto object-contain" title={getCategoryName(colCat)} />
-					{:else if /^([a-zA-Z]{2})$/.test(colCat) }
-						<span class={"fi fi-" + colCat.toLowerCase()} role="img" aria-label={countryName(colCat, $languageStore)} title={countryName(colCat, $languageStore)} style="font-size:2.5rem;"></span>
+						<img
+							src={logoMap[colCat]}
+							alt={getCategoryName(colCat)}
+							class="max-h-full max-w-full sm:h-14 w-auto object-contain"
+							title={getCategoryName(colCat)}
+						/>
+					{:else if /^([a-zA-Z]{2})$/.test(colCat)}
+						<span
+							class={'fi fi-' + colCat.toLowerCase()}
+							role="img"
+							aria-label={countryName(colCat, $languageStore)}
+							title={countryName(colCat, $languageStore)}
+							style="font-size:2.5rem;"
+						></span>
 					{:else}
 						{getCategoryName(colCat)}
 					{/if}
@@ -443,11 +465,24 @@ https://www.leaffan.net/deldoku
 		{#each rowCategories as rowCat, rowIdx}
 			<!-- {@const rslug = slugify(rowCat)} -->
 			<div class="flex">
-				<div class="cell-size sm:size-24 md:size-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-1 sm:p-2 hyphens-auto max-sm:overflow-hidden max-sm:wrap-anywhere">
+				<div
+					class="cell-size sm:size-24 md:size-28 flex items-center justify-center font-bold text-center bg-gray-100 text-xs sm:text-sm p-1 sm:p-2 hyphens-auto max-sm:overflow-hidden max-sm:wrap-anywhere"
+				>
 					{#if logoMap[rowCat]}
-						<img src={logoMap[rowCat]} alt={getCategoryName(rowCat)} class="max-h-full max-w-full sm:h-14 w-auto object-contain" title={getCategoryName(rowCat)} />
-					{:else if /^([a-zA-Z]{2})$/.test(rowCat) }
-						<span class={"fi fi-" + rowCat.toLowerCase()} role="img" aria-label={countryName(rowCat, $languageStore)} title={countryName(rowCat, $languageStore)} style="font-size:2.5rem;"></span>
+						<img
+							src={logoMap[rowCat]}
+							alt={getCategoryName(rowCat)}
+							class="max-h-full max-w-full sm:h-14 w-auto object-contain"
+							title={getCategoryName(rowCat)}
+						/>
+					{:else if /^([a-zA-Z]{2})$/.test(rowCat)}
+						<span
+							class={'fi fi-' + rowCat.toLowerCase()}
+							role="img"
+							aria-label={countryName(rowCat, $languageStore)}
+							title={countryName(rowCat, $languageStore)}
+							style="font-size:2.5rem;"
+						></span>
 					{:else}
 						{getCategoryName(rowCat)}
 					{/if}
@@ -461,11 +496,11 @@ https://www.leaffan.net/deldoku
 							onCellClick={() => {
 								// Prevent input if game is finished
 								if (gameFinished) return;
-								
+
 								// Prevent input in cells with correct answers
 								const cellKey = getCellKey(rowIdx, colIdx);
 								if (correctCells.includes(cellKey)) return;
-								
+
 								selectedCell = [rowIdx, colIdx];
 								playerSearchComponent?.focusInput();
 								debug('Cell clicked:', rowIdx, colIdx, 'selectedCell now:', selectedCell);
@@ -483,44 +518,56 @@ https://www.leaffan.net/deldoku
 
 	<!-- Counter and Score Display (below game board) -->
 	<div class="mt-4 flex items-stretch gap-2 board-width sm:w-96 md:w-112 mx-auto">
-		<div class={`flex-1 p-2 rounded-lg transition-all ${flashAnswers ? 'scale-105 ring-2 ring-blue-500' : ''} ${gameFinished ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50 border-2 border-gray-300'}`}>
-			<div class={`text-xs sm:text-sm ${gameFinished ? 'font-bold text-blue-800' : 'font-semibold text-gray-700'} text-center whitespace-nowrap`}>
+		<div
+			class={`flex-1 p-2 rounded-lg transition-all ${flashAnswers ? 'scale-105 ring-2 ring-blue-500' : ''} ${gameFinished ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50 border-2 border-gray-300'}`}
+		>
+			<div
+				class={`text-xs sm:text-sm ${gameFinished ? 'font-bold text-blue-800' : 'font-semibold text-gray-700'} text-center whitespace-nowrap`}
+			>
 				{t('answersGiven', $languageStore)}: {answersGiven} / 9
 			</div>
 		</div>
-		
-		<div class={`flex-1 p-2 rounded-lg transition-all ${flashScore ? 'scale-105 ring-2 ring-green-500' : ''} ${gameFinished ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50 border-2 border-gray-300'}`}>
-			<div class={`text-xs sm:text-sm ${gameFinished ? 'font-bold text-blue-800' : 'font-semibold text-gray-700'} text-center whitespace-nowrap`}>
+
+		<div
+			class={`flex-1 p-2 rounded-lg transition-all ${flashScore ? 'scale-105 ring-2 ring-green-500' : ''} ${gameFinished ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50 border-2 border-gray-300'}`}
+		>
+			<div
+				class={`text-xs sm:text-sm ${gameFinished ? 'font-bold text-blue-800' : 'font-semibold text-gray-700'} text-center whitespace-nowrap`}
+			>
 				{t('score', $languageStore)}: {currentScore} / 1000
 			</div>
 		</div>
 	</div>
 
 	{#if saveFailed}
-		<p class="mt-2 text-xs sm:text-sm text-red-600 text-center" role="status">{t('saveFailed', $languageStore)}</p>
+		<p class="mt-2 text-xs sm:text-sm text-red-600 text-center" role="status">
+			{t('saveFailed', $languageStore)}
+		</p>
 	{/if}
 
 	{#if gameFinished}
-		   <div class="mt-4 flex items-stretch gap-2 board-width sm:w-96 md:w-112 mx-auto">
-			   <button
-				   class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 text-sm sm:text-base rounded-lg transition-colors"
-				   style="width:100%"
-				   onclick={copyResultToClipboard}
-			   >
+		<div class="mt-4 flex items-stretch gap-2 board-width sm:w-96 md:w-112 mx-auto">
+			<button
+				class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 text-sm sm:text-base rounded-lg transition-colors"
+				style="width:100%"
+				onclick={copyResultToClipboard}
+			>
 				<span aria-live="polite">
-					{shareStatus === 'copied' ? t('shareCopied', $languageStore)
-						: shareStatus === 'failed' ? t('shareFailed', $languageStore)
-						: t('shareResult', $languageStore)}
+					{shareStatus === 'copied'
+						? t('shareCopied', $languageStore)
+						: shareStatus === 'failed'
+							? t('shareFailed', $languageStore)
+							: t('shareResult', $languageStore)}
 				</span>
-			   </button>
-		   </div>
+			</button>
+		</div>
 	{/if}
 
 	<!-- Overlay for player input -->
 	{#if selectedCell !== null}
 		<!-- Klick auf den Hintergrund schließt; per Tastatur übernimmt das Escape in modalDialog -->
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<div 
+		<div
 			role="dialog"
 			aria-modal="true"
 			aria-labelledby="player-dialog-title"
@@ -535,20 +582,26 @@ https://www.leaffan.net/deldoku
 		>
 			<div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl">
 				<div class="mb-4">
-					<h2 id="player-dialog-title" class="text-lg font-bold text-gray-800 mb-2 text-center">{t('selectPlayer', $languageStore)}</h2>
+					<h2 id="player-dialog-title" class="text-lg font-bold text-gray-800 mb-2 text-center">
+						{t('selectPlayer', $languageStore)}
+					</h2>
 					<div class="text-sm text-gray-600 text-center">
-					<span class="font-semibold">{t('row', $languageStore)}:</span> {getCategoryName(rowCategories[selectedCell[0]])} · 
-					<span class="font-semibold">{t('column', $languageStore)}:</span> {getCategoryName(colCategories[selectedCell[1]])}
+						<span class="font-semibold">{t('row', $languageStore)}:</span>
+						{getCategoryName(rowCategories[selectedCell[0]])} ·
+						<span class="font-semibold">{t('column', $languageStore)}:</span>
+						{getCategoryName(colCategories[selectedCell[1]])}
 					</div>
 				</div>
-				<PlayerSearch 
-					bind:this={playerSearchComponent} 
-					onPlayerSelect={handlePlayerSelect} 
-					usedPlayerIds={usedPlayerIds}
-					incorrectPlayerIds={selectedCell ? (incorrectPlayersByCell[getCellKey(selectedCell[0], selectedCell[1])] || []) : []}
+				<PlayerSearch
+					bind:this={playerSearchComponent}
+					onPlayerSelect={handlePlayerSelect}
+					{usedPlayerIds}
+					incorrectPlayerIds={selectedCell
+						? incorrectPlayersByCell[getCellKey(selectedCell[0], selectedCell[1])] || []
+						: []}
 				/>
 				<button
-					onclick={() => selectedCell = null}
+					onclick={() => (selectedCell = null)}
 					class="mt-4 w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors"
 				>
 					{t('cancel', $languageStore)} (ESC)

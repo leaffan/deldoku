@@ -14,13 +14,22 @@
 		label?: string; // Zugänglicher Name inkl. Zustand (richtig/falsch/offen)
 	}
 
-	let { rowCategory, colCategory, player, onCellClick, isSelected, isCorrect, isIncorrect, label }: Props = $props();
+	let {
+		rowCategory,
+		colCategory,
+		player,
+		onCellClick,
+		isSelected,
+		isCorrect,
+		isIncorrect,
+		label
+	}: Props = $props();
 
 	// Abbreviates first names to initials (for mobile view)
 	function abbreviateName(fullName: string): string {
 		const parts = fullName.split(' ');
 		if (parts.length <= 1) return fullName;
-		
+
 		// First part = initial, rest = full name
 		const firstInitial = parts[0].charAt(0) + '.';
 		const lastName = parts.slice(1).join(' ');
@@ -38,8 +47,17 @@
 	{#if player}
 		<div class="flex flex-col items-center justify-center gap-1">
 			<div class="flex flex-row gap-1">
-				{#each player.nationality.split(',').map(n => n.trim()).sort() as nat}
-					<span class="fi fi-{nat}" role="img" aria-label={countryName(nat, $languageStore)} title={countryName(nat, $languageStore)} style="font-size: 1rem;"></span>
+				{#each player.nationality
+					.split(',')
+					.map((n) => n.trim())
+					.sort() as nat}
+					<span
+						class="fi fi-{nat}"
+						role="img"
+						aria-label={countryName(nat, $languageStore)}
+						title={countryName(nat, $languageStore)}
+						style="font-size: 1rem;"
+					></span>
 				{/each}
 			</div>
 			<!-- Full name on larger screens, abbreviated name on mobile devices -->
@@ -48,7 +66,7 @@
 				<span class="sm:hidden">{abbreviateName(player.name)}</span>
 			</div>
 			<div class="text-xs opacity-80">
-				{player.first_season} – 
+				{player.first_season} –
 				{#if player.last_season !== getCurrentSeason()}
 					{player.last_season + 1}
 				{/if}

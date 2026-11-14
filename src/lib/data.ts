@@ -51,7 +51,7 @@ export async function loadPlayers(): Promise<DELPlayer[]> {
 		const basePath = getBasePath();
 		const response = await fetch(`${basePath}all_players.json`);
 		const compressed = await response.json();
-		
+
 		// Transformiere komprimierte Daten zurück zum vollen Format
 		samplePlayers = compressed.map((p: any) => ({
 			id: p.i,
@@ -150,7 +150,7 @@ export function validatePlayerMatch(
 ): boolean {
 	// Hole die gültigen Player-IDs für diese Zelle
 	const expectedPlayerIds = answers[rowIdx][colIdx];
-	
+
 	// Überprüfe ob der ausgewählte Spieler in den gültigen IDs enthalten ist
 	if (!expectedPlayerIds.some((id) => samePlayer(id, player.id))) {
 		return false;

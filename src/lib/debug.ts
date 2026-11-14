@@ -9,7 +9,7 @@ if (typeof window !== 'undefined') {
 	const params = new URLSearchParams(window.location.search);
 	debugEnabled = params.get('debug') === 'true';
 	debugChallenge = params.get('challenge');
-	
+
 	if (debugEnabled) {
 		console.log('🐛 Debug-Modus aktiviert');
 		if (debugChallenge) {
