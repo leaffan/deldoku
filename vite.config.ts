@@ -10,7 +10,13 @@ function phpApiProxy(): Plugin {
 		const match = req.url?.match(/^\/deldoku(?:_tst)?(\/api\/.*)$/);
 		if (!match) return next();
 		const proxyReq = http.request(
-			{ host: 'localhost', port: 8090, path: '/deldoku' + match[1], method: req.method, headers: req.headers },
+			{
+				host: 'localhost',
+				port: 8090,
+				path: '/deldoku' + match[1],
+				method: req.method,
+				headers: req.headers
+			},
 			(proxyRes) => {
 				res.writeHead(proxyRes.statusCode ?? 502, proxyRes.headers);
 				proxyRes.pipe(res);

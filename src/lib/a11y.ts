@@ -33,7 +33,10 @@ export function modalDialog(node: HTMLElement, onClose: () => void) {
 		if (items.length === 0) return;
 		const first = items[0];
 		const last = items[items.length - 1];
-		if (e.shiftKey && (document.activeElement === first || !node.contains(document.activeElement))) {
+		if (
+			e.shiftKey &&
+			(document.activeElement === first || !node.contains(document.activeElement))
+		) {
 			e.preventDefault();
 			last.focus();
 		} else if (!e.shiftKey && document.activeElement === last) {
@@ -57,7 +60,9 @@ export function modalDialog(node: HTMLElement, onClose: () => void) {
 /** Name eines Landes zum ISO-Code in der gewählten Sprache, z. B. "de" → "Deutschland". */
 export function countryName(code: string, lang: string): string {
 	try {
-		return new Intl.DisplayNames([lang], { type: 'region' }).of(code.toUpperCase()) ?? code.toUpperCase();
+		return (
+			new Intl.DisplayNames([lang], { type: 'region' }).of(code.toUpperCase()) ?? code.toUpperCase()
+		);
 	} catch {
 		return code.toUpperCase();
 	}

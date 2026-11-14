@@ -5,12 +5,12 @@ import { readFileSync, writeFileSync, statSync } from 'fs';
 const players = JSON.parse(readFileSync('all_players_uncompressed.json', 'utf-8'));
 
 // Komprimiere die Felder
-const compressed = players.map(p => ({
-  i: p.id,           // id → i
-  n: p.name,         // name → n
-  t: p.nationality,  // nationality → t (territory)
-  f: p.first_season, // first_season → f
-  l: p.last_season   // last_season → l
+const compressed = players.map((p) => ({
+	i: p.id, // id → i
+	n: p.name, // name → n
+	t: p.nationality, // nationality → t (territory)
+	f: p.first_season, // first_season → f
+	l: p.last_season // last_season → l
 }));
 
 // Speichere die komprimierte Version

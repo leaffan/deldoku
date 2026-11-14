@@ -2,7 +2,6 @@
 	import { getCurrentSeason, type DELPlayer } from '$lib/data';
 	import { playersStore, languageStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
-	import { debug } from '$lib/debug';
 
 	interface Props {
 		onPlayerSelect: (player: DELPlayer) => void;
@@ -52,7 +51,9 @@
 	// ID der per Pfeiltaste markierten Option (für aria-activedescendant)
 	let activeOptionId = $derived.by(() => {
 		if (!isOpen || selectedIndex < 0) return undefined;
-		const available = suggestions.filter(p => !usedPlayerIds.includes(p.id) && !incorrectPlayerIds.includes(p.id));
+		const available = suggestions.filter(
+			(p) => !usedPlayerIds.includes(p.id) && !incorrectPlayerIds.includes(p.id)
+		);
 		const player = available[selectedIndex];
 		return player ? `${uid}-opt-${suggestions.indexOf(player)}` : undefined;
 	});
@@ -64,11 +65,12 @@
 		selectedIndex = -1; // Reset selection on new input
 
 		// Get all incorrect answers (always at the beginning)
-		const incorrectPlayers = $playersStore.filter(p => incorrectPlayerIds.includes(p.id));
-		
+		const incorrectPlayers = $playersStore.filter((p) => incorrectPlayerIds.includes(p.id));
+
 		if (input.length > 0) {
 			const filtered = $playersStore.filter(
-				(p) => p.name.toLowerCase().includes(input.toLowerCase()) && !incorrectPlayerIds.includes(p.id)
+				(p) =>
+					p.name.toLowerCase().includes(input.toLowerCase()) && !incorrectPlayerIds.includes(p.id)
 			);
 			// Incorrect answers first, then filtered rest
 			suggestions = [...incorrectPlayers, ...filtered];
@@ -114,8 +116,10 @@
 		if (!isOpen || suggestions.length === 0) return;
 
 		// Filter only available (not used and not already incorrect) players
-		const availableSuggestions = suggestions.filter(p => !usedPlayerIds.includes(p.id) && !incorrectPlayerIds.includes(p.id));
-		
+		const availableSuggestions = suggestions.filter(
+			(p) => !usedPlayerIds.includes(p.id) && !incorrectPlayerIds.includes(p.id)
+		);
+
 		if (availableSuggestions.length === 0) return;
 
 		switch (e.key) {
@@ -155,14 +159,22 @@
 		onblur={handleBlur}
 		onkeydown={handleKeyDown}
 		class="w-full px-3 py-2 border-2 rounded-lg transition-colors
-			{feedbackStatus === 'correct' ? 'border-green-500 bg-green-50' : 
-			 feedbackStatus === 'incorrect' ? 'border-red-500 bg-red-50' : 
-			 'border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500'}"
+			{feedbackStatus === 'correct'
+			? 'border-green-500 bg-green-50'
+			: feedbackStatus === 'incorrect'
+				? 'border-red-500 bg-red-50'
+				: 'border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500'}"
 	/>
 
 	{#if isOpen && suggestions.length > 0}
-		{@const availablePlayers = suggestions.filter(p => !usedPlayerIds.includes(p.id) && !incorrectPlayerIds.includes(p.id))}
-		<ul id="{uid}-list" role="listbox" class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-10 max-h-96 overflow-y-auto">
+		{@const availablePlayers = suggestions.filter(
+			(p) => !usedPlayerIds.includes(p.id) && !incorrectPlayerIds.includes(p.id)
+		)}
+		<ul
+			id="{uid}-list"
+			role="listbox"
+			class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-10 max-h-96 overflow-y-auto"
+		>
 			{#each suggestions as player, index (player.id)}
 				{@const isUsed = usedPlayerIds.includes(player.id)}
 				{@const isIncorrect = incorrectPlayerIds.includes(player.id)}
@@ -175,15 +187,20 @@
 					aria-selected={isSelected}
 					aria-disabled={isDisabled}
 				>
-					<div class={`w-full px-3 py-2 flex justify-between items-center transition-colors
+					<div
+						class={`w-full px-3 py-2 flex justify-between items-center transition-colors
 						${isSelected ? 'bg-blue-100 border-l-4 border-blue-500' : 'hover:bg-gray-50'}
-						${isIncorrect ? 'bg-red-50' : ''}`}>
+						${isIncorrect ? 'bg-red-50' : ''}`}
+					>
 						<div>
 							<div class="font-semibold {isDisabled ? 'line-through text-gray-400' : ''}">
 								{player.name}
-
 							</div>
-							<div class="text-sm text-gray-600">{player.first_season} –  {player.last_season !== getCurrentSeason() ? player.last_season + 1 : ''}</div>
+							<div class="text-sm text-gray-600">
+								{player.first_season} – {player.last_season !== getCurrentSeason()
+									? player.last_season + 1
+									: ''}
+							</div>
 						</div>
 						<!-- Tastatur läuft über die Pfeiltasten im Suchfeld; der Button ist nur für Maus und Touch -->
 						<button
@@ -204,6 +221,10 @@
 
 	<!-- Ansage für Screenreader, ob die Antwort richtig war -->
 	<p class="sr-only" aria-live="assertive">
-		{feedbackStatus === 'correct' ? t('answerCorrect', $languageStore) : feedbackStatus === 'incorrect' ? t('answerIncorrect', $languageStore) : ''}
+		{feedbackStatus === 'correct'
+			? t('answerCorrect', $languageStore)
+			: feedbackStatus === 'incorrect'
+				? t('answerIncorrect', $languageStore)
+				: ''}
 	</p>
 </div>

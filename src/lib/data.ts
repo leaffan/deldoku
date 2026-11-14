@@ -24,6 +24,22 @@ export class NoChallengeError extends Error {
 	}
 }
 
+// Formate der JSON-Dateien, wie sie vom Server kommen
+interface CompressedPlayer {
+	i: string; // id
+	n: string; // name
+	t: string; // nationality
+	f: number; // first_season
+	l: number; // last_season
+}
+
+interface ChallengeFile {
+	title?: DELDokuChallenge['title'];
+	rowCategories: string[];
+	colCategories: string[];
+	answers: string[][][];
+}
+
 export let samplePlayers: DELPlayer[] = [];
 
 function getBasePath(): string {
@@ -50,10 +66,10 @@ export async function loadPlayers(): Promise<DELPlayer[]> {
 	if (samplePlayers.length === 0 && typeof window !== 'undefined') {
 		const basePath = getBasePath();
 		const response = await fetch(`${basePath}all_players.json`);
-		const compressed = await response.json();
-		
+		const compressed: CompressedPlayer[] = await response.json();
+
 		// Transformiere komprimierte Daten zurück zum vollen Format
-		samplePlayers = compressed.map((p: any) => ({
+		samplePlayers = compressed.map((p) => ({
 			id: p.i,
 			name: p.n,
 			nationality: p.t,
@@ -83,7 +99,7 @@ export function getDailyChallengeDate(): string {
 
 // null nur bei 404 (Datei fehlt); Netzwerk-, Server- und Parse-Fehler werden weitergereicht,
 // damit sie als Fehler angezeigt werden statt als "keine Challenge" oder Ersatz-Challenge
-async function fetchChallengeFile(name: string): Promise<any | null> {
+async function fetchChallengeFile(name: string): Promise<ChallengeFile | null> {
 	const response = await fetch(`${getBasePath()}challenges/${name}.json`);
 	if (response.status === 404) {
 		return null;
@@ -150,7 +166,7 @@ export function validatePlayerMatch(
 ): boolean {
 	// Hole die gültigen Player-IDs für diese Zelle
 	const expectedPlayerIds = answers[rowIdx][colIdx];
-	
+
 	// Überprüfe ob der ausgewählte Spieler in den gültigen IDs enthalten ist
 	if (!expectedPlayerIds.some((id) => samePlayer(id, player.id))) {
 		return false;

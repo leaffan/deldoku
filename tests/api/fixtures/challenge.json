@@ -1,22 +1,22 @@
 {
-  "title": { "de": "API-Test", "en": "API test" },
-  "rowCategories": ["row-a", "row-b", "row-c"],
-  "colCategories": ["col-a", "col-b", "col-c"],
-  "answers": [
-    [
-      ["12390/t.j.-mulock", "15224/daniel-wei%C3%9F", "22333/bastian-steingroÃŸ"],
-      ["9001/test-0-1-a", "9002/test-0-1-b", "9003/test-0-1-c"],
-      ["9011/test-0-2-a", "9012/test-0-2-b", "9013/test-0-2-c"]
-    ],
-    [
-      ["9101/test-1-0-a", "9102/test-1-0-b", "9103/test-1-0-c"],
-      ["9111/test-1-1-a", "9112/test-1-1-b", "9113/test-1-1-c"],
-      ["9121/test-1-2-a", "9122/test-1-2-b", "9123/test-1-2-c"]
-    ],
-    [
-      ["9201/test-2-0-a", "9202/test-2-0-b", "9203/test-2-0-c"],
-      ["9211/test-2-1-a", "9212/test-2-1-b", "9213/test-2-1-c"],
-      ["9221/test-2-2-a", "9222/test-2-2-b", "9223/test-2-2-c"]
-    ]
-  ]
+	"title": { "de": "API-Test", "en": "API test" },
+	"rowCategories": ["row-a", "row-b", "row-c"],
+	"colCategories": ["col-a", "col-b", "col-c"],
+	"answers": [
+		[
+			["12390/t.j.-mulock", "15224/daniel-wei%C3%9F", "22333/bastian-steingroÃŸ"],
+			["9001/test-0-1-a", "9002/test-0-1-b", "9003/test-0-1-c"],
+			["9011/test-0-2-a", "9012/test-0-2-b", "9013/test-0-2-c"]
+		],
+		[
+			["9101/test-1-0-a", "9102/test-1-0-b", "9103/test-1-0-c"],
+			["9111/test-1-1-a", "9112/test-1-1-b", "9113/test-1-1-c"],
+			["9121/test-1-2-a", "9122/test-1-2-b", "9123/test-1-2-c"]
+		],
+		[
+			["9201/test-2-0-a", "9202/test-2-0-b", "9203/test-2-0-c"],
+			["9211/test-2-1-a", "9212/test-2-1-b", "9213/test-2-1-c"],
+			["9221/test-2-2-a", "9222/test-2-2-b", "9223/test-2-2-c"]
+		]
+	]
 }

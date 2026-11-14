@@ -1,0 +1,11 @@
+# Erzeugtes und Abhängigkeiten
+build/
+.svelte-kit/
+node_modules/
+pnpm-lock.yaml
+
+# Daten und statische Dateien (Spielerdaten, Logos, PHP)
+static/
+all_players_uncompressed.json
+data/
+.dev-data/

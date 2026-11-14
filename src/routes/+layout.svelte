@@ -20,19 +20,32 @@
 		<div class="footer-content">
 			<p class="footer-title">DELDoku</p>
 			<div class="footer-links">
-				<a href="https://www.leaffan.net/del" target="_blank" rel="noopener noreferrer" class="footer-link">
+				<a
+					href="https://www.leaffan.net/del"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="footer-link"
+				>
 					{t('delStats', $languageStore)}
 				</a>
 				<span class="footer-separator">•</span>
-				<a href="mailto:deldoku@leaffan.net" class="footer-link">
-					deldoku@leaffan.net
-				</a>
+				<a href="mailto:deldoku@leaffan.net" class="footer-link">deldoku@leaffan.net</a>
 				<span class="footer-separator">•</span>
-				<a href="https://bsky.app/profile/leaffan.bsky.social" target="_blank" rel="noopener noreferrer" class="footer-link">
+				<a
+					href="https://bsky.app/profile/leaffan.bsky.social"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="footer-link"
+				>
 					@leaffan.bsky.social
 				</a>
 				<span class="footer-separator">•</span>
-				<a href="https://github.com/leaffan/deldoku" target="_blank" rel="noopener noreferrer" class="footer-link">
+				<a
+					href="https://github.com/leaffan/deldoku"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="footer-link"
+				>
 					deldoku @ GitHub
 				</a>
 			</div>

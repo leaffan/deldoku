@@ -16,57 +16,60 @@
 	let noChallenge = $state(false);
 
 	// Lade Players, Stats und Challenge beim Komponenten-Mount; nicht beim Prerendern im Build
-	if (browser) Promise.all([
-		playersStore.init(),
-		statsStore.init()
-	])
-		.then(async () => {
-			let challengeDate: string | null = null;
-			if (isDebugEnabled()) {
-				challengeDate = getDebugChallenge();
-			}
-			if (challengeDate) {
-				// Challenge-Override: Lade gezielt die Datei
-				try {
-					const basePath = (typeof window !== 'undefined') ? new URL('.', window.location.href).pathname : '/deldoku/';
-					const response = await fetch(`${basePath}challenges/${challengeDate}.json`);
-					if (!response.ok) {
-						throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-					}
-					const challengeData = await response.json();
-					const grid = Array(3).fill(null).map(() => Array(3).fill(null));
-					challenge = {
-						date: challengeDate,
-						title: challengeData.title,
-						rowCategories: challengeData.rowCategories,
-						colCategories: challengeData.colCategories,
-						grid,
-						answers: challengeData.answers
-					};
-					loading = false;
-					return;
-				} catch (err) {
-					console.error('Error loading debug challenge:', err);
-					error = `${t('error', $languageStore)}${err instanceof Error ? err.message : err}`;
-					loading = false;
-					return;
+	if (browser)
+		Promise.all([playersStore.init(), statsStore.init()])
+			.then(async () => {
+				let challengeDate: string | null = null;
+				if (isDebugEnabled()) {
+					challengeDate = getDebugChallenge();
 				}
-			}
-			// Standard: Lade die Tages-Challenge
-			return generateDailyChallenge([]).then((data) => {
-				challenge = data;
+				if (challengeDate) {
+					// Challenge-Override: Lade gezielt die Datei
+					try {
+						const basePath =
+							typeof window !== 'undefined'
+								? new URL('.', window.location.href).pathname
+								: '/deldoku/';
+						const response = await fetch(`${basePath}challenges/${challengeDate}.json`);
+						if (!response.ok) {
+							throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+						}
+						const challengeData = await response.json();
+						const grid = Array(3)
+							.fill(null)
+							.map(() => Array(3).fill(null));
+						challenge = {
+							date: challengeDate,
+							title: challengeData.title,
+							rowCategories: challengeData.rowCategories,
+							colCategories: challengeData.colCategories,
+							grid,
+							answers: challengeData.answers
+						};
+						loading = false;
+						return;
+					} catch (err) {
+						console.error('Error loading debug challenge:', err);
+						error = `${t('error', $languageStore)}${err instanceof Error ? err.message : err}`;
+						loading = false;
+						return;
+					}
+				}
+				// Standard: Lade die Tages-Challenge
+				return generateDailyChallenge([]).then((data) => {
+					challenge = data;
+					loading = false;
+				});
+			})
+			.catch((err) => {
+				if (err instanceof NoChallengeError) {
+					noChallenge = true;
+				} else {
+					console.error('Error loading game:', err);
+					error = `${t('error', $languageStore)}${err.message}`;
+				}
 				loading = false;
 			});
-		})
-		.catch((err) => {
-			if (err instanceof NoChallengeError) {
-				noChallenge = true;
-			} else {
-				console.error('Error loading game:', err);
-				error = `${t('error', $languageStore)}${err.message}`;
-			}
-			loading = false;
-		});
 </script>
 
 <svelte:head>
@@ -75,18 +78,23 @@
 </svelte:head>
 
 <header class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-4">
-   <div class="max-w-4xl mx-auto flex justify-between items-center">
-	   <div class="flex items-center gap-3">
-		   <h1 class="text-lg sm:text-xl font-bold">DELDoku</h1>
-	   </div>
-	   <div class="flex items-center gap-3">
+	<div class="max-w-4xl mx-auto flex justify-between items-center">
+		<div class="flex items-center gap-3">
+			<h1 class="text-lg sm:text-xl font-bold">DELDoku</h1>
+		</div>
+		<div class="flex items-center gap-3">
 			<button
-				onclick={() => showRules = true}
+				onclick={() => (showRules = true)}
 				class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 rounded-lg transition-colors"
 				aria-label={t('howToPlay', $languageStore)}
 			>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+					/>
 				</svg>
 				<span class="hidden sm:inline">{t('howToPlay', $languageStore)}</span>
 			</button>
@@ -130,13 +138,12 @@
 				<GameBoard
 					rowCategories={challenge.rowCategories}
 					colCategories={challenge.colCategories}
-					grid={challenge.grid}
 					{challenge}
 				/>
 
 				<div class="text-center">
 					<button
-						onclick={() => showStats = !showStats}
+						onclick={() => (showStats = !showStats)}
 						class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 text-sm sm:text-base rounded-lg transition-colors"
 					>
 						{showStats ? t('hideStats', $languageStore) : t('showStats', $languageStore)}
@@ -155,7 +162,7 @@
 {#if showRules}
 	<!-- Klick auf den Hintergrund schließt; per Tastatur übernimmt das Escape in modalDialog -->
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
-	<div 
+	<div
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="rules-dialog-title"
@@ -169,14 +176,16 @@
 		}}
 	>
 		<div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-			<h2 id="rules-dialog-title" class="text-2xl font-bold text-gray-800 mb-4">{t('howToPlay', $languageStore)}</h2>
-			
+			<h2 id="rules-dialog-title" class="text-2xl font-bold text-gray-800 mb-4">
+				{t('howToPlay', $languageStore)}
+			</h2>
+
 			<div class="space-y-4 text-gray-700">
 				<div>
 					<h3 class="font-bold text-lg mb-2">{t('rulesGoal', $languageStore)}</h3>
 					<p>{t('rulesGoalText', $languageStore)}</p>
 				</div>
-				
+
 				<div>
 					<h3 class="font-bold text-lg mb-2">{t('rulesHowTo', $languageStore)}</h3>
 					<ul class="list-disc list-inside space-y-1">
@@ -186,7 +195,7 @@
 						<li>{t('rulesHowTo4', $languageStore)}</li>
 					</ul>
 				</div>
-				
+
 				<div>
 					<h3 class="font-bold text-lg mb-2">{t('rulesScoring', $languageStore)}</h3>
 					<ul class="list-disc list-inside space-y-1">
@@ -197,9 +206,9 @@
 					</ul>
 				</div>
 			</div>
-			
+
 			<button
-				onclick={() => showRules = false}
+				onclick={() => (showRules = false)}
 				class="mt-6 w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors"
 			>
 				{t('close', $languageStore)}
@@ -212,7 +221,8 @@
 	:global(body) {
 		margin: 0;
 		padding: 0;
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-			'Open Sans', 'Helvetica Neue', sans-serif;
+		font-family:
+			-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+			'Helvetica Neue', sans-serif;
 	}
 </style>
