@@ -1,0 +1,5 @@
+# Commits, die nur umformatieren; git blame überspringt sie.
+# Lokal einmalig aktivieren: git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Apply Prettier formatting and LF line endings
+a2a3f0215c262b8c53a713f3a945c1198fb6a231
