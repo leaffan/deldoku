@@ -10,20 +10,30 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write .",
 		"dev:down": "node scripts/dev-php.mjs down"
 	},
 	"devDependencies": {
+		"@eslint/js": "^10.0.1",
 		"@fontsource/fira-mono": "^5.2.7",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.70.4",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
 		"@tailwindcss/vite": "^4.3.5",
 		"@types/node": "^25.0.3",
+		"eslint": "^10.14.0",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-svelte": "^3.24.1",
 		"flag-icons": "7.2.3",
+		"globals": "^17.14.0",
+		"prettier": "^3.10.1",
+		"prettier-plugin-svelte": "^4.1.1",
 		"svelte": "^5.55.7",
 		"svelte-check": "^4.3.4",
 		"tailwindcss": "^4.3.5",
 		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.72.2",
 		"vite": "^8.1.6"
 	}
 }

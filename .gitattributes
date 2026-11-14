@@ -1,2 +1,12 @@
-*.py text eol=lf
-*.sh text eol=lf
+# Alle Textdateien mit LF im Repo und im Arbeitsverzeichnis (Windows und WSL teilen sich ein Checkout)
+* text=auto eol=lf
+
+# Binärdateien nie anfassen
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
