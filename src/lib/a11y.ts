@@ -3,13 +3,29 @@
 const FOCUSABLE =
 	'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+// Zuletzt fokussiertes Element außerhalb modaler Dialoge. Das Suchfeld im Spielerdialog holt sich
+// den Fokus schon beim Einhängen, bevor modalDialog läuft; document.activeElement zeigt dann
+// bereits in den Dialog und taugt nicht mehr als Ziel für die Fokus-Rückgabe.
+let lastFocusOutsideDialog: HTMLElement | null = null;
+if (typeof document !== 'undefined') {
+	document.addEventListener(
+		'focusin',
+		(e) => {
+			const el = e.target as HTMLElement;
+			if (!el.closest?.('[aria-modal="true"]')) lastFocusOutsideDialog = el;
+		},
+		true
+	);
+}
+
 /**
  * Svelte-Action für modale Dialoge: hält den Tab-Fokus im Element, schließt mit Escape
  * und gibt den Fokus beim Schließen an das zuvor fokussierte Element zurück.
  */
 export function modalDialog(node: HTMLElement, onClose: () => void) {
 	let close = onClose;
-	const previouslyFocused = document.activeElement as HTMLElement | null;
+	const active = document.activeElement as HTMLElement | null;
+	const previouslyFocused = active && node.contains(active) ? lastFocusOutsideDialog : active;
 
 	// Nur fokussieren, wenn nicht schon ein Kindelement (z. B. das Suchfeld) den Fokus hat
 	queueMicrotask(() => {

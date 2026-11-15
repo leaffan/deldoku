@@ -13,11 +13,13 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"test:unit": "vitest run",
+		"test:e2e": "playwright test",
 		"dev:down": "node scripts/dev-php.mjs down"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
 		"@fontsource/fira-mono": "^5.3.0",
+		"@playwright/test": "^1.65.1",
 		"@sveltejs/adapter-static": "^3.0.11",
 		"@sveltejs/kit": "^2.70.4",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",

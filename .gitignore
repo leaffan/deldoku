@@ -28,3 +28,8 @@ static/challenges/*
 
 # Lokale Daten des PHP-Dev-Containers
 /.dev-data
+
+# E2E-Tests (Playwright): Server-Verzeichnis und Ergebnisse
+/.e2e-server
+/test-results
+/playwright-report

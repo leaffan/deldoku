@@ -9,3 +9,8 @@ static/
 all_players_uncompressed.json
 data/
 .dev-data/
+
+# E2E-Tests (Playwright)
+.e2e-server/
+test-results/
+playwright-report/

@@ -7,7 +7,19 @@ import ts from 'typescript-eslint';
 import svelteConfig from './svelte.config.js';
 
 export default defineConfig(
-	{ ignores: ['build/', '.svelte-kit/', 'node_modules/', 'static/', 'data/', '.dev-data/'] },
+	{
+		ignores: [
+			'build/',
+			'.svelte-kit/',
+			'node_modules/',
+			'static/',
+			'data/',
+			'.dev-data/',
+			'.e2e-server/',
+			'test-results/',
+			'playwright-report/'
+		]
+	},
 	js.configs.recommended,
 	...ts.configs.recommended,
 	...svelte.configs.recommended,
