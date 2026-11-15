@@ -1,6 +1,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig, type Connect, type Plugin } from 'vite';
+import type { Connect, Plugin } from 'vite';
+import { defineConfig } from 'vitest/config';
 import http from 'node:http';
 
 // Leitet /deldoku[_tst]/api/* an den PHP-Container aus docker-compose.yml weiter.
@@ -46,5 +47,10 @@ export default defineConfig({
 	build: {
 		// Flaggen einzeln ausliefern statt alle ~400 SVGs ins CSS einzubetten; sie werden nur bei Bedarf geladen
 		assetsInlineLimit: (filePath) => (filePath.includes('/flag-icons/') ? false : undefined)
+	},
+	test: {
+		// Unit-Tests liegen neben dem Code (z. B. src/lib/data.test.ts); fetch und window werden gemockt
+		include: ['src/**/*.test.ts'],
+		environment: 'node'
 	}
 });
