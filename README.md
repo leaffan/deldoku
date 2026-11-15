@@ -57,6 +57,22 @@ Tags have no `v` prefix (`2.0.0`). To release:
    ```
    The notes are grouped by PR label (see `.github/release.yml`), so label PRs like their issues.
 
+## Backups
+
+`scripts/backup.sh` archives the server-side game data (`data/`) as `tar.gz` and deletes its own archives older than the given number of days. It holds the same lock as `stats.php` while archiving, so no game is half in the backup. Run it daily via cron, with the backup directory outside the web root:
+
+```sh
+# m h dom mon dow  command
+15 3 * * * bash <repo-scripts>/backup.sh <data-dir> <backup-dir> 14
+```
+
+To restore, unpack the archive next to the live data and swap the directories (games played since the backup are lost):
+
+```sh
+mkdir restore && tar -xzf <backup-dir>/deldoku-data-<timestamp>.tar.gz -C restore
+mv <data-dir> <data-dir>.broken && mv restore/data <data-dir>
+```
+
 ## Technology Stack
 
 - **Framework**: SvelteKit 2
