@@ -51,6 +51,7 @@ beforeEach(async () => {
 afterEach(() => {
 	vi.useRealTimers();
 	vi.unstubAllGlobals();
+	vi.unstubAllEnvs();
 });
 
 describe('epId / samePlayer', () => {
@@ -98,7 +99,10 @@ describe('validatePlayerMatch', () => {
 
 describe('getDailyChallengeDate', () => {
 	it('uses the UTC date, not the local one', () => {
-		// 23:30 UTC is already the next day in Germany
+		// 23:30 UTC is already the next day in Germany; force that time zone so the test also
+		// catches local-time regressions on machines (e.g. CI) that run in UTC
+		vi.stubEnv('TZ', 'Europe/Berlin');
+		expect(new Date().getDate()).toBe(16);
 		expect(data.getDailyChallengeDate()).toBe('2030-06-15');
 	});
 });
