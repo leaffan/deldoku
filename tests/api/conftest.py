@@ -118,6 +118,16 @@ def free_port():
         return sock.getsockname()[1]
 
 
+def stop_process(proc):
+    """Beendet den PHP-Server; reagiert er nicht auf terminate(), wird er hart beendet."""
+    proc.terminate()
+    try:
+        proc.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        proc.wait(timeout=5)
+
+
 @pytest.fixture(scope="session")
 def server(tmp_path_factory):
     root = tmp_path_factory.mktemp("srv")
@@ -148,12 +158,11 @@ def server(tmp_path_factory):
         except OSError:
             time.sleep(0.1)
     else:
-        proc.terminate()
+        stop_process(proc)
         pytest.fail("PHP server did not start")
 
     yield Server(root, base_url)
-    proc.terminate()
-    proc.wait(timeout=5)
+    stop_process(proc)
 
 
 @pytest.fixture(autouse=True)
