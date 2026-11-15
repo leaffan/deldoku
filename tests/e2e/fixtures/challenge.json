@@ -1,0 +1,10 @@
+{
+	"title": { "de": "E2E-Test", "en": "E2E test" },
+	"rowCategories": ["10_g_career_po", "30_pts_career_po", "50_gp_career_po"],
+	"colCategories": ["1990s", "2000s", "2010s"],
+	"answers": [
+		[["900001/anton-ahorn"], ["900002/berta-birke"], ["900003/carl-cedar"]],
+		[["900004/dora-eiche"], ["900005/emil-esche"], ["900006/frida-fichte"]],
+		[["900007/gustav-ginkgo"], ["900008/hanna-hasel"], ["900009/ida-ilex"]]
+	]
+}
