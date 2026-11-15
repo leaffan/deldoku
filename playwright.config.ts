@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { TODAY } from './tests/e2e/constants';
 
 // E2E-Tests gegen den Produktions-Build und das echte stats.php (PHP 8.2 in Docker, siehe
 // tests/e2e/serve.sh). Vorher `pnpm build` ausführen.
@@ -31,9 +32,10 @@ export default defineConfig({
 		}
 	],
 	webServer: {
-		command: 'bash tests/e2e/serve.sh',
+		// Als Argumente, nicht als Umgebungsvariablen: Unter Windows startet `bash` die WSL-Bash, und
+		// dort kommen Umgebungsvariablen nicht an
+		command: `bash tests/e2e/serve.sh ${TODAY} ${PORT}`,
 		url: `http://127.0.0.1:${PORT}/deldoku/`,
-		env: { E2E_PORT: String(PORT) },
 		// PHP protokolliert jeden Request; nur bei Bedarf anzeigen (E2E_SERVER_LOG=1)
 		stderr: process.env.E2E_SERVER_LOG ? 'pipe' : 'ignore',
 		reuseExistingServer: false,

@@ -2,8 +2,9 @@ import { test as base, expect, type Locator, type Page } from '@playwright/test'
 import { mkdir, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
-/** Fester Spieltag; muss zu TODAY in serve.sh passen (dort heißt die Test-Challenge so). */
-export const TODAY = '2030-06-15';
+import { TODAY } from './constants';
+
+export { TODAY };
 
 // data/ des Test-Servers (serve.sh); der Container läuft mit unserer User-ID, wir dürfen es leeren
 const DATA_DIR = fileURLToPath(new URL('../../.e2e-server/data', import.meta.url));

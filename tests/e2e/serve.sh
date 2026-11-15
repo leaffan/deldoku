@@ -3,11 +3,12 @@
 #   <root>/deldoku/   Build, dazu Test-Spielerliste und Test-Challenge aus tests/e2e/fixtures
 #   <root>/data/      leer; die Tests leeren es vor jedem Test (siehe fixtures.ts)
 # Wird von Playwright gestartet (playwright.config.ts); setzt `pnpm build` voraus.
+# Aufruf: serve.sh <datum> <port>; das Datum kommt aus tests/e2e/constants.ts
 set -euo pipefail
 REPO=$(cd "$(dirname "$0")/../.." && pwd)
 ROOT="$REPO/.e2e-server"
-PORT="${E2E_PORT:-8091}"
-TODAY=2030-06-15 # muss zu TODAY in fixtures.ts passen
+TODAY="${1:?Datum fehlt}"
+PORT="${2:?Port fehlt}"
 CONTAINER=deldoku-e2e
 
 if [ ! -f "$REPO/build/index.html" ]; then
