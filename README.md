@@ -35,6 +35,28 @@ pnpm run build
 
 You can preview the production build with `pnpm run preview`.
 
+## Releases
+
+Versions follow [SemVer](https://semver.org/):
+
+- **MAJOR**: incompatible for players or stored data (e.g. stats format changes)
+- **MINOR**: new features
+- **PATCH**: fixes
+
+Tags have no `v` prefix (`2.0.0`). To release:
+
+1. Bump `version` in `package.json` in a PR and merge it (the footer shows this version).
+2. Tag the merge commit on `main` and push the tag:
+   ```sh
+   git tag -a 2.0.0 -m "2.0.0"
+   git push origin 2.0.0
+   ```
+3. Create the GitHub release from the tag with generated notes:
+   ```sh
+   gh release create 2.0.0 --generate-notes
+   ```
+   The notes are grouped by PR label (see `.github/release.yml`), so label PRs like their issues.
+
 ## Technology Stack
 
 - **Framework**: SvelteKit 2

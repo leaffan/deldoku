@@ -2,7 +2,10 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import type { Connect, Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
+import { readFileSync } from 'node:fs';
 import http from 'node:http';
+
+const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8'));
 
 // Leitet /deldoku[_tst]/api/* an den PHP-Container aus docker-compose.yml weiter.
 // Muss vor SvelteKit laufen, sonst wird static/api/stats.php als Quelltext ausgeliefert.
@@ -44,6 +47,8 @@ function phpApiProxy(): Plugin {
 
 export default defineConfig({
 	plugins: [phpApiProxy(), tailwindcss(), sveltekit()],
+	// Version aus package.json für den Footer
+	define: { __APP_VERSION__: JSON.stringify(version) },
 	build: {
 		// Flaggen einzeln ausliefern statt alle ~400 SVGs ins CSS einzubetten; sie werden nur bei Bedarf geladen
 		assetsInlineLimit: (filePath) => (filePath.includes('/flag-icons/') ? false : undefined)

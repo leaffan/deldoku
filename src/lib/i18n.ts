@@ -48,6 +48,7 @@ export type Translations = {
 	points: string;
 	noGamesYet: string;
 	delStats: string;
+	version: string;
 	todaysTopic: string;
 	shareResult: string;
 	shareCopied: string;
@@ -541,6 +542,7 @@ export const translations: Record<Language, Translations> = {
 		points: 'Pkt',
 		noGamesYet: 'Noch keine Spiele gespielt. Starten Sie ein Spiel um Statistiken zu sammeln!',
 		delStats: 'DEL-Statistiken',
+		version: 'Version',
 		globalStatsTitle: '🌍 Gesamtstatistiken (heute)',
 		globalStatsLoading: 'Lade Gesamtstatistiken...',
 		globalStatsError: 'Fehler: ',
@@ -611,6 +613,7 @@ export const translations: Record<Language, Translations> = {
 		points: 'Pts',
 		noGamesYet: 'No games played yet. Start a game to collect statistics!',
 		delStats: 'DEL Statistics',
+		version: 'Version',
 		globalStatsTitle: '🌍 Global Statistics (today)',
 		globalStatsLoading: 'Loading global statistics...',
 		globalStatsError: 'Error: ',

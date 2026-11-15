@@ -5,6 +5,8 @@
 
 	let { children } = $props();
 
+	const version = __APP_VERSION__;
+
 	// Seitensprache für Screenreader und Silbentrennung an die gewählte Sprache anpassen
 	$effect(() => {
 		document.documentElement.lang = $languageStore;
@@ -18,7 +20,18 @@
 
 	<footer>
 		<div class="footer-content">
-			<p class="footer-title">DELDoku</p>
+			<p class="footer-title">
+				DELDoku
+				<a
+					href="https://github.com/leaffan/deldoku/releases/tag/{version}"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="footer-version"
+					aria-label="{t('version', $languageStore)} {version}"
+				>
+					{version}
+				</a>
+			</p>
 			<div class="footer-links">
 				<a
 					href="https://www.leaffan.net/del"
@@ -93,6 +106,18 @@
 		margin: 0;
 		font-weight: 600;
 		color: #495057;
+	}
+
+	.footer-version {
+		margin-left: 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 400;
+		color: #6c757d;
+		text-decoration: none;
+	}
+
+	.footer-version:hover {
+		text-decoration: underline;
 	}
 
 	.footer-links {
