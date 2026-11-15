@@ -1,0 +1,17 @@
+# Gruppiert die automatisch erzeugten Release Notes (aus den PR-Titeln) nach Labels
+changelog:
+  exclude:
+    labels: [duplicate, invalid, wontfix]
+  categories:
+    - title: Fixes
+      labels: [defect, bug]
+    - title: Features
+      labels: [enhancement]
+    - title: Infrastructure
+      labels: [infra]
+    - title: Documentation
+      labels: [documentation]
+    - title: Dependencies
+      labels: [dependencies]
+    - title: Other
+      labels: ['*']
