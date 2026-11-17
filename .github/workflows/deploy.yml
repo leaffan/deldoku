@@ -1,6 +1,7 @@
 name: Deploy
 
-# Testinstanz: automatisch, sobald die CI auf main grün ist.
+# Testinstanz: automatisch, sobald die CI auf main grün ist, oder manuell mit einem beliebigen Branch
+# (zum Ausprobieren vor dem Merge; der nächste Merge auf main überschreibt ihn wieder).
 # Live: manuell mit einem Release-Tag; das Environment "production" verlangt eine Freigabe.
 # Host, Zugang und Ziel stehen nur in den Environment-Secrets; der Deploy-Schlüssel ist auf dem
 # Server auf das Instanzverzeichnis beschränkt. Das Repo ist öffentlich, also auch die Logs:
@@ -12,42 +13,49 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
+      environment:
+        description: 'test: the branch selected above; production: the release tag below'
+        type: choice
+        options: [test, production]
+        default: test
       tag:
-        description: Release tag to deploy to production (e.g. 2.0.0)
-        required: true
+        description: Release tag for production (e.g. 2.0.0)
+        required: false
 
 permissions:
   contents: read
 
 jobs:
   deploy:
-    name: Deploy to ${{ github.event_name == 'workflow_dispatch' && 'production' || 'test' }}
+    name: Deploy to ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'test' }}
     # Nur nach erfolgreicher CI eines Pushs auf main (nicht nach dem wöchentlichen Audit-Lauf)
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.event_name == 'workflow_dispatch' && 'production' || 'test' }}
+      name: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'test' }}
       url: ${{ vars.DEPLOY_URL }}
     concurrency:
-      group: deploy-${{ github.event_name == 'workflow_dispatch' && 'production' || 'test' }}
+      group: deploy-${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'test' }}
       cancel-in-progress: false
     env:
+      PRODUCTION: ${{ github.event_name == 'workflow_dispatch' && inputs.environment == 'production' }}
       TAG: ${{ inputs.tag }}
     steps:
       - name: Check release tag
-        if: github.event_name == 'workflow_dispatch'
+        if: env.PRODUCTION == 'true'
         run: |
           [[ $TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::'$TAG' is not a release tag like 2.0.0"; exit 1; }
 
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.event.workflow_run.head_sha }}
+          # production: der Tag; test von Hand: der gewählte Branch; test automatisch: der Commit der CI
+          ref: ${{ env.PRODUCTION == 'true' && format('refs/tags/{0}', inputs.tag) || github.event.workflow_run.head_sha || github.sha }}
           fetch-depth: 0
 
       - name: Check that the tag is on main and matches package.json
-        if: github.event_name == 'workflow_dispatch'
+        if: env.PRODUCTION == 'true'
         run: |
           git merge-base --is-ancestor HEAD origin/main || { echo "::error::$TAG is not on main"; exit 1; }
           version=$(node -p "require('./package.json').version")
@@ -66,7 +74,7 @@ jobs:
         run: pnpm build
         env:
           # Basispfad /deldoku_tst statt /deldoku (svelte.config.js)
-          VITE_BUILD_ENV: ${{ github.event_name == 'workflow_dispatch' && 'production' || 'test' }}
+          VITE_BUILD_ENV: ${{ env.PRODUCTION == 'true' && 'production' || 'test' }}
 
       - name: Set up SSH
         env:

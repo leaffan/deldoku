@@ -61,7 +61,7 @@ Tags have no `v` prefix (`2.0.0`). To release:
 
 `.github/workflows/deploy.yml` builds and uploads the app with `rsync`:
 
-- **Test instance** (`/deldoku_tst`): automatically after CI passes on `main`.
+- **Test instance** (`/deldoku_tst`): automatically after CI passes on `main`. To try a branch on the server before merging, run the workflow manually on that branch with environment `test`; the next merge to `main` replaces it again.
 - **Production** (`/deldoku`): run the workflow manually with a release tag (e.g. `2.0.0`); the `production` environment asks for approval. The tag must be on `main` and match `package.json`.
 
 The upload runs in two passes (new files first, then `index.html` and deleting outdated files), so visitors never get a page whose scripts are missing. Daily challenges on the server are never touched; only `challenges/fallback.json` is deployed. A smoke test then checks that the page shows the deployed version and that the stats API answers.
