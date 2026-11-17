@@ -105,7 +105,8 @@ jobs:
             challenges=(--filter='+ /challenges/' --filter='+ /challenges/fallback.json'
               --filter='+ /challenges/.htaccess' --filter='- /challenges/*')
           else
-            challenges=(--filter='- /challenges/')
+            # Ohne "/" am Ende: passt auch auf den Symlink auf dem Server, sonst löscht --delete-after ihn
+            challenges=(--filter='- /challenges')
           fi
           sync() {
             rsync -rlz --checksum --chmod=D755,F644 -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes" \
