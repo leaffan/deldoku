@@ -91,11 +91,12 @@ jobs:
           TARGET: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
         run: |
           # Der Schlüssel ist serverseitig per rrsync auf das Instanzverzeichnis beschränkt; "./" ist dessen Wurzel.
-          # challenges/: nur fallback.json ausliefern, die Tages-Challenges auf dem Server nie anfassen
-          # (ausgeschlossene Dateien sind auch vor --delete geschützt).
+          # challenges/: nur fallback.json und .htaccess (verhindert das Auflisten) ausliefern, die Tages-Challenges
+          # auf dem Server nie anfassen (ausgeschlossene Dateien sind auch vor --delete geschützt).
           sync() {
             rsync -rlz --checksum --chmod=D755,F644 -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes" \
-              --filter='+ /challenges/' --filter='+ /challenges/fallback.json' --filter='- /challenges/*' \
+              --filter='+ /challenges/' --filter='+ /challenges/fallback.json' --filter='+ /challenges/.htaccess' \
+              --filter='- /challenges/*' \
               "$@" build/ "$TARGET:./"
           }
           # 1. Neue Dateien neben die alten legen; index.html verweist noch auf die alten Skripte
