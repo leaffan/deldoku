@@ -71,7 +71,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm build
+        run: |
+          # Commit als Build-Kennung in _app/version.json, damit der Smoke-Test genau diesen Build erkennt
+          BUILD_SHA=$(git rev-parse HEAD) pnpm build
+          # Die Testinstanz nicht in Suchmaschinen aufnehmen
+          if [ "$PRODUCTION" != true ]; then
+            printf 'User-agent: *\nDisallow: /\n' > build/robots.txt
+          fi
         env:
           # Basispfad /deldoku_tst statt /deldoku (svelte.config.js)
           VITE_BUILD_ENV: ${{ env.PRODUCTION == 'true' && 'production' || 'test' }}
@@ -93,11 +99,17 @@ jobs:
           # Der Schlüssel ist serverseitig per rrsync auf das Instanzverzeichnis beschränkt; "./" ist dessen Wurzel.
           # challenges/: nur fallback.json und .htaccess (verhindert das Auflisten) ausliefern, die Tages-Challenges
           # auf dem Server nie anfassen (ausgeschlossene Dateien sind auch vor --delete geschützt).
+          # Die Testinstanz teilt sich challenges/ mit der Produktion und lässt das Verzeichnis ganz aus, damit
+          # ein Branch nie die Dateien der Produktion überschreibt.
+          if [ "$PRODUCTION" = true ]; then
+            challenges=(--filter='+ /challenges/' --filter='+ /challenges/fallback.json'
+              --filter='+ /challenges/.htaccess' --filter='- /challenges/*')
+          else
+            challenges=(--filter='- /challenges/')
+          fi
           sync() {
             rsync -rlz --checksum --chmod=D755,F644 -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes" \
-              --filter='+ /challenges/' --filter='+ /challenges/fallback.json' --filter='+ /challenges/.htaccess' \
-              --filter='- /challenges/*' \
-              "$@" build/ "$TARGET:./"
+              "${challenges[@]}" "$@" build/ "$TARGET:./"
           }
           # 1. Neue Dateien neben die alten legen; index.html verweist noch auf die alten Skripte
           sync --exclude=/index.html
@@ -113,6 +125,11 @@ jobs:
           # Der Footer verlinkt das Release der ausgelieferten Version
           grep -q "releases/tag/$version\"" <<<"$page" \
             || { echo "::error::page does not show version $version"; exit 1; }
+          # Zwischen zwei Releases bleibt die Version gleich; erst der Commit belegt, dass dieser Build online ist
+          sha=$(git rev-parse HEAD)
+          curl -fsS --retry 3 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/_app/version.json" \
+            | jq -e --arg sha "$sha" '.version == $sha' >/dev/null \
+            || { echo "::error::server does not run build $sha"; exit 1; }
           curl -fsS --retry 3 --retry-all-errors "$URL/api/stats.php?date=$(date -u +%F)" \
             | jq -e 'type == "object"' >/dev/null \
             || { echo "::error::stats API did not return JSON"; exit 1; }

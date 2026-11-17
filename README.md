@@ -64,15 +64,25 @@ Tags have no `v` prefix (`2.0.0`). To release:
 - **Test instance** (`/deldoku_tst`): automatically after CI passes on `main`. To try a branch on the server before merging, run the workflow manually on that branch with environment `test`; the next merge to `main` replaces it again.
 - **Production** (`/deldoku`): run the workflow manually with a release tag (e.g. `2.0.0`); the `production` environment asks for approval. The tag must be on `main` and match `package.json`.
 
-The upload runs in two passes (new files first, then `index.html` and deleting outdated files), so visitors never get a page whose scripts are missing. Daily challenges on the server are never touched; only `challenges/fallback.json` and `challenges/.htaccess` are deployed. A smoke test then checks that the page shows the deployed version and that the stats API answers.
+The upload runs in two passes (new files first, then `index.html` and deleting outdated files), so visitors never get a page whose scripts are missing. Daily challenges on the server are never touched; production deploys only `challenges/fallback.json` and `challenges/.htaccess`, the test instance leaves `challenges/` out entirely. The test instance gets a `robots.txt` that disallows indexing. A smoke test then checks that the page shows the deployed version, that the server runs the deployed commit (`_app/version.json`) and that the stats API answers.
 
 Each environment (`test`, `production`) needs these secrets: `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY` (a dedicated key, restricted on the server to that instance's directory) and `DEPLOY_KNOWN_HOSTS`, plus the variable `DEPLOY_URL` (public URL of the instance).
 
+Restrict the deployment branches of `production` to `main`: a manual run uses `deploy.yml` from the selected branch, so otherwise a branch could run a modified workflow with the production secrets. `test` allows all branches, so branches can be tried before merging.
+
 The test instance stores its game data in `data_tst/`, separate from production's `data/`.
+
+### Server setup
+
+- PHP 8.0 or newer (`stats.php` uses `str_ends_with`).
+- Restrict each deploy key to its instance directory with `rrsync` in `~/.ssh/authorized_keys`:
+  ```
+  command="rrsync <instance-dir>",restrict ssh-ed25519 <public-key> deploy-<environment>
+  ```
 
 ## Backups
 
-`scripts/backup.sh` archives the server-side game data (`data/`) as `tar.gz` and deletes its own archives older than the given number of days. It holds the same lock as `stats.php` while archiving, so no game is half in the backup. Run it daily via cron, with the backup directory outside the web root:
+`scripts/backup.sh` archives the server-side game data (`data/`) as `tar.gz` and deletes its own archives older than the given number of days. It holds the same lock as `stats.php` while archiving, so no game is half in the backup. The test instance's data (`data_tst/`) is deliberately not backed up. Run the script daily via cron, with the backup directory outside the web root:
 
 ```sh
 # m h dom mon dow  command
