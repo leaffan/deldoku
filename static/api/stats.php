@@ -36,8 +36,10 @@ function respond($status, $data) {
     exit;
 }
 
+// Jede Instanz hat eigene Daten neben dem Instanzverzeichnis: deldoku/ -> data/, deldoku_tst/ -> data_tst/
 function dataDir() {
-    return __DIR__ . '/../../data';
+    $suffix = str_ends_with(basename(dirname(__DIR__)), '_tst') ? '_tst' : '';
+    return __DIR__ . "/../../data$suffix";
 }
 
 function ensureDataDirs() {

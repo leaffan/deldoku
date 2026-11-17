@@ -12,6 +12,7 @@ import subprocess
 import time
 import urllib.error
 import urllib.request
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -54,8 +55,8 @@ class User:
 class Api:
     """Minimal client for api/stats.php. Every call returns (status, parsed JSON or raw text)."""
 
-    def __init__(self, base_url):
-        self.url = base_url + "/deldoku/api/stats.php"
+    def __init__(self, base_url, instance="deldoku"):
+        self.url = f"{base_url}/{instance}/api/stats.php"
 
     def request(self, method, query="", body=None, token=None, raw=None):
         data = raw if raw is not None else (json.dumps(body).encode() if body is not None else None)
@@ -128,10 +129,10 @@ def stop_process(proc):
         proc.wait(timeout=5)
 
 
-@pytest.fixture(scope="session")
-def server(tmp_path_factory):
-    root = tmp_path_factory.mktemp("srv")
-    api_dir = root / "deldoku" / "api"
+@contextmanager
+def php_server(root, instance="deldoku"):
+    """Serve root with PHP's built-in server; stats.php is copied to root/<instance>/api."""
+    api_dir = root / instance / "api"
     api_dir.mkdir(parents=True)
     stats = api_dir / "stats.php"
     shutil.copy(REPO / "static" / "api" / "stats.php", stats)
@@ -150,7 +151,6 @@ def server(tmp_path_factory):
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
-    base_url = f"http://127.0.0.1:{port}"
     for _ in range(50):
         try:
             with socket.create_connection(("127.0.0.1", port), timeout=0.2):
@@ -161,8 +161,17 @@ def server(tmp_path_factory):
         stop_process(proc)
         pytest.fail("PHP server did not start")
 
-    yield Server(root, base_url)
-    stop_process(proc)
+    try:
+        yield f"http://127.0.0.1:{port}"
+    finally:
+        stop_process(proc)
+
+
+@pytest.fixture(scope="session")
+def server(tmp_path_factory):
+    root = tmp_path_factory.mktemp("srv")
+    with php_server(root) as base_url:
+        yield Server(root, base_url)
 
 
 @pytest.fixture(autouse=True)

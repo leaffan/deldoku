@@ -1,0 +1,110 @@
+name: Deploy
+
+# Testinstanz: automatisch, sobald die CI auf main grün ist.
+# Live: manuell mit einem Release-Tag; das Environment "production" verlangt eine Freigabe.
+# Host, Zugang und Ziel stehen nur in den Environment-Secrets; der Deploy-Schlüssel ist auf dem
+# Server auf das Instanzverzeichnis beschränkt. Das Repo ist öffentlich, also auch die Logs:
+# nichts ausgeben, was Pfade oder Dateilisten verrät.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to deploy to production (e.g. 2.0.0)
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to ${{ github.event_name == 'workflow_dispatch' && 'production' || 'test' }}
+    # Nur nach erfolgreicher CI eines Pushs auf main (nicht nach dem wöchentlichen Audit-Lauf)
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event_name == 'workflow_dispatch' && 'production' || 'test' }}
+      url: ${{ vars.DEPLOY_URL }}
+    concurrency:
+      group: deploy-${{ github.event_name == 'workflow_dispatch' && 'production' || 'test' }}
+      cancel-in-progress: false
+    env:
+      TAG: ${{ inputs.tag }}
+    steps:
+      - name: Check release tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          [[ $TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::'$TAG' is not a release tag like 2.0.0"; exit 1; }
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Check that the tag is on main and matches package.json
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git merge-base --is-ancestor HEAD origin/main || { echo "::error::$TAG is not on main"; exit 1; }
+          version=$(node -p "require('./package.json').version")
+          [ "$version" = "$TAG" ] || { echo "::error::package.json has $version, not $TAG"; exit 1; }
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 12
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+        env:
+          # Basispfad /deldoku_tst statt /deldoku (svelte.config.js)
+          VITE_BUILD_ENV: ${{ github.event_name == 'workflow_dispatch' && 'production' || 'test' }}
+
+      - name: Set up SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          install -m 600 /dev/null ~/.ssh/deploy_key
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Upload
+        env:
+          TARGET: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
+        run: |
+          # Der Schlüssel ist serverseitig per rrsync auf das Instanzverzeichnis beschränkt; "./" ist dessen Wurzel.
+          # challenges/: nur fallback.json ausliefern, die Tages-Challenges auf dem Server nie anfassen
+          # (ausgeschlossene Dateien sind auch vor --delete geschützt).
+          sync() {
+            rsync -rlz --checksum --chmod=D755,F644 -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes" \
+              --filter='+ /challenges/' --filter='+ /challenges/fallback.json' --filter='- /challenges/*' \
+              "$@" build/ "$TARGET:./"
+          }
+          # 1. Neue Dateien neben die alten legen; index.html verweist noch auf die alten Skripte
+          sync --exclude=/index.html
+          # 2. index.html umstellen und erst dann veraltete Dateien löschen
+          sync --delete-after
+
+      - name: Smoke test
+        env:
+          URL: ${{ vars.DEPLOY_URL }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          page=$(curl -fsS --retry 3 --retry-all-errors "$URL/")
+          # Der Footer verlinkt das Release der ausgelieferten Version
+          grep -q "releases/tag/$version\"" <<<"$page" \
+            || { echo "::error::page does not show version $version"; exit 1; }
+          curl -fsS --retry 3 --retry-all-errors "$URL/api/stats.php?date=$(date -u +%F)" \
+            | jq -e 'type == "object"' >/dev/null \
+            || { echo "::error::stats API did not return JSON"; exit 1; }
+          echo "Deployed $version, page and API respond"
