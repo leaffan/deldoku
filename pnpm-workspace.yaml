@@ -22,3 +22,10 @@ overrides:
   nanoid@<3.3.18: ^3.3.18
   postcss@<8.5.23: ^8.5.23
   source-map-js@<1.2.2: ^1.2.2
+
+# Vom Audit ausgenommene Meldungen, jeweils mit Begründung; bei jedem Upgrade prüfen, ob sie entfallen.
+auditConfig:
+  ignoreGhsas:
+    # SvelteKit: DoS beim Parsen von Formulardaten für Remote Functions (behoben erst in Kit 3.1.1).
+    # Nicht ausnutzbar: adapter-static, auf dem Server läuft kein SvelteKit-Code. Entfällt mit #25.
+    - GHSA-3r8g-jcqq-3p5j
