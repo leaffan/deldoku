@@ -23,9 +23,14 @@ overrides:
   postcss@<8.5.23: ^8.5.23
   source-map-js@<1.2.2: ^1.2.2
 
-# Vom Audit ausgenommene Meldungen, jeweils mit Begründung; bei jedem Upgrade prüfen, ob sie entfallen.
+# Vorübergehend ignorierte Meldungen, jeweils bei uns nicht ausnutzbar:
 auditConfig:
   ignoreGhsas:
-    # SvelteKit: DoS beim Parsen von Formulardaten für Remote Functions (behoben erst in Kit 3.1.1).
-    # Nicht ausnutzbar: adapter-static, auf dem Server läuft kein SvelteKit-Code. Entfällt mit #25.
+    # ReDoS in picomatch: nur Build-Werkzeug, verarbeitet keine fremden Muster. Noch keine
+    # korrigierte Version; sobald es eine gibt, entfernen und unter overrides eine Untergrenze ergänzen.
+    - GHSA-fc5q-39xc-vjpf
+    # SvelteKit, Weiterleitung über enhanced form submission: keine Form Actions/use:enhance,
+    # adapter-static ohne Server. Behoben erst in 3.1.1; entfernen mit dem Upgrade auf SvelteKit 3.
+    # pnpm meldet die erste ID, die Advisory-Seite die zweite.
     - GHSA-3r8g-jcqq-3p5j
+    - GHSA-pfhg-q3qv-9q6r
