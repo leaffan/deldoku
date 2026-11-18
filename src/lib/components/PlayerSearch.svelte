@@ -2,6 +2,7 @@
 	import { getCurrentSeason, type DELPlayer } from '$lib/data';
 	import { playersStore, languageStore } from '$lib/stores';
 	import { t } from '$lib/i18n';
+	import { playerMatches, prepareQuery } from '$lib/search';
 
 	interface Props {
 		onPlayerSelect: (player: DELPlayer) => void;
@@ -68,9 +69,9 @@
 		const incorrectPlayers = $playersStore.filter((p) => incorrectPlayerIds.includes(p.id));
 
 		if (input.length > 0) {
+			const queryForms = prepareQuery(input);
 			const filtered = $playersStore.filter(
-				(p) =>
-					p.name.toLowerCase().includes(input.toLowerCase()) && !incorrectPlayerIds.includes(p.id)
+				(p) => playerMatches(p, queryForms) && !incorrectPlayerIds.includes(p.id)
 			);
 			// Incorrect answers first, then filtered rest
 			suggestions = [...incorrectPlayers, ...filtered];
