@@ -43,7 +43,8 @@ describe('playerMatches', () => {
 
 	it.each([
 		['Müller', 'mux'],
-		['Smith', 'smyth']
+		['Smith', 'smyth'],
+		['Smith', '   ']
 	])('%s is not found by %j', (name, query) => {
 		expect(finds(name, query)).toBe(false);
 	});
