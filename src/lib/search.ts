@@ -38,7 +38,8 @@ function playerForms(player: DELPlayer): string[] {
 
 /** Vorbereitete Eingabe; einmal pro Tastendruck berechnen und für alle Spieler verwenden. */
 export function prepareQuery(query: string): string[] {
-	return searchForms(query.trim());
+	const trimmed = query.trim();
+	return trimmed.length === 0 ? [] : searchForms(trimmed);
 }
 
 export function playerMatches(player: DELPlayer, queryForms: string[]): boolean {
