@@ -18,7 +18,7 @@ export function searchForms(text: string): string[] {
 		.replaceAll('ä', 'ae')
 		.replaceAll('ö', 'oe')
 		.replaceAll('ü', 'ue')
-		.replaceAll('ß', 'ss') /* … ö, ü, ß */;
+		.replaceAll('ß', 'ss'); /* … ö, ü, ß */
 	// Ergebnis zusammenstellen: Einzigartige Formen von Original und transkribiert
 	return [...new Set([strip(lower), strip(transcribed)])];
 }
