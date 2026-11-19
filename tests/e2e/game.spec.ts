@@ -98,3 +98,24 @@ test('can be played with the keyboard alone', { tag: '@keyboard' }, async ({ gam
 	await expect(game.dialog).toBeHidden();
 	await expect(game.cell(0, 1)).toBeFocused();
 });
+
+test('deletes the own data after confirmation', async ({ game, page }) => {
+	await game.answer(0, 0, PLAYERS.anton.name);
+	await game.closeDialog();
+	await game.submit.click();
+	await game.expectScore(100);
+
+	await page.getByRole('button', { name: 'Statistiken anzeigen' }).click();
+	await page.getByRole('button', { name: 'Meine Daten löschen' }).click();
+	// Abbrechen lässt alles, wie es ist
+	await page.getByRole('button', { name: 'Abbrechen' }).click();
+	await page.getByRole('button', { name: 'Meine Daten löschen' }).click();
+	await page.getByRole('button', { name: 'Endgültig löschen' }).click();
+	await expect(page.getByText('Deine Daten wurden gelöscht.')).toBeVisible();
+
+	// Lokaler Login ist entfernt, nach dem Neuladen gibt es keine Statistik mehr
+	expect(await page.evaluate(() => localStorage.getItem('del_doku_auth'))).toBeNull();
+	await page.reload();
+	await page.getByRole('button', { name: 'Statistiken anzeigen' }).click();
+	await expect(page.getByText('Noch keine Spiele gespielt.', { exact: false })).toBeVisible();
+});
