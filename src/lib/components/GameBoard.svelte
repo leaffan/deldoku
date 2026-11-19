@@ -1,16 +1,16 @@
 <script lang="ts">
-	import type { DELPlayer, DELDokuChallenge } from '$lib/data';
-	import { validatePlayerMatch, getStatsApiUrl, samePlayer } from '$lib/data';
-	import { languageStore } from '$lib/stores';
-	import { t, categories, type Language } from '$lib/i18n';
-	import { pngLogoCategories } from '$lib/pngLogoCategories';
-	import { debug } from '$lib/debug';
+	import type { DELPlayer, DELDokuChallenge } from '#lib/data.ts';
+	import { validatePlayerMatch, getStatsApiUrl, samePlayer } from '#lib/data.ts';
+	import { languageStore } from '#lib/stores.ts';
+	import { t, categories, type Language } from '#lib/i18n.ts';
+	import { pngLogoCategories } from '#lib/pngLogoCategories.ts';
+	import { debug } from '#lib/debug.ts';
 	import GameCell from './GameCell.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
-	import { statsStore } from '$lib/stores';
+	import { statsStore } from '#lib/stores.ts';
 	import { onMount } from 'svelte';
 	import { asset } from '$app/paths';
-	import { modalDialog, countryName } from '$lib/a11y';
+	import { modalDialog, countryName } from '#lib/a11y.ts';
 
 	interface Props {
 		rowCategories: string[];
@@ -368,7 +368,7 @@ https://www.leaffan.net/deldoku
 <div class="w-full flex flex-col items-center">
 	<div class="mb-3 text-center">
 		<img
-			src={asset('/img/deldoku.png')}
+			src={asset('img/deldoku.png')}
 			alt="DELDoku Logo"
 			class="h-20 sm:h-28 md:h-32 w-auto mx-auto mb-2"
 		/>

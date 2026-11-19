@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { getCurrentSeason, type DELPlayer } from '$lib/data';
-	import { playersStore, languageStore } from '$lib/stores';
-	import { t } from '$lib/i18n';
-	import { playerMatches, prepareQuery } from '$lib/search';
+	import { getCurrentSeason, type DELPlayer } from '#lib/data.ts';
+	import { playersStore, languageStore } from '#lib/stores.ts';
+	import { t } from '#lib/i18n.ts';
+	import { playerMatches, prepareQuery } from '#lib/search.ts';
 
 	interface Props {
 		onPlayerSelect: (player: DELPlayer) => void;

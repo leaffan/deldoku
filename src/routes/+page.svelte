@@ -1,12 +1,12 @@
 <script lang="ts">
-	import GameBoard from '$lib/components/GameBoard.svelte';
-	import Stats from '$lib/components/Stats.svelte';
-	import { generateDailyChallenge, NoChallengeError, type DELDokuChallenge } from '$lib/data';
-	import { playersStore, languageStore, statsStore } from '$lib/stores';
-	import { t } from '$lib/i18n';
-	import { modalDialog } from '$lib/a11y';
-	import { getDebugChallenge, isDebugEnabled } from '$lib/debug';
-	import { browser } from '$app/environment';
+	import GameBoard from '#lib/components/GameBoard.svelte';
+	import Stats from '#lib/components/Stats.svelte';
+	import { generateDailyChallenge, NoChallengeError, type DELDokuChallenge } from '#lib/data.ts';
+	import { playersStore, languageStore, statsStore } from '#lib/stores.ts';
+	import { t } from '#lib/i18n.ts';
+	import { modalDialog } from '#lib/a11y.ts';
+	import { getDebugChallenge, isDebugEnabled } from '#lib/debug.ts';
+	import { browser } from '$app/env';
 
 	let showStats = $state(false);
 	let showRules = $state(false);

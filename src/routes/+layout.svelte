@@ -1,7 +1,7 @@
 <script lang="ts">
 	import './layout.css';
-	import { languageStore } from '$lib/stores';
-	import { t } from '$lib/i18n';
+	import { languageStore } from '#lib/stores.ts';
+	import { t } from '#lib/i18n.ts';
 
 	let { children } = $props();
 

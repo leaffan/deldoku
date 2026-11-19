@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { statsStore, languageStore, winRate, playersStore } from '$lib/stores';
-	import { t } from '$lib/i18n';
-	import { getStatsApiUrl, getDailyChallengeDate, samePlayer } from '$lib/data';
+	import { statsStore, languageStore, winRate, playersStore } from '#lib/stores.ts';
+	import { t } from '#lib/i18n.ts';
+	import { getStatsApiUrl, getDailyChallengeDate, samePlayer } from '#lib/data.ts';
 
 	// Gesamtstatistiken für den aktuellen Tag (Svelte 5 $state)
 	let avgCorrectAnswers = $state<number | null>(null);
