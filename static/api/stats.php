@@ -4,6 +4,7 @@
 // GET  api/stats.php[?date=YYYY-MM-DD]          Öffentliche Tageswerte (nur Aggregate)
 // GET  api/stats.php?userId=<id>                 Eigene Stats, Header X-DelDoku-Token erforderlich
 // POST api/stats.php {date, selections[, userId]} Spiel absenden; ohne userId wird ein neuer Nutzer angelegt
+// DELETE api/stats.php?userId=<id>               Eigenes Konto samt Spielen löschen, Header X-DelDoku-Token erforderlich
 //
 // Bewusst PHP-7.4-kompatibel gehalten.
 
@@ -14,6 +15,7 @@ const WIN_BONUS = 100;
 const MAX_SCORE_PER_DAY = 1000; // 9 Zellen à 100 Punkte plus Siegbonus
 const CELL_KEYS = ['0-0', '0-1', '0-2', '1-0', '1-1', '1-2', '2-0', '2-1', '2-2'];
 const DEFAULT_REGISTRATION_LIMIT = 20; // neue Nutzer pro IP und UTC-Tag
+const RETENTION_MONTHS = 12; // Konten ohne Spiel in diesem Zeitraum werden gelöscht
 
 // --- Nur für die API-Tests (tests/api): auf dem Server nie gesetzt ---
 // DELDOKU_TEST_TODAY               festes "heute" (YYYY-MM-DD), damit Tests nicht über Mitternacht kippen
@@ -217,6 +219,88 @@ function authenticate($userId) {
         respond(401, ['error' => 'invalid credentials']);
     }
     return $user;
+}
+
+function logFile() {
+    return dataDir() . '/games.jsonl';
+}
+
+// Entfernt Nutzerdateien und ihre Zeilen im Spiel-Log. Nur unter withLock() aufrufen.
+function deleteUsers($userIds) {
+    if (count($userIds) === 0) {
+        return;
+    }
+    $remove = array_flip($userIds);
+    $log = logFile();
+    if (file_exists($log)) {
+        $in = fopen($log, 'r');
+        $tmp = $log . '.tmp' . getmypid();
+        $out = fopen($tmp, 'w');
+        if ($in === false || $out === false) {
+            respond(500, ['error' => 'could not write data']);
+        }
+        while (($line = fgets($in)) !== false) {
+            $entry = json_decode($line, true);
+            // Unlesbare Zeilen behalten, statt sie stillschweigend zu verlieren
+            if (is_array($entry) && isset($entry['userId']) && isset($remove[$entry['userId']])) {
+                continue;
+            }
+            if (fwrite($out, $line) === false) {
+                respond(500, ['error' => 'could not write data']);
+            }
+        }
+        fclose($in);
+        if (!fclose($out) || !rename($tmp, $log)) {
+            @unlink($tmp);
+            respond(500, ['error' => 'could not write data']);
+        }
+    }
+    foreach ($userIds as $userId) {
+        if (file_exists(userFile($userId)) && !unlink(userFile($userId))) {
+            respond(500, ['error' => 'could not delete data']);
+        }
+    }
+}
+
+// Zeitpunkt, ab dem ein Konto als abgelaufen gilt: RETENTION_MONTHS vor heute (UTC)
+function retentionCutoff() {
+    return gmdate('c', strtotime(utcToday() . ' 00:00:00 UTC -' . RETENTION_MONTHS . ' months'));
+}
+
+// Ob ein Konto seit dem Stichtag (ISO-8601, UTC) nicht mehr gespielt hat
+function isExpired($user, $cutoff) {
+    $games = isset($user['games']) && is_array($user['games']) ? $user['games'] : [];
+    $lastPlayed = end($games);
+    $activity = $lastPlayed !== false && isset($lastPlayed['timestamp']) ? $lastPlayed['timestamp'] : (isset($user['created']) ? $user['created'] : null);
+    return is_string($activity) && $activity < $cutoff;
+}
+
+// Einmal pro UTC-Tag beim ersten API-Aufruf: abgelaufene Konten löschen
+function expireInactiveUsers() {
+    $today = utcToday();
+    $marker = dataDir() . '/expired_until';
+    if (file_exists($marker) && trim(file_get_contents($marker)) === $today) {
+        return;
+    }
+    withLock(function () use ($marker, $today) {
+        // Erneut prüfen: ein paralleler Request kann schon aufgeräumt haben
+        if (file_exists($marker) && trim(file_get_contents($marker)) === $today) {
+            return;
+        }
+        $cutoff = retentionCutoff();
+        $expired = [];
+        foreach (glob(dataDir() . '/users/u_*.json') as $path) {
+            $user = json_decode(file_get_contents($path), true);
+            // Beschädigte Dateien nicht anfassen; sie fallen bei Zugriff ohnehin mit 500 auf
+            if (is_array($user) && isset($user['userId']) && isValidUserId($user['userId']) && isExpired($user, $cutoff)) {
+                $expired[] = $user['userId'];
+            }
+        }
+        deleteUsers($expired);
+        if (file_put_contents($marker, $today) === false) {
+            respond(500, ['error' => 'could not write data']);
+        }
+    });
 }
 
 // Liefert [answers, isFallback]. Ohne Tagesdatei gilt wie im Client die Ersatz-Challenge.
@@ -496,7 +580,7 @@ function handlePost() {
             $logLines .= logLine(registrationLogEntry($user));
         }
         $logLines .= logLine(['type' => 'game', 'userId' => $user['userId']] + $entry);
-        if (file_put_contents(dataDir() . '/games.jsonl', $logLines, FILE_APPEND) === false) {
+        if (file_put_contents(logFile(), $logLines, FILE_APPEND) === false) {
             respond(500, ['error' => 'could not write data']);
         }
         writeJsonFileAtomic(dayFile($date, $fallback), $day);
@@ -526,12 +610,24 @@ function handlePost() {
     respond(200, $result);
 }
 
+function handleDelete() {
+    $userId = isset($_GET['userId']) ? $_GET['userId'] : null;
+    withLock(function () use ($userId) {
+        $user = authenticate($userId);
+        deleteUsers([$user['userId']]);
+    });
+    respond(200, ['deleted' => true]);
+}
+
 ensureDataDirs();
+expireInactiveUsers();
 
 $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
 if ($method === 'GET') {
     handleGet();
 } elseif ($method === 'POST') {
     handlePost();
+} elseif ($method === 'DELETE') {
+    handleDelete();
 }
 respond(405, ['error' => 'method not allowed']);
