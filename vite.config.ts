@@ -1,3 +1,5 @@
+import adapter from '@sveltejs/adapter-static';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import type { Connect, Plugin } from 'vite';
@@ -46,7 +48,28 @@ function phpApiProxy(): Plugin {
 }
 
 export default defineConfig({
-	plugins: [phpApiProxy(), tailwindcss(), sveltekit()],
+	plugins: [
+		phpApiProxy(),
+		tailwindcss(),
+		sveltekit({
+			// Consult https://svelte.dev/docs/kit/integrations
+			// for more information about preprocessors
+			preprocess: vitePreprocess(),
+
+			adapter: adapter({
+				pages: 'build',
+				assets: 'build',
+				precompress: false,
+				strict: false
+			}),
+
+			paths: {
+				base: process.env.VITE_BUILD_ENV === 'test' ? '/deldoku_tst' : '/deldoku'
+			},
+			// Der Deploy setzt den Commit, damit der Smoke-Test den ausgelieferten Build erkennt; sonst ein Zeitstempel
+			version: { name: process.env.BUILD_SHA || undefined }
+		})
+	],
 	// Version aus package.json für den Footer
 	define: { __APP_VERSION__: JSON.stringify(version) },
 	build: {

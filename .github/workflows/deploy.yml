@@ -79,7 +79,7 @@ jobs:
             printf 'User-agent: *\nDisallow: /\n' > build/robots.txt
           fi
         env:
-          # Basispfad /deldoku_tst statt /deldoku (svelte.config.js)
+          # Basispfad /deldoku_tst statt /deldoku (vite.config.ts)
           VITE_BUILD_ENV: ${{ env.PRODUCTION == 'true' && 'production' || 'test' }}
 
       - name: Set up SSH

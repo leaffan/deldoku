@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { getCurrentSeason, type DELPlayer } from '$lib/data';
-	import { countryName } from '$lib/a11y';
-	import { languageStore } from '$lib/stores';
+	import { getCurrentSeason, type DELPlayer } from '#lib/data.ts';
+	import { countryName } from '#lib/a11y.ts';
+	import { languageStore } from '#lib/stores.ts';
 
 	interface Props {
 		player?: DELPlayer | null;
