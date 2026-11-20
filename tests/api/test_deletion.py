@@ -28,7 +28,7 @@ def set_activity(server, user, timestamp):
 
 def run_daily_expiry(api, server):
     """Forget that today's expiry already ran, then trigger it with any request."""
-    (server.data / "expired_until").unlink()
+    (server.data / "expired_until").unlink(missing_ok=True)
     api.day()
 
 
