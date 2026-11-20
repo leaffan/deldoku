@@ -147,7 +147,24 @@ function createStatsStore() {
 			}
 		},
 
-		submitGame
+		submitGame,
+
+		// Löscht Konto und Spiele auf dem Server; das nächste Spiel legt ein neues Konto an
+		deleteAccount: async () => {
+			if (auth) {
+				const response = await fetch(
+					`${getStatsApiUrl()}?userId=${encodeURIComponent(auth.userId)}`,
+					{ method: 'DELETE', headers: { 'X-DelDoku-Token': auth.token } }
+				);
+				// 401: Konto existiert auf dem Server nicht mehr (z. B. abgelaufen), Ziel also erreicht
+				if (!response.ok && response.status !== 401) {
+					throw new Error(`HTTP ${response.status}`);
+				}
+			}
+			auth = null;
+			saveAuth(null);
+			set(defaultStats);
+		}
 	};
 }
 

@@ -47,6 +47,11 @@ export type Translations = {
 	rulesScoring4: string;
 	points: string;
 	noGamesYet: string;
+	deleteData: string;
+	deleteDataConfirm: string;
+	deleteDataConfirmButton: string;
+	deleteDataFailed: string;
+	deleteDataDone: string;
 	delStats: string;
 	version: string;
 	todaysTopic: string;
@@ -541,6 +546,12 @@ export const translations: Record<Language, Translations> = {
 		rulesScoring4: 'Maximale Punktzahl: 1000 Punkte',
 		points: 'Pkt',
 		noGamesYet: 'Noch keine Spiele gespielt. Starten Sie ein Spiel um Statistiken zu sammeln!',
+		deleteData: 'Meine Daten löschen',
+		deleteDataConfirm:
+			'Alle Spiele, Statistiken und Serien dieses Geräts werden unwiderruflich vom Server gelöscht.',
+		deleteDataConfirmButton: 'Endgültig löschen',
+		deleteDataFailed: 'Löschen fehlgeschlagen: ',
+		deleteDataDone: 'Deine Daten wurden gelöscht.',
 		delStats: 'DEL-Statistiken',
 		version: 'Version',
 		globalStatsTitle: '🌍 Gesamtstatistiken (heute)',
@@ -612,6 +623,12 @@ export const translations: Record<Language, Translations> = {
 		rulesScoring4: 'Maximum score: 1000 points',
 		points: 'Pts',
 		noGamesYet: 'No games played yet. Start a game to collect statistics!',
+		deleteData: 'Delete my data',
+		deleteDataConfirm:
+			'All games, statistics and streaks of this device will be permanently deleted from the server.',
+		deleteDataConfirmButton: 'Delete permanently',
+		deleteDataFailed: 'Deletion failed: ',
+		deleteDataDone: 'Your data has been deleted.',
 		delStats: 'DEL Statistics',
 		version: 'Version',
 		globalStatsTitle: '🌍 Global Statistics (today)',

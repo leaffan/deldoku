@@ -80,6 +80,9 @@ class Api:
     def post(self, body=None, token=None, raw=None):
         return self.request("POST", body=body, token=token, raw=raw)
 
+    def delete(self, user_id, token=None):
+        return self.request("DELETE", f"?userId={user_id}", token=token)
+
     def play(self, selections, user=None, date=TODAY, **extra):
         """Submit a game; without a user a new one is registered."""
         body = {"date": date, "selections": selections, **extra}

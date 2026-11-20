@@ -46,6 +46,26 @@
 			})
 			.reverse();
 	});
+
+	// Löschen in zwei Schritten: erst Button, dann Bestätigung
+	let confirmingDelete = $state(false);
+	let deleting = $state(false);
+	let deleteError = $state<string | null>(null);
+	let deleted = $state(false);
+
+	async function deleteData() {
+		deleting = true;
+		deleteError = null;
+		try {
+			await statsStore.deleteAccount();
+			confirmingDelete = false;
+			deleted = true;
+		} catch (e) {
+			deleteError = e instanceof Error ? e.message : String(e);
+		} finally {
+			deleting = false;
+		}
+	}
 </script>
 
 <div class="bg-white rounded-lg shadow-lg p-6">
@@ -211,4 +231,40 @@
 			{t('noGamesYet', $languageStore)}
 		</div>
 	{/if}
+
+	<div class="border-t mt-6 pt-4 text-sm" aria-live="polite">
+		{#if deleted}
+			<p class="text-gray-600">{t('deleteDataDone', $languageStore)}</p>
+		{:else if $statsStore.totalGames > 0}
+			{#if confirmingDelete}
+				<p class="mb-3 text-gray-700">{t('deleteDataConfirm', $languageStore)}</p>
+				<div class="flex flex-wrap gap-2">
+					<button
+						onclick={deleteData}
+						disabled={deleting}
+						class="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium disabled:opacity-50"
+					>
+						{t('deleteDataConfirmButton', $languageStore)}
+					</button>
+					<button
+						onclick={() => (confirmingDelete = false)}
+						disabled={deleting}
+						class="px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-100"
+					>
+						{t('cancel', $languageStore)}
+					</button>
+				</div>
+			{:else}
+				<button
+					onclick={() => (confirmingDelete = true)}
+					class="text-red-600 hover:text-red-800 underline"
+				>
+					{t('deleteData', $languageStore)}
+				</button>
+			{/if}
+			{#if deleteError}
+				<p class="mt-2 text-red-600">{t('deleteDataFailed', $languageStore)}{deleteError}</p>
+			{/if}
+		{/if}
+	</div>
 </div>
