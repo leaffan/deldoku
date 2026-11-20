@@ -6,7 +6,7 @@
 // POST api/stats.php {date, selections[, userId]} Spiel absenden; ohne userId wird ein neuer Nutzer angelegt
 // DELETE api/stats.php?userId=<id>               Eigenes Konto samt Spielen löschen, Header X-DelDoku-Token erforderlich
 //
-// Bewusst PHP-7.4-kompatibel gehalten.
+// Benötigt PHP 8.0 oder neuer (str_ends_with); Produktion und CI laufen auf PHP 8.2.
 
 const MAX_BODY_BYTES = 8192;
 const MAX_GAMES_PER_DAY = 20;
