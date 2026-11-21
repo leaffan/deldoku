@@ -48,11 +48,14 @@ export type Translations = {
 	points: string;
 	noGamesYet: string;
 	deleteData: string;
+	yourId: string;
 	deleteDataConfirm: string;
 	deleteDataConfirmButton: string;
 	deleteDataFailed: string;
 	deleteDataDone: string;
 	delStats: string;
+	privacyPolicy: string;
+	imprint: string;
 	version: string;
 	todaysTopic: string;
 	shareResult: string;
@@ -547,12 +550,15 @@ export const translations: Record<Language, Translations> = {
 		points: 'Pkt',
 		noGamesYet: 'Noch keine Spiele gespielt. Starten Sie ein Spiel um Statistiken zu sammeln!',
 		deleteData: 'Meine Daten löschen',
+		yourId: 'Deine Kennung (für Anfragen zu deinen Daten):',
 		deleteDataConfirm:
 			'Alle Spiele, Statistiken und Serien dieses Geräts werden unwiderruflich vom Server gelöscht.',
 		deleteDataConfirmButton: 'Endgültig löschen',
 		deleteDataFailed: 'Löschen fehlgeschlagen: ',
 		deleteDataDone: 'Deine Daten wurden gelöscht.',
 		delStats: 'DEL-Statistiken',
+		privacyPolicy: 'Datenschutz',
+		imprint: 'Impressum',
 		version: 'Version',
 		globalStatsTitle: '🌍 Gesamtstatistiken (heute)',
 		globalStatsLoading: 'Lade Gesamtstatistiken...',
@@ -624,12 +630,15 @@ export const translations: Record<Language, Translations> = {
 		points: 'Pts',
 		noGamesYet: 'No games played yet. Start a game to collect statistics!',
 		deleteData: 'Delete my data',
+		yourId: 'Your identifier (for requests about your data):',
 		deleteDataConfirm:
 			'All games, statistics and streaks of this device will be permanently deleted from the server.',
 		deleteDataConfirmButton: 'Delete permanently',
 		deleteDataFailed: 'Deletion failed: ',
 		deleteDataDone: 'Your data has been deleted.',
 		delStats: 'DEL Statistics',
+		privacyPolicy: 'Privacy',
+		imprint: 'Imprint',
 		version: 'Version',
 		globalStatsTitle: '🌍 Global Statistics (today)',
 		globalStatsLoading: 'Loading global statistics...',

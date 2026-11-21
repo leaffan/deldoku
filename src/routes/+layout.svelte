@@ -7,6 +7,9 @@
 
 	const version = __APP_VERSION__;
 
+	// Datenschutzerklärung auf leaffan.net gibt es auf Deutsch (maßgeblich) und Englisch
+	let privacySuffix = $derived($languageStore === 'en' ? '_en' : '');
+
 	// Seitensprache für Screenreader und Silbentrennung an die gewählte Sprache anpassen
 	$effect(() => {
 		document.documentElement.lang = $languageStore;
@@ -60,6 +63,25 @@
 					class="footer-link"
 				>
 					deldoku @ GitHub
+				</a>
+			</div>
+			<div class="footer-links">
+				<a
+					href="https://www.leaffan.net/contents/legal/data_privacy_statement{privacySuffix}.html"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="footer-link"
+				>
+					{t('privacyPolicy', $languageStore)}
+				</a>
+				<span class="footer-separator">•</span>
+				<a
+					href="https://www.leaffan.net/contents/legal/imprint.html"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="footer-link"
+				>
+					{t('imprint', $languageStore)}
 				</a>
 			</div>
 		</div>

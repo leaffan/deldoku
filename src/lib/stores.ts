@@ -68,10 +68,19 @@ function saveAuth(auth: Auth | null) {
 	}
 }
 
+// Eigene Kennung, sichtbar in der Statistik (z. B. für Auskunftsanfragen); null ohne Konto
+export const userIdStore = writable<string | null>(null);
+
 function createStatsStore() {
 	// Server vergibt userId und Token beim ersten abgesendeten Spiel
 	let auth: Auth | null = null;
 	const { subscribe, set } = writable<PlayerStats>(defaultStats);
+
+	function setAuth(next: Auth | null, persist = true) {
+		auth = next;
+		if (persist) saveAuth(next);
+		userIdStore.set(next?.userId ?? null);
+	}
 
 	async function submitGame(
 		date: string,
@@ -95,8 +104,7 @@ function createStatsStore() {
 		});
 		if (response.status === 401 && auth) {
 			// Zugangsdaten auf dem Server unbekannt: als neuer Nutzer erneut absenden
-			auth = null;
-			saveAuth(null);
+			setAuth(null);
 			return submitGame(date, selections, isFallback);
 		}
 		if (!response.ok) {
@@ -104,8 +112,7 @@ function createStatsStore() {
 		}
 		const data = await response.json();
 		if (data.token) {
-			auth = { userId: data.userId, token: data.token };
-			saveAuth(auth);
+			setAuth({ userId: data.userId, token: data.token });
 		}
 		set(data.stats);
 		return data.game;
@@ -124,7 +131,7 @@ function createStatsStore() {
 			} catch {
 				// ignorieren
 			}
-			auth = loadAuth();
+			setAuth(loadAuth(), false);
 			if (!auth) return;
 
 			try {
@@ -133,8 +140,7 @@ function createStatsStore() {
 					{ headers: { 'X-DelDoku-Token': auth.token } }
 				);
 				if (response.status === 401) {
-					auth = null;
-					saveAuth(null);
+					setAuth(null);
 					return;
 				}
 				if (!response.ok) {
@@ -161,8 +167,7 @@ function createStatsStore() {
 					throw new Error(`HTTP ${response.status}`);
 				}
 			}
-			auth = null;
-			saveAuth(null);
+			setAuth(null);
 			set(defaultStats);
 		}
 	};
