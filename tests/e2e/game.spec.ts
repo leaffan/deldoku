@@ -106,9 +106,11 @@ test('deletes the own data after confirmation', async ({ game, page }) => {
 	await game.expectScore(100);
 
 	await page.getByRole('button', { name: 'Statistiken anzeigen' }).click();
-	const auth = await page.evaluate(() =>
-		JSON.parse(localStorage.getItem('del_doku_auth') ?? 'null')
-	);
+	// Nach dem ersten Spiel muss ein Login gespeichert sein; als String lesen, damit ein Fehlen als Assertion auffällt
+	const stored = await page.evaluate(() => localStorage.getItem('del_doku_auth'));
+	expect(stored, 'del_doku_auth fehlt nach dem ersten Spiel').not.toBeNull();
+	const auth = JSON.parse(stored!);
+	expect(auth.userId).toMatch(/^u_[0-9a-f]{16}$/);
 	await expect(page.getByText(auth.userId)).toBeVisible();
 	await page.getByRole('button', { name: 'Meine Daten löschen' }).click();
 	// Abbrechen lässt alles, wie es ist
