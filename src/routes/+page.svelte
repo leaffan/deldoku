@@ -8,6 +8,8 @@
 	import { getDebugChallenge, isDebugEnabled } from '#lib/debug.ts';
 	import { browser } from '$app/env';
 
+	const SITE_URL = 'https://www.leaffan.net/deldoku/';
+
 	let showStats = $state(false);
 	let showRules = $state(false);
 	let challenge = $state<DELDokuChallenge | null>(null);
@@ -73,8 +75,25 @@
 </script>
 
 <svelte:head>
-	<title>DELDoku - {t('title', $languageStore)}</title>
+	<title>{t('pageTitle', $languageStore)}</title>
 	<meta name="description" content={t('subtitle', $languageStore)} />
+	<!-- Link previews: crawlers don't run JavaScript, so these come from the prerendered (German) page.
+	     Absolute production URLs on purpose, also on the test instance, which is not indexed. -->
+	<link rel="canonical" href={SITE_URL} />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="DELDoku" />
+	<meta property="og:locale" content="de_DE" />
+	<meta property="og:url" content={SITE_URL} />
+	<meta property="og:title" content={t('pageTitle', $languageStore)} />
+	<meta property="og:description" content={t('subtitle', $languageStore)} />
+	<meta property="og:image" content="{SITE_URL}img/og-image.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta
+		property="og:image:alt"
+		content="DELDoku-Logo: ein 3×3-Raster mit Fragezeichen und einer Lupe über einem Puck"
+	/>
+	<meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
 <header class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-4">
