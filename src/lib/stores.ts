@@ -5,22 +5,22 @@ import { loadPlayers, getStatsApiUrl } from './data';
 
 export interface GameEntry {
 	timestamp: string; // ISO 8601 full timestamp
-	date?: string; // Challenge-Datum (YYYY-MM-DD)
+	date?: string; // Challenge date (YYYY-MM-DD)
 	won: boolean;
 	playerSelections: Record<string, string>; // "0-0": "<player id>", "0-1": "", etc.
-	score?: number; // Punktzahl (0-1000, inkl. 100 Bonus für Gewinn)
-	cellScores?: Record<string, number>; // Punkte pro Zelle
+	score?: number; // Score (0-1000, incl. 100 bonus for a win)
+	cellScores?: Record<string, number>; // Points per cell
 }
 
 export interface PlayerStats {
 	totalGames: number;
 	gamesWon: number;
 	lastPlayedDate: string; // ISO 8601 full timestamp
-	gameHistory: GameEntry[]; // die letzten 100 Spiele
+	gameHistory: GameEntry[]; // the last 100 games
 	daysPlayed?: number;
 	daysWon?: number;
-	totalPoints?: number; // Summe des besten Ergebnisses pro Tag
-	pointsPercent?: number | null; // Anteil an den möglichen Punkten der gespielten Tage (0-100)
+	totalPoints?: number; // Sum of the best result per day
+	pointsPercent?: number | null; // Share of the possible points on the days played (0-100)
 	currentStreak?: number;
 	longestStreak?: number;
 }
@@ -64,17 +64,17 @@ function saveAuth(auth: Auth | null) {
 			localStorage.removeItem(AUTH_KEY);
 		}
 	} catch {
-		// localStorage nicht verfügbar (z. B. privates Fenster): Stats gelten dann nur für diese Sitzung
+		// localStorage unavailable (e.g. private window): stats then apply to this session only
 	}
 }
 
-// Eigene Kennung, sichtbar in der Statistik (z. B. für Auskunftsanfragen); null ohne Konto.
-// Nur lesbar exportiert: Geändert wird sie ausschließlich über setAuth(), damit sie zu auth passt.
+// Own user ID, shown in the stats (e.g. for data access requests); null without an account.
+// Exported read-only: it is changed only via setAuth(), so it stays in sync with auth.
 const userId = writable<string | null>(null);
 export const userIdStore = readonly(userId);
 
 function createStatsStore() {
-	// Server vergibt userId und Token beim ersten abgesendeten Spiel
+	// The server assigns userId and token on the first submitted game
 	let auth: Auth | null = null;
 	const { subscribe, set } = writable<PlayerStats>(defaultStats);
 
@@ -92,7 +92,7 @@ function createStatsStore() {
 		const headers: Record<string, string> = { 'Content-Type': 'application/json' };
 		const body: Record<string, unknown> = { date, selections };
 		if (isFallback) {
-			// Sonst würde nach einem späteren Upload der Tagesdatei gegen die falsche Challenge gewertet
+			// Otherwise, after a later upload of the daily file, the game would be scored against the wrong challenge
 			body.challenge = 'fallback';
 		}
 		if (auth) {
@@ -105,7 +105,7 @@ function createStatsStore() {
 			body: JSON.stringify(body)
 		});
 		if (response.status === 401 && auth) {
-			// Zugangsdaten auf dem Server unbekannt: als neuer Nutzer erneut absenden
+			// Credentials unknown to the server: resubmit as a new user
 			setAuth(null);
 			return submitGame(date, selections, isFallback);
 		}
@@ -123,15 +123,15 @@ function createStatsStore() {
 	return {
 		subscribe,
 
-		// Lade eigene Stats vom Server
+		// Load own stats from the server
 		init: async () => {
 			if (typeof window === 'undefined') return;
 			try {
-				// Schlüssel des alten Stats-Formats aufräumen
+				// Clean up the key of the old stats format
 				localStorage.removeItem('del_doku_user_id');
 				localStorage.removeItem('del_doku_stats');
 			} catch {
-				// ignorieren
+				// ignore
 			}
 			setAuth(loadAuth(), false);
 			if (!auth) return;
@@ -157,14 +157,14 @@ function createStatsStore() {
 
 		submitGame,
 
-		// Löscht Konto und Spiele auf dem Server; das nächste Spiel legt ein neues Konto an
+		// Deletes the account and games on the server; the next game creates a new account
 		deleteAccount: async () => {
 			if (auth) {
 				const response = await fetch(
 					`${getStatsApiUrl()}?userId=${encodeURIComponent(auth.userId)}`,
 					{ method: 'DELETE', headers: { 'X-DelDoku-Token': auth.token } }
 				);
-				// 401: Konto existiert auf dem Server nicht mehr (z. B. abgelaufen), Ziel also erreicht
+				// 401: account no longer exists on the server (e.g. expired), so the goal is reached
 				if (!response.ok && response.status !== 401) {
 					throw new Error(`HTTP ${response.status}`);
 				}
@@ -196,12 +196,12 @@ function createPlayersStore() {
 export const playersStore = createPlayersStore();
 
 function createLanguageStore() {
-	// Versuche Sprache aus localStorage zu laden, Standard ist Deutsch
+	// Try to load the language from localStorage; default is German
 	let savedLanguage: string | null = null;
 	try {
 		savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
 	} catch {
-		// localStorage nicht verfügbar (z. B. privates Fenster): Standard verwenden
+		// localStorage unavailable (e.g. private window): use the default
 	}
 	const initialLanguage: Language = savedLanguage === 'en' ? 'en' : 'de';
 
@@ -217,7 +217,7 @@ function createLanguageStore() {
 						localStorage.setItem('language', newLang);
 					}
 				} catch {
-					// Nicht speicherbar: Umschalten gilt dann nur für diese Sitzung
+					// Cannot be stored: the switch then applies to this session only
 				}
 				return newLang;
 			});

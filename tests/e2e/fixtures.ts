@@ -6,21 +6,21 @@ import { TODAY } from './constants';
 
 export { TODAY };
 
-// data/ des Test-Servers (serve.sh); der Container läuft mit unserer User-ID, wir dürfen es leeren
+// data/ of the test server (serve.sh); the container runs with our user ID, so we may empty it
 const DATA_DIR = fileURLToPath(new URL('../../.e2e-server/data', import.meta.url));
 
-/** Spieler aus fixtures/players.json, die in der Test-Challenge vorkommen. */
+/** Players from fixtures/players.json that appear in the test challenge. */
 export const PLAYERS = {
-	anton: { id: '900001/anton-ahorn', name: 'Anton Ahorn' }, // Zelle 0-0
-	berta: { id: '900002/berta-birke', name: 'Berta Birke' }, // Zelle 0-1
-	wally: { id: '900010/wally-wrong', name: 'Wally Wrong' } // in keiner Zelle richtig
+	anton: { id: '900001/anton-ahorn', name: 'Anton Ahorn' }, // cell 0-0
+	berta: { id: '900002/berta-birke', name: 'Berta Birke' }, // cell 0-1
+	wally: { id: '900010/wally-wrong', name: 'Wally Wrong' } // correct in no cell
 };
 
-/** Spielbrett der Startseite, angesprochen wie von Nutzern: über Rollen und sichtbare Texte. */
+/** Game board on the start page, addressed as users do: via roles and visible texts. */
 export class Game {
 	constructor(readonly page: Page) {}
 
-	/** Zelle in Zeile row, Spalte col (0-basiert); ihr Name nennt Zeile, Spalte und Zustand. */
+	/** Cell in row `row`, column `col` (0-based); its name states row, column and state. */
 	cell(row: number, col: number): Locator {
 		return this.page.getByRole('button', { name: /^Zeile / }).nth(row * 3 + col);
 	}
@@ -41,15 +41,15 @@ export class Game {
 		return this.page.getByRole('button', { name: 'Lösung einreichen' });
 	}
 
-	/** Zelle öffnen und einen Spieler eintragen (Maus bzw. Touch). */
+	/** Open a cell and enter a player (mouse or touch). */
 	async answer(row: number, col: number, name: string) {
-		// Nach einer richtigen Antwort schließt sich der Dialog erst nach kurzer Verzögerung
+		// After a correct answer the dialog closes only after a short delay
 		await expect(this.dialog).toBeHidden();
 		await this.cell(row, col).click();
 		await this.choose(name);
 	}
 
-	/** Im offenen Dialog einen Spieler suchen und „Auswählen“ drücken. */
+	/** Search for a player in the open dialog and press "Auswählen" (select). */
 	async choose(name: string) {
 		await this.search.fill(name);
 		await this.option(name).locator('button').click();
@@ -73,7 +73,7 @@ export const test = base.extend<{ game: Game }>({
 	game: async ({ page }, use) => {
 		await rm(DATA_DIR, { recursive: true, force: true });
 		await mkdir(DATA_DIR);
-		// Browser und Server (DELDOKU_TEST_TODAY) spielen am selben Tag; Timer laufen normal weiter
+		// Browser and server (DELDOKU_TEST_TODAY) play on the same day; timers keep running normally
 		await page.clock.setFixedTime(new Date(`${TODAY}T10:00:00Z`));
 		await page.goto('./');
 		const game = new Game(page);

@@ -27,10 +27,10 @@ static/challenges/*
 !static/challenges/fallback.json
 !static/challenges/.htaccess
 
-# Lokale Daten des PHP-Dev-Containers
+# Local data of the PHP dev container
 /.dev-data
 
-# E2E-Tests (Playwright): Server-Verzeichnis und Ergebnisse
+# E2E tests (Playwright): server directory and results
 /.e2e-server
 /test-results
 /playwright-report

@@ -1,11 +1,11 @@
-// Hilfsfunktionen für Barrierefreiheit
+// Accessibility helpers
 
 const FOCUSABLE =
 	'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-// Zuletzt fokussiertes Element außerhalb modaler Dialoge. Das Suchfeld im Spielerdialog holt sich
-// den Fokus schon beim Einhängen, bevor modalDialog läuft; document.activeElement zeigt dann
-// bereits in den Dialog und taugt nicht mehr als Ziel für die Fokus-Rückgabe.
+// Last focused element outside modal dialogs. The search field in the player dialog grabs focus
+// on mount, before modalDialog runs; by then document.activeElement already points into the
+// dialog and is no longer usable as the target for restoring focus.
 let lastFocusOutsideDialog: HTMLElement | null = null;
 if (typeof document !== 'undefined') {
 	document.addEventListener(
@@ -19,15 +19,15 @@ if (typeof document !== 'undefined') {
 }
 
 /**
- * Svelte-Action für modale Dialoge: hält den Tab-Fokus im Element, schließt mit Escape
- * und gibt den Fokus beim Schließen an das zuvor fokussierte Element zurück.
+ * Svelte action for modal dialogs: traps Tab focus inside the element, closes on Escape
+ * and returns focus to the previously focused element on close.
  */
 export function modalDialog(node: HTMLElement, onClose: () => void) {
 	let close = onClose;
 	const active = document.activeElement as HTMLElement | null;
 	const previouslyFocused = active && node.contains(active) ? lastFocusOutsideDialog : active;
 
-	// Nur fokussieren, wenn nicht schon ein Kindelement (z. B. das Suchfeld) den Fokus hat
+	// Only focus if no child element (e.g. the search field) already has focus
 	queueMicrotask(() => {
 		if (!node.contains(document.activeElement)) {
 			(node.querySelector<HTMLElement>(FOCUSABLE) ?? node).focus();
@@ -36,7 +36,7 @@ export function modalDialog(node: HTMLElement, onClose: () => void) {
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
-			// Eine offene Vorschlagsliste (Combobox) schließt sich zuerst selbst, nicht der ganze Dialog
+			// An open suggestion list (combobox) closes itself first, not the whole dialog
 			if ((e.target as HTMLElement | null)?.getAttribute?.('aria-expanded') === 'true') return;
 			e.preventDefault();
 			close();
@@ -73,7 +73,7 @@ export function modalDialog(node: HTMLElement, onClose: () => void) {
 	};
 }
 
-/** Name eines Landes zum ISO-Code in der gewählten Sprache, z. B. "de" → "Deutschland". */
+/** Country name for an ISO code in the selected language, e.g. "de" → "Deutschland". */
 export function countryName(code: string, lang: string): string {
 	try {
 		return (

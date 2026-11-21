@@ -1,5 +1,5 @@
-# Native Binaries (rolldown, lightningcss, Tailwind oxide) für Windows und WSL installieren,
-# damit dasselbe node_modules auf beiden Seiten funktioniert.
+# Install native binaries (rolldown, lightningcss, Tailwind oxide) for Windows and WSL,
+# so the same node_modules works on both sides.
 supportedArchitectures:
   os:
     - current
@@ -10,12 +10,12 @@ supportedArchitectures:
   libc:
     - glibc
 
-# Windows und WSL nutzen unterschiedliche Store-Pfade; ohne diese Einstellung hält jede Seite die
-# Installation der anderen für veraltet und installiert bei jedem `pnpm run` komplett neu.
+# Windows and WSL use different store paths; without this setting each side considers the other's
+# install outdated and reinstalls everything on every `pnpm run`.
 verifyDepsBeforeRun: false
 
-# Sicherheits-Untergrenzen für transitive Abhängigkeiten. pnpm 10 liest Overrides nur noch hier
-# (oder in package.json), nicht mehr aus .npmrc. Direkte Abhängigkeiten werden in package.json angehoben.
+# Security minimum versions for transitive dependencies. pnpm 10 reads overrides only here
+# (or in package.json), no longer from .npmrc. Direct dependencies are bumped in package.json.
 overrides:
   cookie@<0.7.0: ^0.7.2
   devalue@<5.9.3: ^5.9.3
@@ -23,14 +23,14 @@ overrides:
   postcss@<8.5.23: ^8.5.23
   source-map-js@<1.2.2: ^1.2.2
 
-# Vorübergehend ignorierte Meldungen, jeweils bei uns nicht ausnutzbar:
+# Temporarily ignored advisories, none exploitable in our setup:
 auditConfig:
   ignoreGhsas:
-    # ReDoS in picomatch: nur Build-Werkzeug, verarbeitet keine fremden Muster. Noch keine
-    # korrigierte Version; sobald es eine gibt, entfernen und unter overrides eine Untergrenze ergänzen.
+    # ReDoS in picomatch: build tool only, processes no untrusted patterns. No fixed version
+    # yet; once there is one, remove this and add a minimum version under overrides.
     - GHSA-fc5q-39xc-vjpf
-    # SvelteKit, Weiterleitung über enhanced form submission: keine Form Actions/use:enhance,
-    # adapter-static ohne Server. Behoben erst in 3.1.1; entfernen mit dem Upgrade auf SvelteKit 3.
-    # pnpm meldet die erste ID, die Advisory-Seite die zweite.
+    # SvelteKit, redirect via enhanced form submission: no form actions/use:enhance,
+    # adapter-static without a server. Fixed only in 3.1.1; remove with the upgrade to SvelteKit 3.
+    # pnpm reports the first ID, the advisory page the second.
     - GHSA-3r8g-jcqq-3p5j
     - GHSA-pfhg-q3qv-9q6r

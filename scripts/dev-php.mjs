@@ -1,5 +1,5 @@
-// Startet bzw. stoppt den PHP-Container für die lokale Entwicklung.
-// Unter Windows läuft Docker in WSL, daher dort über `wsl` aufrufen.
+// Starts or stops the PHP container for local development.
+// On Windows, Docker runs in WSL, so call it via `wsl` there.
 import { spawnSync } from 'node:child_process';
 
 const action = process.argv[2] === 'down' ? ['down'] : ['up', '-d'];
@@ -10,6 +10,6 @@ const [cmd, args] =
 
 const result = spawnSync(cmd, args, { stdio: 'inherit' });
 if (result.status !== 0) {
-	console.error('\nPHP-Container konnte nicht gestartet/gestoppt werden. Läuft Docker (in WSL)?');
+	console.error('\nCould not start/stop the PHP container. Is Docker running (in WSL)?');
 	process.exit(result.status ?? 1);
 }

@@ -1,7 +1,7 @@
-# Alle Textdateien mit LF im Repo und im Arbeitsverzeichnis (Windows und WSL teilen sich ein Checkout)
+# All text files with LF in the repo and the working tree (Windows and WSL share one checkout)
 * text=auto eol=lf
 
-# Binärdateien nie anfassen
+# Never touch binary files
 *.png binary
 *.jpg binary
 *.jpeg binary

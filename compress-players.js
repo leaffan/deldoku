@@ -1,10 +1,10 @@
-// Script zum Komprimieren der all_players.json
+// Script to compress all_players.json
 import { readFileSync, writeFileSync, statSync } from 'fs';
 
-// Lade die Original-Datei
+// Load the original file
 const players = JSON.parse(readFileSync('all_players_uncompressed.json', 'utf-8'));
 
-// Komprimiere die Felder
+// Compress the fields
 const compressed = players.map((p) => ({
 	i: p.id, // id → i
 	n: p.name, // name → n
@@ -13,8 +13,8 @@ const compressed = players.map((p) => ({
 	l: p.last_season // last_season → l
 }));
 
-// Speichere die komprimierte Version
+// Save the compressed version
 writeFileSync('static/all_players.json', JSON.stringify(compressed));
 
-console.log(`Original: ${players.length} Spieler`);
-console.log(`Komprimiert auf ${statSync('static/all_players.json').size} bytes`);
+console.log(`Original: ${players.length} players`);
+console.log(`Compressed to ${statSync('static/all_players.json').size} bytes`);
