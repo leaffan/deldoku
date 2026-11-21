@@ -123,7 +123,7 @@ def free_port():
 
 
 def stop_process(proc):
-    """Beendet den PHP-Server; reagiert er nicht auf terminate(), wird er hart beendet."""
+    """Stop the PHP server; if it does not respond to terminate(), kill it."""
     proc.terminate()
     try:
         proc.wait(timeout=5)

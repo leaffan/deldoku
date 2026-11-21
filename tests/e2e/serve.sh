@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
-# Liefert den Produktions-Build (build/) mit dem echten stats.php aus, wie auf dem Server:
-#   <root>/deldoku/   Build, dazu Test-Spielerliste und Test-Challenge aus tests/e2e/fixtures
-#   <root>/data/      leer; die Tests leeren es vor jedem Test (siehe fixtures.ts)
-# Wird von Playwright gestartet (playwright.config.ts); setzt `pnpm build` voraus.
-# Aufruf: serve.sh <datum> <port>; das Datum kommt aus tests/e2e/constants.ts
+# Serves the production build (build/) with the real stats.php, laid out as on the server:
+#   <root>/deldoku/   build, plus test player list and test challenge from tests/e2e/fixtures
+#   <root>/data/      empty; the tests empty it before each test (see fixtures.ts)
+# Started by Playwright (playwright.config.ts); requires `pnpm build`.
+# Usage: serve.sh <date> <port>; the date comes from tests/e2e/constants.ts
 set -euo pipefail
 REPO=$(cd "$(dirname "$0")/../.." && pwd)
 ROOT="$REPO/.e2e-server"
-TODAY="${1:?Datum fehlt}"
-PORT="${2:?Port fehlt}"
+TODAY="${1:?date missing}"
+PORT="${2:?port missing}"
 CONTAINER=deldoku-e2e
 
 if [ ! -f "$REPO/build/index.html" ]; then
-	echo "build/ fehlt, zuerst 'pnpm build' ausführen" >&2
+	echo "build/ missing, run 'pnpm build' first" >&2
 	exit 1
 fi
 
 rm -rf "$ROOT"
 mkdir -p "$ROOT/data"
 cp -r "$REPO/build" "$ROOT/deldoku"
-# Nur die Test-Challenge ausliefern, keine lokal vorhandenen echten Challenges
+# Serve only the test challenge, not any real challenges present locally
 rm -rf "$ROOT/deldoku/challenges"
 mkdir "$ROOT/deldoku/challenges"
 cp "$REPO/tests/e2e/fixtures/challenge.json" "$ROOT/deldoku/challenges/$TODAY.json"

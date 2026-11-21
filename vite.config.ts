@@ -9,8 +9,8 @@ import http from 'node:http';
 
 const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8'));
 
-// Leitet /deldoku[_tst]/api/* an den PHP-Container aus docker-compose.yml weiter.
-// Muss vor SvelteKit laufen, sonst wird static/api/stats.php als Quelltext ausgeliefert.
+// Forwards /deldoku[_tst]/api/* to the PHP container from docker-compose.yml.
+// Must run before SvelteKit, otherwise static/api/stats.php is served as source text.
 function phpApiProxy(): Plugin {
 	const handler: Connect.NextHandleFunction = (req, res, next) => {
 		const match = req.url?.match(/^\/deldoku(?:_tst)?(\/api\/.*)$/);
@@ -66,18 +66,18 @@ export default defineConfig({
 			paths: {
 				base: process.env.VITE_BUILD_ENV === 'test' ? '/deldoku_tst' : '/deldoku'
 			},
-			// Der Deploy setzt den Commit, damit der Smoke-Test den ausgelieferten Build erkennt; sonst ein Zeitstempel
+			// The deploy sets the commit so the smoke test recognizes the deployed build; otherwise a timestamp
 			version: { name: process.env.BUILD_SHA || undefined }
 		})
 	],
-	// Version aus package.json für den Footer
+	// Version from package.json for the footer
 	define: { __APP_VERSION__: JSON.stringify(version) },
 	build: {
-		// Flaggen einzeln ausliefern statt alle ~400 SVGs ins CSS einzubetten; sie werden nur bei Bedarf geladen
+		// Serve flags as separate files instead of inlining all ~400 SVGs into the CSS; they load only when needed
 		assetsInlineLimit: (filePath) => (filePath.includes('/flag-icons/') ? false : undefined)
 	},
 	test: {
-		// Unit-Tests liegen neben dem Code (z. B. src/lib/data.test.ts); fetch und window werden gemockt
+		// Unit tests live next to the code (e.g. src/lib/data.test.ts); fetch and window are mocked
 		include: ['src/**/*.test.ts'],
 		environment: 'node'
 	}

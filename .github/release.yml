@@ -1,4 +1,4 @@
-# Gruppiert die automatisch erzeugten Release Notes (aus den PR-Titeln) nach Labels
+# Groups the auto-generated release notes (from PR titles) by label
 changelog:
   exclude:
     labels: [duplicate, invalid, wontfix]

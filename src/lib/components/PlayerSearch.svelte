@@ -11,7 +11,7 @@
 	}
 
 	let { onPlayerSelect, usedPlayerIds = [], incorrectPlayerIds = [] }: Props = $props();
-	const uid = $props.id(); // Eindeutige IDs für die ARIA-Verknüpfung von Eingabe und Liste
+	const uid = $props.id(); // Unique IDs for the ARIA link between input and list
 	let searchQuery = $state('');
 	let suggestions = $state<DELPlayer[]>([]);
 	let isOpen = $state(false);
@@ -49,7 +49,7 @@
 		}, 800);
 	}
 
-	// ID der per Pfeiltaste markierten Option (für aria-activedescendant)
+	// ID of the option highlighted via arrow keys (for aria-activedescendant)
 	let activeOptionId = $derived.by(() => {
 		if (!isOpen || selectedIndex < 0) return undefined;
 		const available = suggestions.filter(
@@ -107,7 +107,7 @@
 	}
 
 	function handleKeyDown(e: KeyboardEvent) {
-		// Escape schließt nur die Liste; ist sie zu, schließt der Dialog (siehe modalDialog)
+		// Escape closes only the list; if it is closed, the dialog closes (see modalDialog)
 		if (e.key === 'Escape' && isOpen) {
 			e.preventDefault();
 			isOpen = false;
@@ -203,7 +203,7 @@
 									: ''}
 							</div>
 						</div>
-						<!-- Tastatur läuft über die Pfeiltasten im Suchfeld; der Button ist nur für Maus und Touch -->
+						<!-- Keyboard uses the arrow keys in the search field; the button is for mouse and touch only -->
 						<button
 							tabindex="-1"
 							aria-hidden="true"
@@ -220,7 +220,7 @@
 		</ul>
 	{/if}
 
-	<!-- Ansage für Screenreader, ob die Antwort richtig war -->
+	<!-- Screen reader announcement of whether the answer was correct -->
 	<p class="sr-only" aria-live="assertive">
 		{feedbackStatus === 'correct'
 			? t('answerCorrect', $languageStore)

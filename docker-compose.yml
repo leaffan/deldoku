@@ -1,4 +1,4 @@
-# Lokales PHP-Backend für `pnpm run dev` (gleiche Verzeichnisstruktur wie auf dem Server)
+# Local PHP backend for `pnpm run dev` (same directory layout as on the server)
 services:
   php:
     image: php:8.2-cli

@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// data.ts hält die Spielerliste und die aktuelle Saison im Modul-Zustand; jeder Test lädt das
-// Modul daher frisch.
+// data.ts keeps the player list and the current season in module state, so each test loads
+// the module fresh.
 type DataModule = typeof import('./data');
 let data: DataModule;
 
 const BASE_URL = 'http://localhost/deldoku/';
-const BASE_PATH = '/deldoku/'; // data.ts lädt relativ zum Pfad der Seite
+const BASE_PATH = '/deldoku/'; // data.ts fetches relative to the page path
 
 const PLAYERS = [
 	{ i: '1001/alice-a', n: 'Alice A', t: 'de', f: 2015, l: 2026 },
@@ -28,7 +28,7 @@ function jsonResponse(body: unknown, status = 200) {
 	return new Response(JSON.stringify(body), { status });
 }
 
-/** fetch-Attrappe: liefert pro Dateipfad unterhalb von /deldoku/ (z. B. "all_players.json") eine Antwort oder 404. */
+/** fetch stub: returns a response per file path below /deldoku/ (e.g. "all_players.json"), or 404. */
 function stubFetch(files: Record<string, Response | (() => Response)>) {
 	const fetchMock = vi.fn(async (url: string) => {
 		const name = url.slice(BASE_PATH.length);

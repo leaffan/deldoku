@@ -1,16 +1,16 @@
-# Erzeugtes und Abhängigkeiten
+# Generated files and dependencies
 build/
 .svelte-kit/
 node_modules/
 pnpm-lock.yaml
 
-# Daten und statische Dateien (Spielerdaten, Logos, PHP)
+# Data and static files (player data, logos, PHP)
 static/
 all_players_uncompressed.json
 data/
 .dev-data/
 
-# E2E-Tests (Playwright)
+# E2E tests (Playwright)
 .e2e-server/
 test-results/
 playwright-report/

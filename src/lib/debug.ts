@@ -1,5 +1,5 @@
-// Debug-Utility für DELDoku
-// Aktiviere Debug-Logs mit ?debug=true in der URL
+// Debug utility for DELDoku
+// Enable debug logs with ?debug=true in the URL
 
 let debugEnabled = false;
 
@@ -11,7 +11,7 @@ if (typeof window !== 'undefined') {
 	debugChallenge = params.get('challenge');
 
 	if (debugEnabled) {
-		console.log('🐛 Debug-Modus aktiviert');
+		console.log('🐛 Debug mode enabled');
 		if (debugChallenge) {
 			console.log(`[DEBUG] Challenge-Override: ${debugChallenge}`);
 		}

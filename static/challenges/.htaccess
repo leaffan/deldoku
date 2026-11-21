@@ -1,7 +1,7 @@
-# Verhindere Directory-Browsing
+# Prevent directory browsing
 Options -Indexes
 
-# Erlaube nur Zugriff auf JSON-Dateien, alles andere wird abgewiesen (403)
+# Allow access to JSON files only, everything else is denied (403)
 # Apache 2.4
 <IfModule mod_authz_core.c>
     Require all denied
@@ -9,7 +9,7 @@ Options -Indexes
         Require all granted
     </FilesMatch>
 </IfModule>
-# Apache 2.2 (Fallback, falls mod_authz_core fehlt)
+# Apache 2.2 (fallback if mod_authz_core is missing)
 <IfModule !mod_authz_core.c>
     Order deny,allow
     Deny from all

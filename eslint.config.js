@@ -29,7 +29,7 @@ export default defineConfig(
 	...svelte.configs.prettier,
 	{
 		languageOptions: { globals: { ...globals.browser, ...globals.node } },
-		// TypeScript prüft undefinierte Namen selbst; no-undef liefert dort nur Fehlalarme
+		// TypeScript checks undefined names itself; no-undef only yields false positives there
 		rules: { 'no-undef': 'off' }
 	},
 	{

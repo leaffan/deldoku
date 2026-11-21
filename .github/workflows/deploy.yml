@@ -1,11 +1,11 @@
 name: Deploy
 
-# Testinstanz: automatisch, sobald die CI auf main grün ist, oder manuell mit einem beliebigen Branch
-# (zum Ausprobieren vor dem Merge; der nächste Merge auf main überschreibt ihn wieder).
-# Live: manuell mit einem Release-Tag; das Environment "production" verlangt eine Freigabe.
-# Host, Zugang und Ziel stehen nur in den Environment-Secrets; der Deploy-Schlüssel ist auf dem
-# Server auf das Instanzverzeichnis beschränkt. Das Repo ist öffentlich, also auch die Logs:
-# nichts ausgeben, was Pfade oder Dateilisten verrät.
+# Test instance: automatically once CI is green on main, or manually with any branch
+# (to try things out before merging; the next merge to main overwrites it again).
+# Live: manually with a release tag; the "production" environment requires approval.
+# Host, credentials and target live only in the environment secrets; on the server the deploy key
+# is restricted to the instance directory. The repo is public, and so are the logs:
+# print nothing that reveals paths or file lists.
 on:
   workflow_run:
     workflows: [CI]
@@ -28,7 +28,7 @@ permissions:
 jobs:
   deploy:
     name: Deploy to ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'test' }}
-    # Nur nach erfolgreicher CI eines Pushs auf main (nicht nach dem wöchentlichen Audit-Lauf)
+    # Only after a successful CI run for a push to main (not after the weekly audit run)
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
@@ -50,7 +50,7 @@ jobs:
 
       - uses: actions/checkout@v7
         with:
-          # production: der Tag; test von Hand: der gewählte Branch; test automatisch: der Commit der CI
+          # production: the tag; test (manual): the selected branch; test (automatic): the CI commit
           ref: ${{ env.PRODUCTION == 'true' && format('refs/tags/{0}', inputs.tag) || github.event.workflow_run.head_sha || github.sha }}
           fetch-depth: 0
 
@@ -72,14 +72,14 @@ jobs:
 
       - name: Build
         run: |
-          # Commit als Build-Kennung in _app/version.json, damit der Smoke-Test genau diesen Build erkennt
+          # Commit as build ID in _app/version.json, so the smoke test recognizes exactly this build
           BUILD_SHA=$(git rev-parse HEAD) pnpm build
-          # Die Testinstanz nicht in Suchmaschinen aufnehmen
+          # Keep the test instance out of search engines
           if [ "$PRODUCTION" != true ]; then
             printf 'User-agent: *\nDisallow: /\n' > build/robots.txt
           fi
         env:
-          # Basispfad /deldoku_tst statt /deldoku (vite.config.ts)
+          # Base path /deldoku_tst instead of /deldoku (vite.config.ts)
           VITE_BUILD_ENV: ${{ env.PRODUCTION == 'true' && 'production' || 'test' }}
 
       - name: Set up SSH
@@ -96,25 +96,25 @@ jobs:
         env:
           TARGET: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
         run: |
-          # Der Schlüssel ist serverseitig per rrsync auf das Instanzverzeichnis beschränkt; "./" ist dessen Wurzel.
-          # challenges/: nur fallback.json und .htaccess (verhindert das Auflisten) ausliefern, die Tages-Challenges
-          # auf dem Server nie anfassen (ausgeschlossene Dateien sind auch vor --delete geschützt).
-          # Die Testinstanz teilt sich challenges/ mit der Produktion und lässt das Verzeichnis ganz aus, damit
-          # ein Branch nie die Dateien der Produktion überschreibt.
+          # On the server, rrsync restricts the key to the instance directory; "./" is its root.
+          # challenges/: ship only fallback.json and .htaccess (prevents directory listing), never touch the
+          # daily challenges on the server (excluded files are also protected from --delete).
+          # The test instance shares challenges/ with production and skips the directory entirely, so
+          # a branch never overwrites production's files.
           if [ "$PRODUCTION" = true ]; then
             challenges=(--filter='+ /challenges/' --filter='+ /challenges/fallback.json'
               --filter='+ /challenges/.htaccess' --filter='- /challenges/*')
           else
-            # Ohne "/" am Ende: passt auch auf den Symlink auf dem Server, sonst löscht --delete-after ihn
+            # No trailing "/": also matches the symlink on the server, otherwise --delete-after removes it
             challenges=(--filter='- /challenges')
           fi
           sync() {
             rsync -rlz --checksum --chmod=D755,F644 -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes" \
               "${challenges[@]}" "$@" build/ "$TARGET:./"
           }
-          # 1. Neue Dateien neben die alten legen; index.html verweist noch auf die alten Skripte
+          # 1. Put new files next to the old ones; index.html still references the old scripts
           sync --exclude=/index.html
-          # 2. index.html umstellen und erst dann veraltete Dateien löschen
+          # 2. Switch index.html, only then delete stale files
           sync --delete-after
 
       - name: Smoke test
@@ -123,10 +123,10 @@ jobs:
         run: |
           version=$(node -p "require('./package.json').version")
           page=$(curl -fsS --retry 3 --retry-all-errors "$URL/")
-          # Der Footer verlinkt das Release der ausgelieferten Version
+          # The footer links the release of the deployed version
           grep -q "releases/tag/$version\"" <<<"$page" \
             || { echo "::error::page does not show version $version"; exit 1; }
-          # Zwischen zwei Releases bleibt die Version gleich; erst der Commit belegt, dass dieser Build online ist
+          # The version stays the same between releases; only the commit proves this build is live
           sha=$(git rev-parse HEAD)
           curl -fsS --retry 3 --retry-all-errors -H 'Cache-Control: no-cache' "$URL/_app/version.json" \
             | jq -e --arg sha "$sha" '.version == $sha' >/dev/null \

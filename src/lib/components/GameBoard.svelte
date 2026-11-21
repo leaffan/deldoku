@@ -38,9 +38,9 @@
 	let flashAnswers = $state(false); // For flash animation on answers
 	let flashScore = $state(false); // For flash animation on score
 	let cellScores = $state<Record<string, number>>({}); // Points per cell
-	let dayCounts: Record<string, Record<string, number>> | null = null; // Antwortzählung des Tages pro Zelle
+	let dayCounts: Record<string, Record<string, number>> | null = null; // Day's answer counts per cell
 	let gameFinished = $state(false); // Whether the game is finished
-	let saveFailed = $state(false); // Ergebnis konnte nicht auf dem Server gespeichert werden
+	let saveFailed = $state(false); // Result could not be saved on the server
 
 	function formatDate(dateStr: string, lang: string): string {
 		if (!dateStr) return '';
@@ -49,11 +49,11 @@
 		return `${y}-${m}-${d}`;
 	}
 
-	// Emoji für grün/rot (🟩/🟥) oder Unicode-Quadrate
+	// Emoji for green/red (🟩/🟥) or Unicode squares
 	const GREEN = '🟩';
 	const RED = '🟥';
 
-	// Entwickler-Template für das Ergebnis. Hier editierbar:
+	// Developer template for the result. Edit here:
 	const resultTemplate = ({
 		grid,
 		score,
@@ -73,12 +73,12 @@ https://www.leaffan.net/deldoku
 `;
 
 	function generateResultText() {
-		// 3x3-Gitter mit grünen/roten Quadraten je nach Korrektheit
+		// 3x3 grid of green/red squares depending on correctness
 		let grid = '';
 		for (let row = 0; row < 3; row++) {
 			for (let col = 0; col < 3; col++) {
 				const cellKey = getCellKey(row, col);
-				// Grün = richtig, Rot = nur falsche Versuche, Weiß = nicht beantwortet
+				// Green = correct, red = only incorrect attempts, white = not answered
 				grid += correctCells.includes(cellKey)
 					? GREEN
 					: incorrectPlayersByCell[cellKey]?.length
@@ -161,12 +161,12 @@ https://www.leaffan.net/deldoku
 			debug('Preloading logo for category:', c);
 			if (/^\d/.test(c)) return; // skipping categories starting with a digit
 			if (/^WJC/.test(c)) return; // skipping categories starting with WJC
-			if (c.toUpperCase() !== 'OG' && /^[a-zA-Z]{2}$/.test(c)) return; // keine Logo-Suche für ISO-Ländercode
+			if (c.toUpperCase() !== 'OG' && /^[a-zA-Z]{2}$/.test(c)) return; // no logo lookup for ISO country codes
 			findLogo(c);
 		});
 	});
 
-	// Tageszählung für die vorläufige Punkteanzeige laden; verbindlich sind die Punkte vom Server
+	// Load the day's counts for the provisional score display; the server's points are authoritative
 	async function loadDayCounts() {
 		if (dayCounts) return;
 		try {
@@ -194,7 +194,7 @@ https://www.leaffan.net/deldoku
 		}
 	});
 
-	// Zugänglicher Name einer Zelle: Zeile, Spalte und Zustand (nicht nur über die Farbe erkennbar)
+	// Accessible name of a cell: row, column and state (not conveyed by color alone)
 	function getCellLabel(rowIdx: number, colIdx: number): string {
 		const key = getCellKey(rowIdx, colIdx);
 		const state = correctCells.includes(key)
@@ -224,7 +224,7 @@ https://www.leaffan.net/deldoku
 	}
 
 	async function handlePlayerSelect(player: DELPlayer) {
-		// Nach der 9. Antwort bzw. Abgabe keine weiteren Antworten annehmen
+		// Accept no more answers after the 9th answer or submission
 		if (gameFinished || answersGiven >= 9) return;
 		if (selectedCell) {
 			const [row, col] = selectedCell;
@@ -237,7 +237,7 @@ https://www.leaffan.net/deldoku
 			answersGiven++;
 			debug('Answers given:', answersGiven);
 
-			// Triggere Flash-Animation
+			// Trigger flash animation
 			flashAnswers = true;
 			setTimeout(() => (flashAnswers = false), 400);
 
@@ -290,7 +290,7 @@ https://www.leaffan.net/deldoku
 
 		// Calculate total number of answers for this cell
 		const totalAnswers = Object.values(usageCounts).reduce((sum, count) => sum + count, 0) || 1;
-		// Der Server zählt unter der Schreibweise der Challenge, daher über die numerische Eliteprospects-ID suchen
+		// The server counts under the challenge's spelling, so look up by numeric Eliteprospects ID
 		const usageCount = Object.entries(usageCounts).reduce(
 			(sum, [id, count]) => (samePlayer(id, playerId) ? sum + count : sum),
 			0
@@ -309,8 +309,8 @@ https://www.leaffan.net/deldoku
 	}
 
 	async function submitSolution() {
-		if (gameFinished) return; // Doppelte Abgabe (Button + automatische Abgabe) verhindern
-		selectedCell = null; // Offenes Suchfenster schließen
+		if (gameFinished) return; // Prevent double submission (button + auto-submit)
+		selectedCell = null; // Close the open search dialog
 		let correctCount = 0;
 		const playerSelections: Record<string, string> = {};
 
@@ -357,11 +357,11 @@ https://www.leaffan.net/deldoku
 			currentScore = result.score;
 			cellScores = result.cellScores;
 		} catch (error) {
-			// Ohne Server bleibt die vorläufige Punktzahl stehen
+			// Without the server, the provisional score remains
 			console.error('Error submitting game:', error);
 			saveFailed = true;
 		}
-		dayCounts = null; // Nächstes Spiel mit aktueller Zählung
+		dayCounts = null; // Next game uses fresh counts
 	}
 </script>
 
@@ -552,7 +552,7 @@ https://www.leaffan.net/deldoku
 
 	<!-- Overlay for player input -->
 	{#if selectedCell !== null}
-		<!-- Klick auf den Hintergrund schließt; per Tastatur übernimmt das Escape in modalDialog -->
+		<!-- Clicking the backdrop closes; for keyboard users, Escape in modalDialog handles it -->
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
 			role="dialog"

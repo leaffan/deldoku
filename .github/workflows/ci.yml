@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches: [main]
-  # Wöchentlich nur der Audit, damit neue Sicherheitsmeldungen auch ohne Code-Änderung auffallen
+  # Weekly: audit only, so new security advisories surface even without code changes
   schedule:
     - cron: '0 6 * * 1'
   workflow_dispatch:
@@ -60,7 +60,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm build
-      # Startet den PHP-Server in Docker selbst (tests/e2e/serve.sh)
+      # Starts the PHP server in Docker itself (tests/e2e/serve.sh)
       - run: pnpm test:e2e
       - uses: actions/upload-artifact@v7
         if: failure()
@@ -79,5 +79,5 @@ jobs:
       - uses: pnpm/action-setup@v6
         with:
           version: 12
-      # Schlägt nur bei Lücken der Stufe high oder critical fehl
+      # Fails only on high or critical vulnerabilities
       - run: pnpm audit --audit-level high

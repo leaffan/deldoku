@@ -9,7 +9,7 @@
 		isSelected?: boolean;
 		isCorrect?: boolean;
 		isIncorrect?: boolean;
-		label?: string; // Zugänglicher Name inkl. Zustand (richtig/falsch/offen)
+		label?: string; // Accessible name incl. state (correct/incorrect/open)
 	}
 
 	let { player, onCellClick, isSelected, isCorrect, isIncorrect, label }: Props = $props();

@@ -7,10 +7,10 @@
 
 	const version = __APP_VERSION__;
 
-	// Datenschutzerklärung auf leaffan.net gibt es auf Deutsch (maßgeblich) und Englisch
+	// The privacy policy on leaffan.net exists in German (authoritative) and English
 	let privacySuffix = $derived($languageStore === 'en' ? '_en' : '');
 
-	// Seitensprache für Screenreader und Silbentrennung an die gewählte Sprache anpassen
+	// Set the page language to the selected language for screen readers and hyphenation
 	$effect(() => {
 		document.documentElement.lang = $languageStore;
 	});
