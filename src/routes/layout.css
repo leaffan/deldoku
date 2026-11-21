@@ -2,7 +2,7 @@
 @import 'flag-icons/css/flag-icons.min.css';
 @import '@fontsource/fira-mono';
 
-/* Tailwind v4 hat Standardwerte gegenüber v3 (bisher per CDN) geändert; diese Regeln stellen das alte Aussehen her */
+/* Tailwind v4 changed defaults compared to v3 (previously via CDN); these rules restore the old look */
 @layer base {
 	*,
 	::after,
@@ -21,7 +21,7 @@
 	}
 }
 
-/* Eigene Grundstile in den base-Layer, damit Tailwind-Utilities sie wie bisher überschreiben */
+/* Custom base styles go in the base layer so Tailwind utilities override them as before */
 @layer base {
 	:root {
 		--font-body:
@@ -132,12 +132,12 @@
 	}
 }
 
-/* Spielfeld auf schmalen Displays: 4 Spalten passen in die Breite abzüglich 3rem Seitenabstand
-   (1rem Layout + 0.5rem Seite, je beidseitig); ab sm gelten die festen Größen */
+/* Game board on narrow displays: 4 columns fit into the width minus 3rem of horizontal padding
+   (1rem layout + 0.5rem page, each on both sides); from sm up the fixed sizes apply */
 @utility cell-size {
 	width: min(5rem, calc((100vw - 3rem) / 4));
 	height: min(5rem, calc((100vw - 3rem) / 4));
-	flex-shrink: 0; /* alle Zeilen gleich breit halten */
+	flex-shrink: 0; /* keep all rows the same width */
 }
 
 @utility board-width {

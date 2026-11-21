@@ -17,7 +17,7 @@
 	let error = $state<string | null>(null);
 	let noChallenge = $state(false);
 
-	// Lade Players, Stats und Challenge beim Komponenten-Mount; nicht beim Prerendern im Build
+	// Load players, stats and challenge on component mount; not during prerendering in the build
 	if (browser)
 		Promise.all([playersStore.init(), statsStore.init()])
 			.then(async () => {
@@ -26,7 +26,7 @@
 					challengeDate = getDebugChallenge();
 				}
 				if (challengeDate) {
-					// Challenge-Override: Lade gezielt die Datei
+					// Challenge override: load the specified file
 					try {
 						const basePath =
 							typeof window !== 'undefined'
@@ -57,7 +57,7 @@
 						return;
 					}
 				}
-				// Standard: Lade die Tages-Challenge
+				// Default: load the daily challenge
 				return generateDailyChallenge([]).then((data) => {
 					challenge = data;
 					loading = false;
@@ -179,7 +179,7 @@
 
 <!-- Rules Modal -->
 {#if showRules}
-	<!-- Klick auf den Hintergrund schließt; per Tastatur übernimmt das Escape in modalDialog -->
+	<!-- Clicking the backdrop closes; for keyboard users, Escape in modalDialog handles it -->
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div
 		role="dialog"

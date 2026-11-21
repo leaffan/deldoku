@@ -1,30 +1,30 @@
 import type { DELPlayer } from './data';
 
 /**
- * Liefert die Suchformen eines Textes (Name oder Eingabe), z. B. für "Müller":
- *   ['muller', 'mueller']  — Akzente entfernt bzw. deutsch transkribiert
- * Doppelte Formen (etwa bei "Smith") sollen nur einmal vorkommen.
+ * Returns the search forms of a text (name or input), e.g. for "Müller":
+ *   ['muller', 'mueller']  — accents stripped or German transcription
+ * Duplicate forms (e.g. for "Smith") occur only once.
  *
- * Name und Eingabe laufen durch dieselbe Funktion; ein Treffer liegt vor, wenn irgendeine
- * Form der Eingabe in irgendeiner Form des Namens enthalten ist.
+ * Names and input go through the same function; it is a match if any form of the
+ * input is contained in any form of the name.
  */
 export function searchForms(text: string): string[] {
-	// Kleinbuchstaben und Sonderzeichen behandeln
+	// Lowercase and handle special characters
 	const lower = text.toLowerCase().replaceAll('ø', 'o');
-	// Akzente entfernen
+	// Strip accents
 	const strip = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '');
-	// Umlaute transkribieren
+	// Transcribe umlauts
 	const transcribed = lower
 		.replaceAll('ä', 'ae')
 		.replaceAll('ö', 'oe')
 		.replaceAll('ü', 'ue')
 		.replaceAll('ß', 'ss'); /* … ö, ü, ß */
-	// Ergebnis zusammenstellen: Einzigartige Formen von Original und transkribiert
+	// Build the result: unique forms of the original and the transcription
 	return [...new Set([strip(lower), strip(transcribed)])];
 }
 
-// Suchformen je Spieler; einmal pro Spielerobjekt berechnet statt bei jedem Tastendruck.
-// WeakMap statt Feld in DELPlayer, damit der Datentyp frei von Such-Interna bleibt.
+// Search forms per player; computed once per player object instead of on every keystroke.
+// WeakMap instead of a field on DELPlayer, so the data type stays free of search internals.
 const formsCache = new WeakMap<DELPlayer, string[]>();
 
 function playerForms(player: DELPlayer): string[] {
@@ -36,7 +36,7 @@ function playerForms(player: DELPlayer): string[] {
 	return forms;
 }
 
-/** Vorbereitete Eingabe; einmal pro Tastendruck berechnen und für alle Spieler verwenden. */
+/** Prepared input; compute once per keystroke and reuse for all players. */
 export function prepareQuery(query: string): string[] {
 	const trimmed = query.trim();
 	return trimmed.length === 0 ? [] : searchForms(trimmed);

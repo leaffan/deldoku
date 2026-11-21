@@ -13,10 +13,10 @@ export interface DELDokuChallenge {
 	colCategories: string[];
 	grid: (DELPlayer | null)[][];
 	answers: string[][][];
-	isFallback?: boolean; // Ersatz-Challenge, weil für das Datum keine Datei existiert
+	isFallback?: boolean; // Fallback challenge, because no file exists for the date
 }
 
-// Weder Tages- noch Ersatz-Challenge verfügbar
+// Neither daily nor fallback challenge available
 export class NoChallengeError extends Error {
 	constructor() {
 		super('No challenge available');
@@ -24,7 +24,7 @@ export class NoChallengeError extends Error {
 	}
 }
 
-// Formate der JSON-Dateien, wie sie vom Server kommen
+// Formats of the JSON files as delivered by the server
 interface CompressedPlayer {
 	i: string; // id
 	n: string; // name
@@ -57,7 +57,7 @@ export function getApiBasePath(): string {
 	return '/deldoku/';
 }
 
-// Direkt auf stats.php zeigen, damit kein MultiViews/Rewrite auf dem Server nötig ist
+// Point directly at stats.php so no MultiViews/rewrite is needed on the server
 export function getStatsApiUrl(): string {
 	return `${getApiBasePath()}api/stats.php`;
 }
@@ -68,7 +68,7 @@ export async function loadPlayers(): Promise<DELPlayer[]> {
 		const response = await fetch(`${basePath}all_players.json`);
 		const compressed: CompressedPlayer[] = await response.json();
 
-		// Transformiere komprimierte Daten zurück zum vollen Format
+		// Expand compressed data back to the full format
 		samplePlayers = compressed.map((p) => ({
 			id: p.i,
 			name: p.n,
@@ -81,15 +81,15 @@ export async function loadPlayers(): Promise<DELPlayer[]> {
 	return samplePlayers;
 }
 
-// Aktuelle Saison = jüngste Saison in den Spielerdaten; Spieler mit dieser last_season sind noch aktiv.
-// Wird einmal in loadPlayers berechnet, weil die Funktion pro Zelle und Suchtreffer aufgerufen wird.
+// Current season = latest season in the player data; players with this last_season are still active.
+// Computed once in loadPlayers, because the function is called per cell and search hit.
 let currentSeason = 0;
 export function getCurrentSeason(): number {
 	return currentSeason;
 }
 
 export function getDailyChallengeDate(): string {
-	// Verwende UTC-Zeit statt lokale Zeit
+	// Use UTC instead of local time
 	const now = new Date();
 	const year = now.getUTCFullYear();
 	const month = String(now.getUTCMonth() + 1).padStart(2, '0');
@@ -97,8 +97,8 @@ export function getDailyChallengeDate(): string {
 	return `${year}-${month}-${day}`;
 }
 
-// null nur bei 404 (Datei fehlt); Netzwerk-, Server- und Parse-Fehler werden weitergereicht,
-// damit sie als Fehler angezeigt werden statt als "keine Challenge" oder Ersatz-Challenge
+// null only on 404 (file missing); network, server and parse errors are propagated
+// so they are shown as errors instead of as "no challenge" or the fallback challenge
 async function fetchChallengeFile(name: string): Promise<ChallengeFile | null> {
 	const response = await fetch(`${getBasePath()}challenges/${name}.json`);
 	if (response.status === 404) {
@@ -113,20 +113,20 @@ async function fetchChallengeFile(name: string): Promise<ChallengeFile | null> {
 export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELDokuChallenge> {
 	const date = getDailyChallengeDate();
 
-	// Lade Spieler wenn nicht vorhanden
+	// Load players if not yet loaded
 	if (players.length === 0) {
 		await loadPlayers();
 	}
 
-	// Nur im Browser laden - nicht während Server-Side Rendering
+	// Only load in the browser, not during server-side rendering
 	if (typeof window === 'undefined') {
-		throw new Error('Challenge kann nur im Browser geladen werden');
+		throw new Error('Challenge can only be loaded in the browser');
 	}
 
 	let challengeData = await fetchChallengeFile(date);
 	let isFallback = false;
 	if (!challengeData) {
-		// Dauerhaft gültige Ersatz-Challenge; der Server wertet mit derselben Datei
+		// Permanently valid fallback challenge; the server scores against the same file
 		challengeData = await fetchChallengeFile('fallback');
 		isFallback = true;
 	}
@@ -147,8 +147,8 @@ export async function generateDailyChallenge(players: DELPlayer[]): Promise<DELD
 	};
 }
 
-// Spieler werden nur über ihre numerische Eliteprospects-ID (die Zahl vor dem "/") verglichen; der Namensteil dient nur der Lesbarkeit
-// und ist zwischen Spielerliste und Challenges nicht immer gleich kodiert (z. B. "krauß" vs. "krauÃŸ")
+// Players are compared only by their numeric Eliteprospects ID (the number before the "/"); the name part is
+// for readability only and is not always encoded the same way in the player list and challenges (e.g. "krauß" vs. "krauÃŸ")
 export function epId(playerId: string): string {
 	const pos = playerId.indexOf('/');
 	return pos === -1 ? playerId : playerId.slice(0, pos);
@@ -164,10 +164,10 @@ export function validatePlayerMatch(
 	rowIdx: number,
 	colIdx: number
 ): boolean {
-	// Hole die gültigen Player-IDs für diese Zelle
+	// Get the valid player IDs for this cell
 	const expectedPlayerIds = answers[rowIdx][colIdx];
 
-	// Überprüfe ob der ausgewählte Spieler in den gültigen IDs enthalten ist
+	// Check whether the selected player is among the valid IDs
 	if (!expectedPlayerIds.some((id) => samePlayer(id, player.id))) {
 		return false;
 	}

@@ -115,4 +115,4 @@ def test_rejects_invalid_retention(tmp_path, data_dir, days):
 def test_fails_without_data_directory(tmp_path):
     result = run_backup(tmp_path / "missing", tmp_path / "backups")
     assert result.returncode == 1
-    assert "Datenverzeichnis fehlt" in result.stderr
+    assert "Data directory missing" in result.stderr

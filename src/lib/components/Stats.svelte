@@ -4,7 +4,7 @@
 	import { t } from '#lib/i18n.ts';
 	import { getStatsApiUrl, getDailyChallengeDate, samePlayer } from '#lib/data.ts';
 
-	// Gesamtstatistiken für den aktuellen Tag (Svelte 5 $state)
+	// Aggregated stats for the current day (Svelte 5 $state)
 	let avgCorrectAnswers = $state<number | null>(null);
 	let avgScore = $state<number | null>(null);
 	let totalGamesToday = $state<number | null>(null);
@@ -35,8 +35,8 @@
 		return player ? player.name : playerId;
 	}
 
-	// Historie, neuestes Spiel zuerst, mit stabilem Schlüssel pro Spiel: Der Zeitstempel ist nur
-	// sekundengenau, daher bei gleichen Zeitstempeln ein Zähler, damit der Schlüssel eindeutig bleibt
+	// History, newest game first, with a stable key per game: the timestamp only has second
+	// precision, so equal timestamps get a counter to keep the key unique
 	let history = $derived.by(() => {
 		const seen: Record<string, number> = {};
 		return $statsStore.gameHistory
@@ -47,7 +47,7 @@
 			.reverse();
 	});
 
-	// Löschen in zwei Schritten: erst Button, dann Bestätigung
+	// Two-step deletion: first the button, then confirmation
 	let confirmingDelete = $state(false);
 	let deleting = $state(false);
 	let deleteError = $state<string | null>(null);

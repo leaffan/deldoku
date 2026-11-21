@@ -1,25 +1,25 @@
 <?php
-// Stats API für DELDoku
+// Stats API for DELDoku
 //
-// GET  api/stats.php[?date=YYYY-MM-DD]          Öffentliche Tageswerte (nur Aggregate)
-// GET  api/stats.php?userId=<id>                 Eigene Stats, Header X-DelDoku-Token erforderlich
-// POST api/stats.php {date, selections[, userId]} Spiel absenden; ohne userId wird ein neuer Nutzer angelegt
-// DELETE api/stats.php?userId=<id>               Eigenes Konto samt Spielen löschen, Header X-DelDoku-Token erforderlich
+// GET  api/stats.php[?date=YYYY-MM-DD]          Public daily values (aggregates only)
+// GET  api/stats.php?userId=<id>                 Own stats, X-DelDoku-Token header required
+// POST api/stats.php {date, selections[, userId]} Submit a game; without userId a new user is created
+// DELETE api/stats.php?userId=<id>               Delete own account including games, X-DelDoku-Token header required
 //
-// Benötigt PHP 8.0 oder neuer (str_ends_with); Produktion und CI laufen auf PHP 8.2.
+// Requires PHP 8.0 or newer (str_ends_with); production and CI run on PHP 8.2.
 
 const MAX_BODY_BYTES = 8192;
 const MAX_GAMES_PER_DAY = 20;
 const HISTORY_LIMIT = 100;
 const WIN_BONUS = 100;
-const MAX_SCORE_PER_DAY = 1000; // 9 Zellen à 100 Punkte plus Siegbonus
+const MAX_SCORE_PER_DAY = 1000; // 9 cells at 100 points each plus win bonus
 const CELL_KEYS = ['0-0', '0-1', '0-2', '1-0', '1-1', '1-2', '2-0', '2-1', '2-2'];
-const DEFAULT_REGISTRATION_LIMIT = 20; // neue Nutzer pro IP und UTC-Tag
-const RETENTION_MONTHS = 12; // Konten ohne Spiel in diesem Zeitraum werden gelöscht
+const DEFAULT_REGISTRATION_LIMIT = 20; // new users per IP and UTC day
+const RETENTION_MONTHS = 12; // accounts without a game in this period are deleted
 
-// --- Nur für die API-Tests (tests/api): auf dem Server nie gesetzt ---
-// DELDOKU_TEST_TODAY               festes "heute" (YYYY-MM-DD), damit Tests nicht über Mitternacht kippen
-// DELDOKU_TEST_REGISTRATION_LIMIT  eigenes Limit für neue Nutzer, da alle Tests von einer IP kommen
+// --- Only for the API tests (tests/api): never set on the server ---
+// DELDOKU_TEST_TODAY               fixed "today" (YYYY-MM-DD), so tests do not break across midnight
+// DELDOKU_TEST_REGISTRATION_LIMIT  separate limit for new users, since all tests come from one IP
 function testSetting($name) {
     $value = getenv($name);
     return $value === false || $value === '' ? null : $value;
@@ -38,7 +38,7 @@ function respond($status, $data) {
     exit;
 }
 
-// Jede Instanz hat eigene Daten neben dem Instanzverzeichnis: deldoku/ -> data/, deldoku_tst/ -> data_tst/
+// Each instance has its own data next to the instance directory: deldoku/ -> data/, deldoku_tst/ -> data_tst/
 function dataDir() {
     $suffix = str_ends_with(basename(dirname(__DIR__)), '_tst') ? '_tst' : '';
     return __DIR__ . "/../../data$suffix";
@@ -46,17 +46,17 @@ function dataDir() {
 
 function ensureDataDirs() {
     $dir = dataDir();
-    // is_dir() nach mkdir(), falls ein paralleler Request das Verzeichnis gerade angelegt hat
+    // is_dir() after mkdir(), in case a parallel request just created the directory
     if (!is_dir($dir . '/users') && !@mkdir($dir . '/users', 0755, true) && !is_dir($dir . '/users')) {
         respond(500, ['error' => 'could not create data directory']);
     }
-    // data/ kann im Document Root liegen; enthält Token-Hashes und Rohdaten
+    // data/ may live in the document root; contains token hashes and raw data
     if (!file_exists($dir . '/.htaccess') && @file_put_contents($dir . '/.htaccess', "Require all denied\n") === false) {
         respond(500, ['error' => 'could not protect data directory']);
     }
 }
 
-// Nur echte Kalenderdaten im Format YYYY-MM-DD zulassen, da der Wert in den Dateipfad eingeht
+// Only allow real calendar dates in YYYY-MM-DD format, since the value goes into the file path
 function isValidChallengeDate($challengeDate) {
     if (!is_string($challengeDate)) {
         return false;
@@ -67,25 +67,25 @@ function isValidChallengeDate($challengeDate) {
     return checkdate((int)$m[2], (int)$m[3], (int)$m[1]);
 }
 
-// Nutzer-IDs gehen ebenfalls in den Dateipfad ein
+// User IDs also go into the file path
 function isValidUserId($userId) {
     return is_string($userId) && preg_match('/\Au_[0-9a-f]{16}\z/', $userId) === 1;
 }
 
-// Spieler-IDs enthalten Punkte, %-Kodierung und Nicht-ASCII-Zeichen; sie landen nur in JSON, nie in Pfaden
+// Player IDs contain dots, %-encoding and non-ASCII characters; they only end up in JSON, never in paths
 function isValidPlayerId($playerId) {
     return is_string($playerId) && strlen($playerId) <= 80
         && preg_match('/\A\d+\/[^\s\x00-\x1F\x7F]+\z/u', $playerId) === 1;
 }
 
-// Spieler werden nur über ihre numerischeEliteprospects-ID (die Zahl vor dem "/") verglichen; der Namensteil dient nur der Lesbarkeit
-// und ist zwischen Spielerliste und Challenges nicht immer gleich kodiert (z. B. "krauß" vs. "krauÃŸ")
+// Players are compared only by their numeric Eliteprospects ID (the number before the "/"); the name part is just for readability
+// and is not always encoded the same in the player list and the challenges (e.g. "krauß" vs. "krauÃŸ")
 function epId($playerId) {
     $pos = strpos($playerId, '/');
     return $pos === false ? $playerId : substr($playerId, 0, $pos);
 }
 
-// Schreibweise der Challenge für den Spieler, oder null, wenn er in der Zelle nicht gültig ist
+// The challenge's spelling for the player, or null if the player is not valid in the cell
 function matchAnswer($playerId, $valid) {
     $epId = epId($playerId);
     foreach ($valid as $answer) {
@@ -111,7 +111,7 @@ function readJsonFile($path, $default) {
     }
     $data = json_decode(file_get_contents($path), true);
     if (!is_array($data)) {
-        // Datei nicht überschreiben, sonst gehen Daten verloren
+        // Do not overwrite the file, or data is lost
         respond(500, ['error' => 'corrupt data file']);
     }
     return $data;
@@ -143,12 +143,12 @@ function userFile($userId) {
     return dataDir() . "/users/$userId.json";
 }
 
-// Ersatz-Challenge getrennt zählen: gleiche Zellnamen, aber andere Kategorien als die Tages-Challenge
+// Count the fallback challenge separately: same cell names, but different categories than the daily challenge
 function dayFile($date, $fallback = false) {
     return dataDir() . "/day_$date" . ($fallback ? '_fallback' : '') . '.json';
 }
 
-// Erlaubt sind nur "fallback" oder keine Angabe
+// Only "fallback" or no value is allowed
 function parseChallengeParam($value) {
     if ($value === null) {
         return false;
@@ -167,7 +167,7 @@ function logLine($data) {
     return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
 }
 
-// Nur der Hash, nie das Token selbst
+// Only the hash, never the token itself
 function registrationLogEntry($user) {
     return [
         'type' => 'register',
@@ -181,12 +181,12 @@ function rateLimitFile($date) {
     return dataDir() . "/ratelimit_$date.json";
 }
 
-// IPs nur als HMAC mit täglich neuem Schlüssel speichern, damit sie nicht über Tage verfolgbar sind
+// Store IPs only as HMAC with a daily new key, so they cannot be tracked across days
 function loadRateLimit() {
     $today = utcToday();
     $path = rateLimitFile($today);
     if (!file_exists($path)) {
-        // Nur heute und gestern behalten
+        // Keep only today and yesterday
         $yesterday = previousDate($today);
         foreach (glob(dataDir() . '/ratelimit_*.json') as $old) {
             $date = substr(basename($old, '.json'), strlen('ratelimit_'));
@@ -225,7 +225,7 @@ function logFile() {
     return dataDir() . '/games.jsonl';
 }
 
-// Entfernt Nutzerdateien und ihre Zeilen im Spiel-Log. Nur unter withLock() aufrufen.
+// Removes user files and their lines in the game log. Call only inside withLock().
 function deleteUsers($userIds) {
     if (count($userIds) === 0) {
         return;
@@ -241,7 +241,7 @@ function deleteUsers($userIds) {
         }
         while (($line = fgets($in)) !== false) {
             $entry = json_decode($line, true);
-            // Unlesbare Zeilen behalten, statt sie stillschweigend zu verlieren
+            // Keep unreadable lines instead of silently losing them
             if (is_array($entry) && isset($entry['userId']) && isset($remove[$entry['userId']])) {
                 continue;
             }
@@ -262,12 +262,12 @@ function deleteUsers($userIds) {
     }
 }
 
-// Zeitpunkt, ab dem ein Konto als abgelaufen gilt: RETENTION_MONTHS vor heute (UTC)
+// Point in time from which an account counts as expired: RETENTION_MONTHS before today (UTC)
 function retentionCutoff() {
     return gmdate('c', strtotime(utcToday() . ' 00:00:00 UTC -' . RETENTION_MONTHS . ' months'));
 }
 
-// Ob ein Konto seit dem Stichtag (ISO-8601, UTC) nicht mehr gespielt hat
+// Whether an account has not played since the cutoff (ISO-8601, UTC)
 function isExpired($user, $cutoff) {
     $games = isset($user['games']) && is_array($user['games']) ? $user['games'] : [];
     $lastPlayed = end($games);
@@ -275,7 +275,7 @@ function isExpired($user, $cutoff) {
     return is_string($activity) && $activity < $cutoff;
 }
 
-// Einmal pro UTC-Tag beim ersten API-Aufruf: abgelaufene Konten löschen
+// Once per UTC day on the first API call: delete expired accounts
 function expireInactiveUsers() {
     $today = utcToday();
     $marker = dataDir() . '/expired_until';
@@ -283,7 +283,7 @@ function expireInactiveUsers() {
         return;
     }
     withLock(function () use ($marker, $today) {
-        // Erneut prüfen: ein paralleler Request kann schon aufgeräumt haben
+        // Check again: a parallel request may already have cleaned up
         if (file_exists($marker) && trim(file_get_contents($marker)) === $today) {
             return;
         }
@@ -291,7 +291,7 @@ function expireInactiveUsers() {
         $expired = [];
         foreach (glob(dataDir() . '/users/u_*.json') as $path) {
             $user = json_decode(file_get_contents($path), true);
-            // Beschädigte Dateien nicht anfassen; sie fallen bei Zugriff ohnehin mit 500 auf
+            // Leave corrupt files alone; they surface with a 500 on access anyway
             if (is_array($user) && isset($user['userId']) && isValidUserId($user['userId']) && isExpired($user, $cutoff)) {
                 $expired[] = $user['userId'];
             }
@@ -303,8 +303,8 @@ function expireInactiveUsers() {
     });
 }
 
-// Liefert [answers, isFallback]. Ohne Tagesdatei gilt wie im Client die Ersatz-Challenge.
-// Der Client gibt "fallback" an, damit ein später hochgeladener Tagesstand nicht falsch gewertet wird.
+// Returns [answers, isFallback]. Without a daily file the fallback challenge applies, as in the client.
+// The client sends "fallback" so a daily challenge uploaded later is not scored incorrectly.
 function loadChallengeAnswers($date, $wantFallback) {
     $path = __DIR__ . "/../challenges/$date.json";
     $isFallback = $wantFallback || !file_exists($path);
@@ -321,7 +321,7 @@ function loadChallengeAnswers($date, $wantFallback) {
     return [$challenge['answers'], $isFallback];
 }
 
-// Seltenheitspunkte: 100 * (1 - Anteil dieses Spielers an allen Antworten der Zelle), mindestens 10
+// Rarity points: 100 * (1 - share of this player among all answers in the cell), at least 10
 function cellScore($cellCounts, $playerId) {
     $total = array_sum($cellCounts);
     if ($total === 0) {
@@ -358,7 +358,7 @@ function computeSummary($user) {
         $prev = $d;
     }
 
-    // Aktueller Streak läuft nur weiter, wenn heute oder gestern gespielt wurde
+    // The current streak only continues if the user played today or yesterday
     $current = 0;
     $cursor = utcToday();
     if (!isset($byDate[$cursor])) {
@@ -386,7 +386,7 @@ function computeSummary($user) {
         'daysPlayed' => count($byDate),
         'daysWon' => $daysWon,
         'totalPoints' => $totalPoints,
-        // Anteil an den möglichen Punkten, bezogen auf die gespielten Tage
+        // Share of the possible points, based on the days played
         'pointsPercent' => count($byDate) > 0 ? round($totalPoints / (count($byDate) * MAX_SCORE_PER_DAY) * 100, 1) : null,
         'currentStreak' => $current,
         'longestStreak' => $longest,
@@ -472,7 +472,7 @@ function handlePost() {
     if (!isValidChallengeDate($date)) {
         respond(400, ['error' => 'invalid date']);
     }
-    // Heute und gestern (UTC) zulassen, damit ein über Mitternacht offener Tab noch absenden kann
+    // Allow today and yesterday (UTC), so a tab left open past midnight can still submit
     $today = utcToday();
     if ($date !== $today && $date !== previousDate($today)) {
         respond(400, ['error' => 'date not playable']);
@@ -480,7 +480,7 @@ function handlePost() {
     $selections = parseSelections(isset($body['selections']) ? $body['selections'] : null);
     $wantFallback = parseChallengeParam(isset($body['challenge']) ? $body['challenge'] : null);
     list($answers, $fallback) = loadChallengeAnswers($date, $wantFallback);
-    // Merker "Spieler schon genannt" ebenfalls getrennt für die Ersatz-Challenge
+    // "Player already used" marker also kept separately for the fallback challenge
     $seenKey = $fallback ? "$date:fallback" : $date;
 
     $result = withLock(function () use ($body, $date, $selections, $answers, $fallback, $seenKey) {
@@ -528,12 +528,12 @@ function handlePost() {
                 $cellScores[$key] = 0;
                 continue;
             }
-            // Ab hier gilt die Schreibweise der Challenge, damit ein anderer Namensteil keine
-            // eigene Zählung (und damit volle Seltenheitspunkte) bekommt
+            // From here on the challenge's spelling applies, so a different name part does not get
+            // its own count (and thus full rarity points)
             $playerId = $match;
             $selections[$key] = $match;
             $counts = isset($day['cells'][$key]) ? $day['cells'][$key] : [];
-            // Punkte gegen den Stand vor diesem Spiel berechnen
+            // Compute points against the state before this game
             $cellScores[$key] = cellScore($counts, $playerId);
             $score += $cellScores[$key];
             $correct++;
@@ -543,7 +543,7 @@ function handlePost() {
             $score += WIN_BONUS;
         }
 
-        // Jeder Spieler zählt pro Nutzer und Zelle nur einmal in die Seltenheitszählung
+        // Each player counts only once per user and cell in the rarity count
         foreach (CELL_KEYS as $key) {
             $playerId = $selections[$key];
             if ($cellScores[$key] === 0) {
@@ -573,8 +573,8 @@ function handlePost() {
         }
         $user['games'][] = $entry;
 
-        // Vollständiges Protokoll, aus dem sich Nutzer- und Tagesdateien neu erzeugen lassen.
-        // Registrierung vor dem ersten Spiel, damit ein Rebuild die Anmeldung (tokenHash) erhalten kann.
+        // Complete log from which user and daily files can be rebuilt.
+        // Registration before the first game, so a rebuild can keep the credentials (tokenHash).
         $logLines = '';
         if ($newToken !== null) {
             $logLines .= logLine(registrationLogEntry($user));
@@ -586,7 +586,7 @@ function handlePost() {
         writeJsonFileAtomic(dayFile($date, $fallback), $day);
         writeJsonFileAtomic(userFile($user['userId']), $user);
         if ($rateLimit !== null) {
-            // Erst nach erfolgreichem Speichern zählen
+            // Count only after a successful save
             $rateLimit['data']['counts'][$ipKey] = $registered + 1;
             writeJsonFileAtomic($rateLimit['path'], $rateLimit['data']);
         }
