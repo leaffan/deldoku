@@ -3,6 +3,7 @@ export type Language = 'de' | 'en';
 export type Translations = {
 	title: string;
 	subtitle: string;
+	pageTitle: string;
 	loading: string;
 	error: string;
 	errorConsole: string;
@@ -489,7 +490,9 @@ export const categories: Record<Language, Record<CategoryKey, string>> = {
 export const translations: Record<Language, Translations> = {
 	de: {
 		title: 'DELDoku',
-		subtitle: 'Finde die Spieler basierend auf Team- und Positionskombinationen!',
+		subtitle:
+			'Neun Felder, neun DEL-Spieler: Finde jeden Tag Spieler, die zu zwei Kategorien passen – Team, Meilenstein oder Jahrzehnt. Seltene Antworten bringen mehr Punkte.',
+		pageTitle: 'DELDoku – das tägliche DEL-Quiz',
 		loading: 'Laden...',
 		error: 'Fehler beim Laden: ',
 		errorConsole: 'Bitte öffne die Browser-Konsole (F12) für mehr Details.',
@@ -569,7 +572,9 @@ export const translations: Record<Language, Translations> = {
 	},
 	en: {
 		title: 'DELDoku',
-		subtitle: 'Find the players based on team and position combinations!',
+		subtitle:
+			'Nine cells, nine DEL players: every day, find players who match two categories – a team, a career milestone or a decade. Rare answers score more points.',
+		pageTitle: 'DELDoku – the daily DEL hockey quiz',
 		loading: 'Loading...',
 		error: 'Error loading: ',
 		errorConsole: 'Please open the browser console (F12) for more details.',
