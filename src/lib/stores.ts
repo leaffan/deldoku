@@ -1,4 +1,4 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived, readonly } from 'svelte/store';
 import type { DELPlayer } from './data';
 import type { Language } from './i18n';
 import { loadPlayers, getStatsApiUrl } from './data';
@@ -68,10 +68,21 @@ function saveAuth(auth: Auth | null) {
 	}
 }
 
+// Eigene Kennung, sichtbar in der Statistik (z. B. für Auskunftsanfragen); null ohne Konto.
+// Nur lesbar exportiert: Geändert wird sie ausschließlich über setAuth(), damit sie zu auth passt.
+const userId = writable<string | null>(null);
+export const userIdStore = readonly(userId);
+
 function createStatsStore() {
 	// Server vergibt userId und Token beim ersten abgesendeten Spiel
 	let auth: Auth | null = null;
 	const { subscribe, set } = writable<PlayerStats>(defaultStats);
+
+	function setAuth(next: Auth | null, persist = true) {
+		auth = next;
+		if (persist) saveAuth(next);
+		userId.set(next?.userId ?? null);
+	}
 
 	async function submitGame(
 		date: string,
@@ -95,8 +106,7 @@ function createStatsStore() {
 		});
 		if (response.status === 401 && auth) {
 			// Zugangsdaten auf dem Server unbekannt: als neuer Nutzer erneut absenden
-			auth = null;
-			saveAuth(null);
+			setAuth(null);
 			return submitGame(date, selections, isFallback);
 		}
 		if (!response.ok) {
@@ -104,8 +114,7 @@ function createStatsStore() {
 		}
 		const data = await response.json();
 		if (data.token) {
-			auth = { userId: data.userId, token: data.token };
-			saveAuth(auth);
+			setAuth({ userId: data.userId, token: data.token });
 		}
 		set(data.stats);
 		return data.game;
@@ -124,7 +133,7 @@ function createStatsStore() {
 			} catch {
 				// ignorieren
 			}
-			auth = loadAuth();
+			setAuth(loadAuth(), false);
 			if (!auth) return;
 
 			try {
@@ -133,8 +142,7 @@ function createStatsStore() {
 					{ headers: { 'X-DelDoku-Token': auth.token } }
 				);
 				if (response.status === 401) {
-					auth = null;
-					saveAuth(null);
+					setAuth(null);
 					return;
 				}
 				if (!response.ok) {
@@ -161,8 +169,7 @@ function createStatsStore() {
 					throw new Error(`HTTP ${response.status}`);
 				}
 			}
-			auth = null;
-			saveAuth(null);
+			setAuth(null);
 			set(defaultStats);
 		}
 	};
@@ -190,7 +197,12 @@ export const playersStore = createPlayersStore();
 
 function createLanguageStore() {
 	// Versuche Sprache aus localStorage zu laden, Standard ist Deutsch
-	const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
+	let savedLanguage: string | null = null;
+	try {
+		savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
+	} catch {
+		// localStorage nicht verfügbar (z. B. privates Fenster): Standard verwenden
+	}
 	const initialLanguage: Language = savedLanguage === 'en' ? 'en' : 'de';
 
 	const { subscribe, update } = writable<Language>(initialLanguage);
@@ -200,8 +212,12 @@ function createLanguageStore() {
 		toggle: () => {
 			update((current) => {
 				const newLang: Language = current === 'de' ? 'en' : 'de';
-				if (typeof window !== 'undefined') {
-					localStorage.setItem('language', newLang);
+				try {
+					if (typeof window !== 'undefined') {
+						localStorage.setItem('language', newLang);
+					}
+				} catch {
+					// Nicht speicherbar: Umschalten gilt dann nur für diese Sitzung
 				}
 				return newLang;
 			});

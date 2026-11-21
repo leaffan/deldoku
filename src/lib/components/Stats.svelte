@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { statsStore, languageStore, winRate, playersStore } from '#lib/stores.ts';
+	import { statsStore, languageStore, winRate, playersStore, userIdStore } from '#lib/stores.ts';
 	import { t } from '#lib/i18n.ts';
 	import { getStatsApiUrl, getDailyChallengeDate, samePlayer } from '#lib/data.ts';
 
@@ -236,6 +236,11 @@
 		{#if deleted}
 			<p class="text-gray-600">{t('deleteDataDone', $languageStore)}</p>
 		{:else if $statsStore.totalGames > 0}
+			{#if $userIdStore}
+				<p class="mb-3 text-gray-600">
+					{t('yourId', $languageStore)} <code class="select-all">{$userIdStore}</code>
+				</p>
+			{/if}
 			{#if confirmingDelete}
 				<p class="mb-3 text-gray-700">{t('deleteDataConfirm', $languageStore)}</p>
 				<div class="flex flex-wrap gap-2">
